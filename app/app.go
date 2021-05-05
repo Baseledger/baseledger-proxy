@@ -85,6 +85,7 @@ import (
 	baseledgertypes "github.com/example/baseledger/x/baseledger/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/example/baseledger/x/trustmesh"
 	trustmeshkeeper "github.com/example/baseledger/x/trustmesh/keeper"
@@ -93,7 +94,7 @@ import (
 
 const Name = "baseledger"
 
-// this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
+// this line is used  by starport scaffolding # stargate/wasm/app/enabledProposals
 
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
