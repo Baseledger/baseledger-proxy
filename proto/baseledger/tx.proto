@@ -1,0 +1,41 @@
+syntax = "proto3";
+package example.baseledger.baseledger;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/example/baseledger/x/baseledger/types";
+
+// Msg defines the Msg service.
+service Msg {
+    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc CreateBaseledgerTransaction(MsgCreateBaseledgerTransaction) returns (MsgCreateBaseledgerTransactionResponse);
+  rpc UpdateBaseledgerTransaction(MsgUpdateBaseledgerTransaction) returns (MsgUpdateBaseledgerTransactionResponse);
+  rpc DeleteBaseledgerTransaction(MsgDeleteBaseledgerTransaction) returns (MsgDeleteBaseledgerTransactionResponse);
+}
+
+// this line is used by starport scaffolding # proto/tx/message
+message MsgCreateBaseledgerTransaction {
+  string creator = 1;
+  string baseid = 2;
+  string payload = 3;
+}
+
+message MsgCreateBaseledgerTransactionResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateBaseledgerTransaction {
+  string creator = 1;
+  uint64 id = 2;
+  string baseid = 3;
+  string payload = 4;
+}
+
+message MsgUpdateBaseledgerTransactionResponse { }
+
+message MsgDeleteBaseledgerTransaction {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteBaseledgerTransactionResponse { }

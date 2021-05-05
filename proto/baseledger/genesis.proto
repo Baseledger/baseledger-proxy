@@ -1,0 +1,14 @@
+syntax = "proto3";
+package example.baseledger.baseledger;
+
+// this line is used by starport scaffolding # genesis/proto/import
+import "baseledger/BaseledgerTransaction.proto";
+
+option go_package = "github.com/example/baseledger/x/baseledger/types";
+
+// GenesisState defines the capability module's genesis state.
+message GenesisState {
+    // this line is used by starport scaffolding # genesis/proto/state
+		repeated BaseledgerTransaction BaseledgerTransactionList = 1; // this line is used by starport scaffolding # genesis/proto/stateField
+}
+

@@ -1,0 +1,39 @@
+syntax = "proto3";
+package example.baseledger.baseledger;
+
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+// this line is used by starport scaffolding # 1
+import "baseledger/BaseledgerTransaction.proto";
+
+option go_package = "github.com/example/baseledger/x/baseledger/types";
+
+// Query defines the gRPC querier service.
+service Query {
+    // this line is used by starport scaffolding # 2
+	rpc BaseledgerTransaction(QueryGetBaseledgerTransactionRequest) returns (QueryGetBaseledgerTransactionResponse) {
+		option (google.api.http).get = "/example/baseledger/baseledger/BaseledgerTransaction/{id}";
+	}
+	rpc BaseledgerTransactionAll(QueryAllBaseledgerTransactionRequest) returns (QueryAllBaseledgerTransactionResponse) {
+		option (google.api.http).get = "/example/baseledger/baseledger/BaseledgerTransaction";
+	}
+
+}
+
+// this line is used by starport scaffolding # 3
+message QueryGetBaseledgerTransactionRequest {
+	uint64 id = 1;
+}
+
+message QueryGetBaseledgerTransactionResponse {
+	BaseledgerTransaction BaseledgerTransaction = 1;
+}
+
+message QueryAllBaseledgerTransactionRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllBaseledgerTransactionResponse {
+	repeated BaseledgerTransaction BaseledgerTransaction = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
