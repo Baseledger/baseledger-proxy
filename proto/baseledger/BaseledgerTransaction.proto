@@ -5,6 +5,7 @@ option go_package = "github.com/example/baseledger/x/baseledger/types";
 
 import "gogoproto/gogo.proto";
 
+
 message BaseledgerTransaction {
   string creator = 1;
   uint64 id = 2;
