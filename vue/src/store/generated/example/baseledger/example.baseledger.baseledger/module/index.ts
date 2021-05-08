@@ -5,14 +5,14 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
 import { MsgUpdateBaseledgerTransaction } from "./types/baseledger/tx";
-import { MsgDeleteBaseledgerTransaction } from "./types/baseledger/tx";
 import { MsgCreateBaseledgerTransaction } from "./types/baseledger/tx";
+import { MsgDeleteBaseledgerTransaction } from "./types/baseledger/tx";
 
 
 const types = [
   ["/example.baseledger.baseledger.MsgUpdateBaseledgerTransaction", MsgUpdateBaseledgerTransaction],
-  ["/example.baseledger.baseledger.MsgDeleteBaseledgerTransaction", MsgDeleteBaseledgerTransaction],
   ["/example.baseledger.baseledger.MsgCreateBaseledgerTransaction", MsgCreateBaseledgerTransaction],
+  ["/example.baseledger.baseledger.MsgDeleteBaseledgerTransaction", MsgDeleteBaseledgerTransaction],
   
 ];
 
@@ -41,8 +41,8 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee=defaultFee, memo=null }: SignAndBroadcastOptions) => memo?client.signAndBroadcast(address, msgs, fee,memo):client.signAndBroadcast(address, msgs, fee),
     msgUpdateBaseledgerTransaction: (data: MsgUpdateBaseledgerTransaction): EncodeObject => ({ typeUrl: "/example.baseledger.baseledger.MsgUpdateBaseledgerTransaction", value: data }),
-    msgDeleteBaseledgerTransaction: (data: MsgDeleteBaseledgerTransaction): EncodeObject => ({ typeUrl: "/example.baseledger.baseledger.MsgDeleteBaseledgerTransaction", value: data }),
     msgCreateBaseledgerTransaction: (data: MsgCreateBaseledgerTransaction): EncodeObject => ({ typeUrl: "/example.baseledger.baseledger.MsgCreateBaseledgerTransaction", value: data }),
+    msgDeleteBaseledgerTransaction: (data: MsgDeleteBaseledgerTransaction): EncodeObject => ({ typeUrl: "/example.baseledger.baseledger.MsgDeleteBaseledgerTransaction", value: data }),
     
   };
 };
