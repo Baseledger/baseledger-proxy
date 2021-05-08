@@ -21,7 +21,7 @@ type OffchainProcessMessage struct {
 //Have here the one interface for all proxy methods hasing, privacy, off-chain messaging (IBaseledgerProxy)
 //We will implement it with our BaseledgerProxy within this project and open it up for other implementations like Provide's to fulfill the interface as well.
 //Assumption is, this would need a component within this project to make RESt/gRPC calls to Provide's or others solutions.
-type IBaseledgerInterface interface {
+type IBaseledgerProxyInterface interface {
 	privatize(text string) string
 	deprivatize(textEncrypted string) string
 

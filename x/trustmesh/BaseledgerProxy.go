@@ -1,6 +1,6 @@
 package trustmesh
 
-//Implements IBaseledgerInterface from /baseledger/x/trustmesh/types/types.go
+//Implements IBaseledgerProxyInterface from /baseledger/x/trustmesh/types/types.go
 
 var (
 //global vars
@@ -19,7 +19,7 @@ func init() {
 
 }
 
-//Implements IBaseledgerInterface from /baseledger/x/trustmesh/types/types.go
+//Implements IBaseledgerProxyInterface from /baseledger/x/trustmesh/types/types.go
 //privatize(text string) string
 //deprivatize(textEncrypted string) string
 
