@@ -1,0 +1,18 @@
+syntax = "proto3";
+package example.baseledger.trustmesh;
+
+option go_package = "github.com/example/baseledger/x/trustmesh/types";
+
+import "gogoproto/gogo.proto";
+
+message SynchronizationRequest {
+  string creator = 1;
+  uint64 id = 2;
+  string WorkgroupID = 3; 
+  string Recipient = 4; 
+  string WorkstepType = 5; 
+  string BusinessObjectType = 6; 
+  string BaseledgerBusinessObjectID = 7; 
+  string BusinessObject = 8; 
+  string ReferencedBaseledgerBusinessObjectID = 9; 
+}

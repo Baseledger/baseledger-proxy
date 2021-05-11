@@ -4,12 +4,60 @@ package example.baseledger.trustmesh;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "trustmesh/SynchronizationFeedback.proto";
+import "trustmesh/SynchronizationRequest.proto";
 
 option go_package = "github.com/example/baseledger/x/trustmesh/types";
 
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+	rpc SynchronizationFeedback(QueryGetSynchronizationFeedbackRequest) returns (QueryGetSynchronizationFeedbackResponse) {
+		option (google.api.http).get = "/example/baseledger/trustmesh/SynchronizationFeedback/{id}";
+	}
+	rpc SynchronizationFeedbackAll(QueryAllSynchronizationFeedbackRequest) returns (QueryAllSynchronizationFeedbackResponse) {
+		option (google.api.http).get = "/example/baseledger/trustmesh/SynchronizationFeedback";
+	}
+
+	rpc SynchronizationRequest(QueryGetSynchronizationRequestRequest) returns (QueryGetSynchronizationRequestResponse) {
+		option (google.api.http).get = "/example/baseledger/trustmesh/SynchronizationRequest/{id}";
+	}
+	rpc SynchronizationRequestAll(QueryAllSynchronizationRequestRequest) returns (QueryAllSynchronizationRequestResponse) {
+		option (google.api.http).get = "/example/baseledger/trustmesh/SynchronizationRequest";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetSynchronizationFeedbackRequest {
+	uint64 id = 1;
+}
+
+message QueryGetSynchronizationFeedbackResponse {
+	SynchronizationFeedback SynchronizationFeedback = 1;
+}
+
+message QueryAllSynchronizationFeedbackRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllSynchronizationFeedbackResponse {
+	repeated SynchronizationFeedback SynchronizationFeedback = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+message QueryGetSynchronizationRequestRequest {
+	uint64 id = 1;
+}
+
+message QueryGetSynchronizationRequestResponse {
+	SynchronizationRequest SynchronizationRequest = 1;
+}
+
+message QueryAllSynchronizationRequestRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllSynchronizationRequestResponse {
+	repeated SynchronizationRequest SynchronizationRequest = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

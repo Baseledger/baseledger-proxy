@@ -2,11 +2,15 @@ syntax = "proto3";
 package example.baseledger.trustmesh;
 
 // this line is used by starport scaffolding # genesis/proto/import
+import "trustmesh/SynchronizationFeedback.proto";
+import "trustmesh/SynchronizationRequest.proto";
 
 option go_package = "github.com/example/baseledger/x/trustmesh/types";
 
 // GenesisState defines the trustmesh module's genesis state.
 message GenesisState {
     // this line is used by starport scaffolding # genesis/proto/state
+		repeated SynchronizationFeedback SynchronizationFeedbackList = 2; // this line is used by starport scaffolding # genesis/proto/stateField
+		repeated SynchronizationRequest SynchronizationRequestList = 1; // this line is used by starport scaffolding # genesis/proto/stateField
     // this line is used by starport scaffolding # ibc/genesis/proto
 }
