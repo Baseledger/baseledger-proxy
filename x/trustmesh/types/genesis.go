@@ -1,8 +1,8 @@
 package types
 
 import (
-// this line is used by starport scaffolding # genesis/types/import
-// this line is used by starport scaffolding # ibc/genesistype/import
+	"fmt"
+	// this line is used by starport scaffolding # ibc/genesistype/import
 )
 
 // DefaultIndex is the default capability global index
@@ -13,6 +13,8 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
+		SynchronizationFeedbackList: []*SynchronizationFeedback{},
+		SynchronizationRequestList:  []*SynchronizationRequest{},
 	}
 }
 
@@ -22,6 +24,24 @@ func (gs GenesisState) Validate() error {
 	// this line is used by starport scaffolding # ibc/genesistype/validate
 
 	// this line is used by starport scaffolding # genesis/types/validate
+	// Check for duplicated ID in SynchronizationFeedback
+	SynchronizationFeedbackIdMap := make(map[uint64]bool)
+
+	for _, elem := range gs.SynchronizationFeedbackList {
+		if _, ok := SynchronizationFeedbackIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for SynchronizationFeedback")
+		}
+		SynchronizationFeedbackIdMap[elem.Id] = true
+	}
+	// Check for duplicated ID in SynchronizationRequest
+	SynchronizationRequestIdMap := make(map[uint64]bool)
+
+	for _, elem := range gs.SynchronizationRequestList {
+		if _, ok := SynchronizationRequestIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for SynchronizationRequest")
+		}
+		SynchronizationRequestIdMap[elem.Id] = true
+	}
 
 	return nil
 }

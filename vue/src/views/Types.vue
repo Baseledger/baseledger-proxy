@@ -2,6 +2,8 @@
 	<div>
 		<div class="container">
       	<!-- this line is used by starport scaffolding # 4 -->
+		<SpType modulePath="example.baseledger.trustmesh" moduleType="SynchronizationFeedback"  />
+		<SpType modulePath="example.baseledger.trustmesh" moduleType="SynchronizationRequest"  />
 		<SpType modulePath="example.baseledger.baseledger" moduleType="BaseledgerTransaction"  />
 		</div>
 	</div>

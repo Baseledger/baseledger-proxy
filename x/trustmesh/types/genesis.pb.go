@@ -24,6 +24,9 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the trustmesh module's genesis state.
 type GenesisState struct {
+	// this line is used by starport scaffolding # genesis/proto/state
+	SynchronizationFeedbackList []*SynchronizationFeedback `protobuf:"bytes,2,rep,name=SynchronizationFeedbackList,proto3" json:"SynchronizationFeedbackList,omitempty"`
+	SynchronizationRequestList  []*SynchronizationRequest  `protobuf:"bytes,1,rep,name=SynchronizationRequestList,proto3" json:"SynchronizationRequestList,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -59,6 +62,20 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
+func (m *GenesisState) GetSynchronizationFeedbackList() []*SynchronizationFeedback {
+	if m != nil {
+		return m.SynchronizationFeedbackList
+	}
+	return nil
+}
+
+func (m *GenesisState) GetSynchronizationRequestList() []*SynchronizationRequest {
+	if m != nil {
+		return m.SynchronizationRequestList
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "example.baseledger.trustmesh.GenesisState")
 }
@@ -66,17 +83,22 @@ func init() {
 func init() { proto.RegisterFile("trustmesh/genesis.proto", fileDescriptor_cc73d7fd1852d8cc) }
 
 var fileDescriptor_cc73d7fd1852d8cc = []byte{
-	// 145 bytes of a gzipped FileDescriptorProto
+	// 239 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2f, 0x29, 0x2a, 0x2d,
 	0x2e, 0xc9, 0x4d, 0x2d, 0xce, 0xd0, 0x4f, 0x4f, 0xcd, 0x4b, 0x2d, 0xce, 0x2c, 0xd6, 0x2b, 0x28,
 	0xca, 0x2f, 0xc9, 0x17, 0x92, 0x49, 0xad, 0x48, 0xcc, 0x2d, 0xc8, 0x49, 0xd5, 0x4b, 0x4a, 0x2c,
-	0x4e, 0xcd, 0x49, 0x4d, 0x49, 0x4f, 0x2d, 0xd2, 0x83, 0xab, 0x55, 0xe2, 0xe3, 0xe2, 0x71, 0x87,
-	0x28, 0x0f, 0x2e, 0x49, 0x2c, 0x49, 0x75, 0xf2, 0x3c, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39,
-	0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63,
-	0x39, 0x86, 0x28, 0xfd, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4, 0xfc, 0x5c, 0x7d, 0xa8,
-	0x91, 0xfa, 0x08, 0x23, 0xf5, 0x2b, 0xf4, 0x11, 0x0e, 0x28, 0xa9, 0x2c, 0x48, 0x2d, 0x4e, 0x62,
-	0x03, 0xdb, 0x6f, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x18, 0x0f, 0xd7, 0xd2, 0x9a, 0x00, 0x00,
-	0x00,
+	0x4e, 0xcd, 0x49, 0x4d, 0x49, 0x4f, 0x2d, 0xd2, 0x83, 0xab, 0x95, 0x52, 0x47, 0x68, 0x0b, 0xae,
+	0xcc, 0x4b, 0xce, 0x28, 0xca, 0xcf, 0xcb, 0xac, 0x4a, 0x2c, 0xc9, 0xcc, 0xcf, 0x73, 0x4b, 0x4d,
+	0x4d, 0x49, 0x4a, 0x4c, 0xce, 0x86, 0x18, 0x23, 0xa5, 0x86, 0x53, 0x61, 0x50, 0x6a, 0x61, 0x69,
+	0x6a, 0x71, 0x09, 0x44, 0x9d, 0xd2, 0x5f, 0x46, 0x2e, 0x1e, 0x77, 0x88, 0x03, 0x82, 0x4b, 0x12,
+	0x4b, 0x52, 0x85, 0xca, 0xb9, 0xa4, 0x71, 0x98, 0xec, 0x93, 0x59, 0x5c, 0x22, 0xc1, 0xa4, 0xc0,
+	0xac, 0xc1, 0x6d, 0x64, 0xaa, 0x87, 0xcf, 0x95, 0x7a, 0x38, 0x0c, 0x08, 0xc2, 0x67, 0xb2, 0x50,
+	0x09, 0x97, 0x14, 0x76, 0x97, 0x82, 0xed, 0x65, 0x04, 0xdb, 0x6b, 0x42, 0x92, 0xbd, 0x50, 0xfd,
+	0x41, 0x78, 0xcc, 0x75, 0xf2, 0x3c, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f,
+	0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86, 0x28,
+	0xfd, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4, 0xfc, 0x5c, 0x7d, 0xa8, 0xad, 0xfa, 0x08,
+	0x5b, 0xf5, 0x2b, 0xf4, 0x11, 0x21, 0x5c, 0x52, 0x59, 0x90, 0x5a, 0x9c, 0xc4, 0x06, 0x0e, 0x51,
+	0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xcb, 0x39, 0x57, 0xb7, 0xdb, 0x01, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -99,6 +121,34 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.SynchronizationFeedbackList) > 0 {
+		for iNdEx := len(m.SynchronizationFeedbackList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.SynchronizationFeedbackList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.SynchronizationRequestList) > 0 {
+		for iNdEx := len(m.SynchronizationRequestList) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.SynchronizationRequestList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -119,6 +169,18 @@ func (m *GenesisState) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if len(m.SynchronizationRequestList) > 0 {
+		for _, e := range m.SynchronizationRequestList {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	if len(m.SynchronizationFeedbackList) > 0 {
+		for _, e := range m.SynchronizationFeedbackList {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
 	return n
 }
 
@@ -157,6 +219,74 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: GenesisState: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SynchronizationRequestList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SynchronizationRequestList = append(m.SynchronizationRequestList, &SynchronizationRequest{})
+			if err := m.SynchronizationRequestList[len(m.SynchronizationRequestList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SynchronizationFeedbackList", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SynchronizationFeedbackList = append(m.SynchronizationFeedbackList, &SynchronizationFeedback{})
+			if err := m.SynchronizationFeedbackList[len(m.SynchronizationFeedbackList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGenesis(dAtA[iNdEx:])
