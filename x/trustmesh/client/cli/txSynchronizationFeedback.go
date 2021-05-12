@@ -2,7 +2,7 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"strconv"
+	//"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -44,7 +44,7 @@ func CmdCreateSynchronizationFeedback() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateSynchronizationFeedback() *cobra.Command {
+/* func CmdUpdateSynchronizationFeedback() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-SynchronizationFeedback [id] [Approved] [BusinessObject] [BaseledgerBusinessObjectIDOfApprovedObject] [Workgroup] [Recipient] [HashOfObjectToApprove] [OriginalBaseledgerTransactionID] [OriginalOffchainProcessMessageID] [FeedbackMessage]",
 		Short: "Update a SynchronizationFeedback",
@@ -110,4 +110,4 @@ func CmdDeleteSynchronizationFeedback() *cobra.Command {
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
-}
+} */

@@ -2,7 +2,7 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"strconv"
+	//"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -37,7 +37,7 @@ func CmdCreateBaseledgerTransaction() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateBaseledgerTransaction() *cobra.Command {
+/* func CmdUpdateBaseledgerTransaction() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-BaseledgerTransaction [id] [baseid] [payload]",
 		Short: "Update a BaseledgerTransaction",
@@ -96,4 +96,4 @@ func CmdDeleteBaseledgerTransaction() *cobra.Command {
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
-}
+} */
