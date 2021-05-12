@@ -2,14 +2,14 @@ package rest
 
 import (
 	"net/http"
-	"strconv"
+	//"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/example/baseledger/x/trustmesh/types"
-	"github.com/gorilla/mux"
+	//"github.com/gorilla/mux"
 )
 
 type createSynchronizationRequestRequest struct {
@@ -72,7 +72,7 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 	}
 }
 
-type updateSynchronizationRequestRequest struct {
+/* type updateSynchronizationRequestRequest struct {
 	BaseReq                              rest.BaseReq `json:"base_req"`
 	Creator                              string       `json:"creator"`
 	WorkgroupID                          string       `json:"WorkgroupID"`
@@ -82,9 +82,9 @@ type updateSynchronizationRequestRequest struct {
 	BaseledgerBusinessObjectID           string       `json:"BaseledgerBusinessObjectID"`
 	BusinessObject                       string       `json:"BusinessObject"`
 	ReferencedBaseledgerBusinessObjectID string       `json:"ReferencedBaseledgerBusinessObjectID"`
-}
+} */
 
-func updateSynchronizationRequestHandler(clientCtx client.Context) http.HandlerFunc {
+/* func updateSynchronizationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
@@ -136,14 +136,14 @@ func updateSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 	}
-}
+} */
 
-type deleteSynchronizationRequestRequest struct {
+/* type deleteSynchronizationRequestRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Creator string       `json:"creator"`
-}
+} */
 
-func deleteSynchronizationRequestHandler(clientCtx client.Context) http.HandlerFunc {
+/* func deleteSynchronizationRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
 		if err != nil {
@@ -174,4 +174,4 @@ func deleteSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 	}
-}
+} */

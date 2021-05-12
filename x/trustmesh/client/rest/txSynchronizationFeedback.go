@@ -2,14 +2,14 @@ package rest
 
 import (
 	"net/http"
-	"strconv"
+	//"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/example/baseledger/x/trustmesh/types"
-	"github.com/gorilla/mux"
+	//"github.com/gorilla/mux"
 )
 
 type createSynchronizationFeedbackRequest struct {
@@ -80,6 +80,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 	}
 }
 
+/*
 type updateSynchronizationFeedbackRequest struct {
 	BaseReq                                    rest.BaseReq `json:"base_req"`
 	Creator                                    string       `json:"creator"`
@@ -191,3 +192,4 @@ func deleteSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 	}
 }
+*/

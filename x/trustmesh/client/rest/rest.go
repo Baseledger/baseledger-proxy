@@ -35,11 +35,11 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
 	r.HandleFunc("/trustmesh/SynchronizationFeedbacks", createSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/trustmesh/SynchronizationFeedbacks/{id}", updateSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/trustmesh/SynchronizationFeedbacks/{id}", deleteSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
+	//r.HandleFunc("/trustmesh/SynchronizationFeedbacks/{id}", updateSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
+	//r.HandleFunc("/trustmesh/SynchronizationFeedbacks/{id}", deleteSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
 
 	r.HandleFunc("/trustmesh/SynchronizationRequests", createSynchronizationRequestHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/trustmesh/SynchronizationRequests/{id}", updateSynchronizationRequestHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/trustmesh/SynchronizationRequests/{id}", deleteSynchronizationRequestHandler(clientCtx)).Methods("POST")
+	//r.HandleFunc("/trustmesh/SynchronizationRequests/{id}", updateSynchronizationRequestHandler(clientCtx)).Methods("POST")
+	//r.HandleFunc("/trustmesh/SynchronizationRequests/{id}", deleteSynchronizationRequestHandler(clientCtx)).Methods("POST")
 
 }

@@ -2,14 +2,14 @@ package rest
 
 import (
 	"net/http"
-	"strconv"
+	//"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/example/baseledger/x/baseledger/types"
-	"github.com/gorilla/mux"
+	//"github.com/gorilla/mux"
 )
 
 type createBaseledgerTransactionRequest struct {
@@ -52,7 +52,7 @@ func createBaseledgerTransactionHandler(clientCtx client.Context) http.HandlerFu
 	}
 }
 
-type updateBaseledgerTransactionRequest struct {
+/* type updateBaseledgerTransactionRequest struct {
 	BaseReq rest.BaseReq `json:"base_req"`
 	Creator string       `json:"creator"`
 	Baseid  string       `json:"baseid"`
@@ -135,3 +135,4 @@ func deleteBaseledgerTransactionHandler(clientCtx client.Context) http.HandlerFu
 		tx.WriteGeneratedTxResponse(clientCtx, w, req.BaseReq, msg)
 	}
 }
+*/

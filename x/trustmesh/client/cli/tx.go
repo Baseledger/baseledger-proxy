@@ -32,12 +32,12 @@ func GetTxCmd() *cobra.Command {
 	// this line is used by starport scaffolding # 1
 
 	cmd.AddCommand(CmdCreateSynchronizationFeedback())
-	cmd.AddCommand(CmdUpdateSynchronizationFeedback())
-	cmd.AddCommand(CmdDeleteSynchronizationFeedback())
+	//cmd.AddCommand(CmdUpdateSynchronizationFeedback())
+	//cmd.AddCommand(CmdDeleteSynchronizationFeedback())
 
 	cmd.AddCommand(CmdCreateSynchronizationRequest())
-	cmd.AddCommand(CmdUpdateSynchronizationRequest())
-	cmd.AddCommand(CmdDeleteSynchronizationRequest())
+	//cmd.AddCommand(CmdUpdateSynchronizationRequest())
+	//cmd.AddCommand(CmdDeleteSynchronizationRequest())
 
 	return cmd
 }

@@ -2,7 +2,7 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"strconv"
+	//"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -42,7 +42,7 @@ func CmdCreateSynchronizationRequest() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateSynchronizationRequest() *cobra.Command {
+/* func CmdUpdateSynchronizationRequest() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-SynchronizationRequest [id] [WorkgroupID] [Recipient] [WorkstepType] [BusinessObjectType] [BaseledgerBusinessObjectID] [BusinessObject] [ReferencedBaseledgerBusinessObjectID]",
 		Short: "Update a SynchronizationRequest",
@@ -106,4 +106,4 @@ func CmdDeleteSynchronizationRequest() *cobra.Command {
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
-}
+} */
