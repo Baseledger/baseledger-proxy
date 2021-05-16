@@ -137,20 +137,6 @@ export default {
 			}
 		},
 		
-		async sendMsgUpdateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
-			try {
-				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
-				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
-  gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
-				}
-			}
-		},
 		async sendMsgCreateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
 			try {
 				const msg = await (await initTxClient(rootGetters)).msgCreateBaseledgerTransaction(value)
@@ -162,6 +148,20 @@ export default {
 					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
+				}
+			}
+		},
+		async sendMsgUpdateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
+			try {
+				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
+				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
+  gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e.toString()=='wallet is required') {
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
 				}
 			}
 		},
@@ -180,18 +180,6 @@ export default {
 			}
 		},
 		
-		async MsgUpdateBaseledgerTransaction({ rootGetters }, { value }) {
-			try {
-				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
-				return msg
-			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Create', 'Could not create message.')
-				}
-			}
-		},
 		async MsgCreateBaseledgerTransaction({ rootGetters }, { value }) {
 			try {
 				const msg = await (await initTxClient(rootGetters)).msgCreateBaseledgerTransaction(value)
@@ -201,6 +189,18 @@ export default {
 					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Create', 'Could not create message.')
+				}
+			}
+		},
+		async MsgUpdateBaseledgerTransaction({ rootGetters }, { value }) {
+			try {
+				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
+				return msg
+			} catch (e) {
+				if (e.toString()=='wallet is required') {
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Create', 'Could not create message.')
 				}
 			}
 		},
