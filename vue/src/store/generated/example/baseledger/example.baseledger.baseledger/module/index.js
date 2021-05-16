@@ -2,13 +2,13 @@
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgUpdateBaseledgerTransaction } from "./types/baseledger/tx";
-import { MsgCreateBaseledgerTransaction } from "./types/baseledger/tx";
 import { MsgDeleteBaseledgerTransaction } from "./types/baseledger/tx";
+import { MsgCreateBaseledgerTransaction } from "./types/baseledger/tx";
+import { MsgUpdateBaseledgerTransaction } from "./types/baseledger/tx";
 const types = [
-    ["/example.baseledger.baseledger.MsgUpdateBaseledgerTransaction", MsgUpdateBaseledgerTransaction],
-    ["/example.baseledger.baseledger.MsgCreateBaseledgerTransaction", MsgCreateBaseledgerTransaction],
     ["/example.baseledger.baseledger.MsgDeleteBaseledgerTransaction", MsgDeleteBaseledgerTransaction],
+    ["/example.baseledger.baseledger.MsgCreateBaseledgerTransaction", MsgCreateBaseledgerTransaction],
+    ["/example.baseledger.baseledger.MsgUpdateBaseledgerTransaction", MsgUpdateBaseledgerTransaction],
 ];
 const registry = new Registry(types);
 const defaultFee = {
@@ -22,9 +22,9 @@ const txClient = async (wallet, { addr: addr } = { addr: "http://localhost:26657
     const { address } = (await wallet.getAccounts())[0];
     return {
         signAndBroadcast: (msgs, { fee = defaultFee, memo = null }) => memo ? client.signAndBroadcast(address, msgs, fee, memo) : client.signAndBroadcast(address, msgs, fee),
-        msgUpdateBaseledgerTransaction: (data) => ({ typeUrl: "/example.baseledger.baseledger.MsgUpdateBaseledgerTransaction", value: data }),
-        msgCreateBaseledgerTransaction: (data) => ({ typeUrl: "/example.baseledger.baseledger.MsgCreateBaseledgerTransaction", value: data }),
         msgDeleteBaseledgerTransaction: (data) => ({ typeUrl: "/example.baseledger.baseledger.MsgDeleteBaseledgerTransaction", value: data }),
+        msgCreateBaseledgerTransaction: (data) => ({ typeUrl: "/example.baseledger.baseledger.MsgCreateBaseledgerTransaction", value: data }),
+        msgUpdateBaseledgerTransaction: (data) => ({ typeUrl: "/example.baseledger.baseledger.MsgUpdateBaseledgerTransaction", value: data }),
     };
 };
 const queryClient = async ({ addr: addr } = { addr: "http://localhost:1317" }) => {

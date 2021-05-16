@@ -137,17 +137,17 @@ export default {
 			}
 		},
 		
-		async sendMsgUpdateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
+		async sendMsgDeleteBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
+				const msg = await (await initTxClient(rootGetters)).msgDeleteBaseledgerTransaction(value)
 				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
   gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Send', 'Could not broadcast Tx.')
 				}
 			}
 		},
@@ -165,30 +165,30 @@ export default {
 				}
 			}
 		},
-		async sendMsgDeleteBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
+		async sendMsgUpdateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgDeleteBaseledgerTransaction(value)
+				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
 				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
   gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Send', 'Could not broadcast Tx.')
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
 				}
 			}
 		},
 		
-		async MsgUpdateBaseledgerTransaction({ rootGetters }, { value }) {
+		async MsgDeleteBaseledgerTransaction({ rootGetters }, { value }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
+				const msg = await (await initTxClient(rootGetters)).msgDeleteBaseledgerTransaction(value)
 				return msg
 			} catch (e) {
 				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Create', 'Could not create message.')
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Create', 'Could not create message.')
 				}
 			}
 		},
@@ -204,15 +204,15 @@ export default {
 				}
 			}
 		},
-		async MsgDeleteBaseledgerTransaction({ rootGetters }, { value }) {
+		async MsgUpdateBaseledgerTransaction({ rootGetters }, { value }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgDeleteBaseledgerTransaction(value)
+				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
 				return msg
 			} catch (e) {
 				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Create', 'Could not create message.')
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Create', 'Could not create message.')
 				}
 			}
 		},
