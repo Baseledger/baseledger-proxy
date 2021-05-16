@@ -41,7 +41,7 @@ func init() {
 
 }
 
-func SynchronizeBusinessObjectCLI(synchronizationRequest types.SynchronizationRequest) {
+func SynchronizeBusinessObjectCLI(synchronizationRequest types.SynchronizationRequest) string {
 	hash := createHashFromBusinessObject(synchronizationRequest.BusinessObject)
 	offchainProcessMessage := newOffchainProcessMessage(
 		synchronizationRequest.WorkstepType,
@@ -73,6 +73,7 @@ func SynchronizeBusinessObjectCLI(synchronizationRequest types.SynchronizationRe
 	fmt.Printf("enc %s\n\n", enc)
 	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
 	fmt.Printf("dec %s\n", dec)
+	return enc
 }
 
 func newOffchainProcessMessage(

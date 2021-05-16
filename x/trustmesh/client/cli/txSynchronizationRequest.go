@@ -1,15 +1,19 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	//"strconv"
-
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	// "github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 
+	baseledgerTypes "github.com/example/baseledger/x/baseledger/types"
 	"github.com/example/baseledger/x/trustmesh/proxy"
 	"github.com/example/baseledger/x/trustmesh/types"
+	uuid "github.com/kthomas/go.uuid"
 )
 
 func CmdCreateSynchronizationRequest() *cobra.Command {
@@ -28,18 +32,23 @@ func CmdCreateSynchronizationRequest() *cobra.Command {
 			createSyncReq.BusinessObject = string(args[5])
 			createSyncReq.ReferencedBaseledgerBusinessObjectID = string(args[6])
 
-			// clientCtx, err := client.GetClientTxContext(cmd)
-			// if err != nil {
-			// 	return err
-			// }
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
 
-			// msg := types.NewMsgCreateSynchronizationRequest(clientCtx.GetFromAddress().String(), string(argsWorkgroupID), string(argsRecipient), string(argsWorkstepType), string(argsBusinessObjectType), string(argsBaseledgerBusinessObjectID), string(argsBusinessObject), string(argsReferencedBaseledgerBusinessObjectID))
-			// if err := msg.ValidateBasic(); err != nil {
-			// 	return err
-			// }
+			payload := proxy.SynchronizeBusinessObjectCLI(createSyncReq)
+			baseId, _ := uuid.NewV4()
 
-			proxy.SynchronizeBusinessObjectCLI(createSyncReq)
-			return nil
+			fmt.Printf("creator address2 %s\n", clientCtx.GetFromAddress().String())
+
+			msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), baseId.String(), string(payload))
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
