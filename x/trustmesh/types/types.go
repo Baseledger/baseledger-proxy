@@ -4,16 +4,44 @@ package types
 type OffchainProcessMessageReferenceType string
 
 type OffchainProcessMessage struct {
-	senderID                         string
-	receiverID                       string
-	topic                            string
-	offchainProcessMessageID         string
-	referencedOffchainProcessMessage string
-	referenceType                    OffchainProcessMessageReferenceType
-	//BusinessObject todo
-	hash                                 string
-	blockchainTransactionIdOfStoredProof string
-	baseledgerTransactionIdOfStoredProof string
+	SenderID                         string
+	ReceiverID                       string
+	Topic                            string
+	OffchainProcessMessageID         string
+	ReferencedOffchainProcessMessage string
+	ReferenceType                    OffchainProcessMessageReferenceType
+	// todo replace string with proper type?
+	BusinessObject                       string
+	WorkstepType                         string
+	Hash                                 string
+	BlockchainTransactionIdOfStoredProof string
+	BaseledgerTransactionIdOfStoredProof string
+	BaseledgerBusinessObjectID           string
+	ReferencedBaseledgerBusinessObjectID string
+	StatusTextMessage                    string
+}
+
+// TODO rename after clean up
+type SynchronizationRequest struct {
+	WorkgroupID                          string
+	Recipient                            string
+	WorkstepType                         string
+	BusinessObjectType                   string
+	BaseledgerBusinessObjectID           string
+	BusinessObject                       string
+	ReferencedBaseledgerBusinessObjectID string
+}
+
+type BaseledgerTransactionPayload struct {
+	PhonebookIdentifier                  string `json:"phonebookIdentifier"`
+	BaseledgerTransactionType            string `json:"baseledgerTransactionType"`
+	OffchainMessageId                    string `json:"offchainMessageId"`
+	ReferencedOffchainMessageId          string `json:"referencedOffchainMessageId"`
+	ReferencedBaseledgerTransactionId    string `json:"referencedBaseledgerTransactionId"`
+	BaseledgerTransactionID              string `json:"baseledgerTransactionID"`
+	Proof                                string `json:"proof"`
+	BaseledgerBusinessObjectID           string `json:"baseledgerBusinessObjectID"`
+	ReferencedBaseledgerBusinessObjectID string `json:"referencedBaseledgerBusinessObjectID"`
 }
 
 // all other types for hasing, privacy, off-chain messaging
