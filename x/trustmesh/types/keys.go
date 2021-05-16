@@ -24,13 +24,3 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
-
-const (
-	SynchronizationRequestKey      = "SynchronizationRequest-value-"
-	SynchronizationRequestCountKey = "SynchronizationRequest-count-"
-)
-
-const (
-	SynchronizationFeedbackKey      = "SynchronizationFeedback-value-"
-	SynchronizationFeedbackCountKey = "SynchronizationFeedback-count-"
-)

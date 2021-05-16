@@ -130,7 +130,7 @@ export class HttpClient {
     }
 }
 /**
- * @title baseledger/BaseledgerTransaction.proto
+ * @title baseledger/tx.proto
  * @version version not set
  */
 export class Api extends HttpClient {

@@ -308,7 +308,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title baseledger/BaseledgerTransaction.proto
+ * @title baseledger/tx.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
