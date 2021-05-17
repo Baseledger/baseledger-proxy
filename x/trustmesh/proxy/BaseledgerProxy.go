@@ -41,31 +41,31 @@ func init() {
 
 }
 
-func SynchronizeBusinessObjectCLI(synchronizationRequest types.SynchronizationRequest) string {
+func SynchronizeBusinessObject(synchronizationRequest *types.SynchronizationRequest) (string, string) {
 	hash := createHashFromBusinessObject(synchronizationRequest.BusinessObject)
 	offchainProcessMessage := newOffchainProcessMessage(
 		synchronizationRequest.WorkstepType,
 		"",
 		synchronizationRequest.BusinessObject,
 		hash,
-		synchronizationRequest.BaseledgerBusinessObjectID,
-		synchronizationRequest.ReferencedBaseledgerBusinessObjectID,
+		synchronizationRequest.BaseledgerBusinessObjectId,
+		synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 		synchronizationRequest.WorkstepType+" suggested")
 
-	workgroup := findWorkgroupMock(synchronizationRequest.WorkgroupID)
+	workgroup := findWorkgroupMock(synchronizationRequest.WorkgroupId)
 
 	transactionIdUuid, _ := uuid.NewV4()
 	payload := &types.BaseledgerTransactionPayload{
 		// TODO proper identifier
 		PhonebookIdentifier:                  "123",
-		BaseledgerTransactionType:            "Suggest",
-		OffchainMessageId:                    offchainProcessMessage.OffchainProcessMessageID,
+		TransactionType:                      "Suggest",
+		OffchainMessageId:                    offchainProcessMessage.OffchainProcessMessageId,
 		ReferencedOffchainMessageId:          "",
 		ReferencedBaseledgerTransactionId:    "",
 		BaseledgerTransactionID:              transactionIdUuid.String(),
 		Proof:                                hash,
-		BaseledgerBusinessObjectID:           synchronizationRequest.BaseledgerBusinessObjectID,
-		ReferencedBaseledgerBusinessObjectID: synchronizationRequest.ReferencedBaseledgerBusinessObjectID,
+		BaseledgerBusinessObjectId:           synchronizationRequest.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 	}
 
 	fmt.Printf("\n payload %v \n", *payload)
@@ -73,7 +73,9 @@ func SynchronizeBusinessObjectCLI(synchronizationRequest types.SynchronizationRe
 	fmt.Printf("enc %s\n\n", enc)
 	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
 	fmt.Printf("dec %s\n", dec)
-	return enc
+
+	//TODO: store trust mesh entry in local db
+	return enc, transactionIdUuid.String()
 }
 
 func newOffchainProcessMessage(
@@ -86,13 +88,13 @@ func newOffchainProcessMessage(
 	statusTextMessage string) *types.OffchainProcessMessage {
 	newUuid, _ := uuid.NewV4()
 	return &types.OffchainProcessMessage{
-		OffchainProcessMessageID:             newUuid.String(),
+		OffchainProcessMessageId:             newUuid.String(),
 		WorkstepType:                         workstepType,
 		ReferencedOffchainProcessMessage:     referencedOffchainProcessMessage,
 		Hash:                                 hashOfBusinessObject,
 		BusinessObject:                       businessObject,
-		BaseledgerBusinessObjectID:           baseledgerBusinessObjectID,
-		ReferencedBaseledgerBusinessObjectID: referencedBaseledgerBusinessObjectID,
+		BaseledgerBusinessObjectId:           baseledgerBusinessObjectID,
+		ReferencedBaseledgerBusinessObjectId: referencedBaseledgerBusinessObjectID,
 		StatusTextMessage:                    statusTextMessage,
 	}
 }
