@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	//"strconv"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -13,23 +11,14 @@ import (
 	"github.com/example/baseledger/x/trustmesh/proxy"
 	"github.com/example/baseledger/x/trustmesh/types"
 
-	//"github.com/gorilla/mux"
-
 	"github.com/cosmos/cosmos-sdk/client/tx"
-
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
-	"github.com/cosmos/cosmos-sdk/types/tx/signing"
-	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-
-	"context"
-
-	txTypes "github.com/cosmos/cosmos-sdk/types/tx"
-	"google.golang.org/grpc"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 )
 
 type createSynchronizationRequest struct {
 	BaseReq                              rest.BaseReq `json:"base_req"`
 	Creator                              string       `json:"creator"`
+	CreatorName                          string       `json:"creatorName"`
 	WorkgroupId                          string       `json:"workgroup_id"`
 	Recipient                            string       `json:"recipient"`
 	WorkstepType                         string       `json:"workstep_type"`
@@ -52,7 +41,7 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 			return
 		}
 
-		lol, err := sdk.AccAddressFromBech32(req.Creator)
+		fromAddress, err := sdk.AccAddressFromBech32(req.BaseReq.From)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -71,126 +60,53 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 		payload, transactionId := proxy.SynchronizeBusinessObject(createSyncReq)
 
 		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), transactionId, string(payload))
+		msg.Creator = baseReq.From
 		if err := msg.ValidateBasic(); err != nil {
 			fmt.Printf("msg validate basic failed %v\n", err.Error())
 		}
 
 		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
 
-		txBuilder := clientCtx.TxConfig.NewTxBuilder()
-		txBuilder.SetGasLimit(100000)
+		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, fromAddress)
 
-		// TODO: move path to constant, and figure out how to pull mnemonic from config
-		keyBytes, _ := hd.Secp256k1.Derive()("prize fly elder purity kiss pluck risk voice armed become elegant odor ugly prepare merge quiz nature memory setup armor evoke hello faculty advance", "", "m/44'/118'/0'/0/0")
-
-		key := hd.Secp256k1.Generate()(keyBytes)
-		address := sdk.AccAddress(key.PubKey().Address()).String()
-		fmt.Printf("cosmos address %v\n", address)
-
-		err = txBuilder.SetMsgs(msg)
 		if err != nil {
-			fmt.Printf("Error when setting msg %v \n", err)
+			fmt.Printf("error while retrieving acc %v\n", err)
 		}
 
-		// TODO: sequence always increments?
-		accNum := 0
-		accSeq := 1
+		fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
 
-		sigV2 := signing.SignatureV2{
-			PubKey: key.PubKey(),
-			Data: &signing.SingleSignatureData{
-				SignMode:  clientCtx.TxConfig.SignModeHandler().DefaultMode(),
-				Signature: nil,
-			},
-			Sequence: uint64(accSeq),
-		}
+		kr, err := keyring.New("baseledger", "test", "/root/.baseledger", nil)
 
-		err = txBuilder.SetSignatures(sigV2)
 		if err != nil {
-			fmt.Printf("Error when setting signatures 1 %v \n", err)
+			fmt.Printf("error when getting key by name %v\n", err)
 		}
 
 		if err != nil {
-			fmt.Printf("error in new acc %v\n", err.Error())
+			fmt.Printf("error fetching test key ring %v\n", err)
 		}
 
-		signerData := xauthsigning.SignerData{
-			ChainID:       clientCtx.ChainID,
-			AccountNumber: uint64(accNum),
-			Sequence:      uint64(accSeq),
-		}
+		clientCtx = clientCtx.
+			WithKeyring(kr).
+			WithFromAddress(fromAddress).
+			WithSkipConfirmation(true).
+			WithFromName(req.CreatorName)
 
-		sigV22, err := tx.SignWithPrivKey(
-			clientCtx.TxConfig.SignModeHandler().DefaultMode(),
-			signerData,
-			txBuilder,
-			key,
-			clientCtx.TxConfig,
-			uint64(accSeq))
+		txFactory := tx.Factory{}.
+			WithChainID(clientCtx.ChainID).
+			WithGas(100000).
+			WithTxConfig(clientCtx.TxConfig).
+			WithAccountNumber(accNum).
+			WithSequence(accSeq).
+			WithAccountRetriever(clientCtx.AccountRetriever).
+			WithKeybase(clientCtx.Keyring)
+
+		err = tx.BroadcastTx(clientCtx, txFactory, msg)
 
 		if err != nil {
-			fmt.Printf("Error when sign priv key %v \n", err)
+			fmt.Printf("error while broadcasting tx %v\n", err.Error())
 		}
-
-		err = txBuilder.SetSignatures(sigV22)
-		if err != nil {
-			fmt.Printf("Error when setting signatures 2 %v \n", err)
-		}
-
-		clientCtx.SkipConfirm = true
-
-		txBytes := getTxBytes(clientCtx.TxConfig, txBuilder)
-
-		clientCtx = clientCtx.WithKeyringDir("/root/.baseledger")
-
-		clientCtx = clientCtx.WithFrom(key.PubKey().Address().String()).WithFromName("alice").WithFromAddress(lol).WithBroadcastMode("sync")
-
-		fmt.Printf("key ring %v \n", clientCtx.Keyring)
-
-		sendTx(txBytes)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	}
-}
-
-func getTxBytes(txConfig client.TxConfig, txBuilder client.TxBuilder) []byte {
-	// Generated Protobuf-encoded bytes.
-	txBytes, err := txConfig.TxEncoder()(txBuilder.GetTx())
-	if err != nil {
-		fmt.Printf("tx bytes error %v \n", err)
-	}
-
-	fmt.Printf("tx bytes %v \n", txBytes)
-	return txBytes
-}
-
-// TODO: try to broadcast without using gRPC
-func sendTx(txBytes []byte) {
-	// Create a connection to the gRPC server.
-	grpcConn, err := grpc.Dial(
-		"127.0.0.1:9090",    // Or your gRPC server address.
-		grpc.WithInsecure(), // The SDK doesn't support any transport security mechanism.
-	)
-	if err != nil {
-		fmt.Printf("dial rpc error %v\n", err)
-	}
-	defer grpcConn.Close()
-
-	// Broadcast the tx via gRPC. We create a new client for the Protobuf Tx
-	// service.
-	txClient := txTypes.NewServiceClient(grpcConn)
-	// We then call the BroadcastTx method on this client.
-	grpcRes, err := txClient.BroadcastTx(
-		context.Background(),
-		&txTypes.BroadcastTxRequest{
-			Mode:    txTypes.BroadcastMode_BROADCAST_MODE_SYNC,
-			TxBytes: txBytes, // Proto-binary of the signed transaction, see previous step.
-		},
-	)
-	if err != nil {
-		fmt.Printf("broadcast error %v\n", err)
-	}
-
-	fmt.Println(grpcRes.TxResponse, grpcRes.TxResponse.Code)
 }
