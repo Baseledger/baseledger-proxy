@@ -2,8 +2,8 @@ package trustmesh
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/example/baseledger/x/trustmesh/keeper"
-	"github.com/example/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/trustmesh/keeper"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

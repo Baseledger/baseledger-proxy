@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/example/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/baseledger/types"
 	"strconv"
 )
 
@@ -40,22 +40,17 @@ func (k Keeper) SetBaseledgerTransactionCount(ctx sdk.Context, count uint64) {
 // AppendBaseledgerTransaction appends a BaseledgerTransaction in the store with a new id and update the count
 func (k Keeper) AppendBaseledgerTransaction(
 	ctx sdk.Context,
-	creator string,
-	baseid string,
-	payload string,
+	BaseledgerTransaction types.BaseledgerTransaction,
 ) uint64 {
 	// Create the BaseledgerTransaction
 	count := k.GetBaseledgerTransactionCount(ctx)
-	var BaseledgerTransaction = types.BaseledgerTransaction{
-		Creator: creator,
-		Id:      count,
-		Baseid:  baseid,
-		Payload: payload,
-	}
+
+	// Set the ID of the appended value
+	BaseledgerTransaction.Id = count
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
-	value := k.cdc.MustMarshalBinaryBare(&BaseledgerTransaction)
-	store.Set(GetBaseledgerTransactionIDBytes(BaseledgerTransaction.Id), value)
+	appendedValue := k.cdc.MustMarshalBinaryBare(&BaseledgerTransaction)
+	store.Set(GetBaseledgerTransactionIDBytes(BaseledgerTransaction.Id), appendedValue)
 
 	// Update BaseledgerTransaction count
 	k.SetBaseledgerTransactionCount(ctx, count+1)

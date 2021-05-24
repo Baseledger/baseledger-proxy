@@ -260,9 +260,9 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_BaseledgerTransaction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"example", "baseledger", "BaseledgerTransaction", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_BaseledgerTransaction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"unibrightio", "baseledger", "BaseledgerTransaction", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_BaseledgerTransactionAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"example", "baseledger", "BaseledgerTransaction"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_BaseledgerTransactionAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"unibrightio", "baseledger", "BaseledgerTransaction"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

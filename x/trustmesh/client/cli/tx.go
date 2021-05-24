@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/example/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 )
 
 var (
@@ -30,6 +30,6 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	// this line is used by starport scaffolding # 1
-	cmd.AddCommand(CmdCreateSynchronizationRequest())
+
 	return cmd
 }

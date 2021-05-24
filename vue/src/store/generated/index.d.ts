@@ -1,4 +1,4 @@
 declare const _default: {
-    ExampleBaseledgerExampleBaseledgerBaseledger: (store: any) => void;
+    UnibrightioBaseledgerUnibrightioBaseledgerBaseledger: (store: any) => void;
 };
 export default _default;

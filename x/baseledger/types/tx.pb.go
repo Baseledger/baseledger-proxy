@@ -30,7 +30,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // this line is used by starport scaffolding # proto/tx/message
 type MsgCreateBaseledgerTransaction struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Baseid  string `protobuf:"bytes,2,opt,name=baseid,proto3" json:"baseid,omitempty"`
+	BaseId  string `protobuf:"bytes,2,opt,name=baseId,proto3" json:"baseId,omitempty"`
 	Payload string `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
@@ -74,9 +74,9 @@ func (m *MsgCreateBaseledgerTransaction) GetCreator() string {
 	return ""
 }
 
-func (m *MsgCreateBaseledgerTransaction) GetBaseid() string {
+func (m *MsgCreateBaseledgerTransaction) GetBaseId() string {
 	if m != nil {
-		return m.Baseid
+		return m.BaseId
 	}
 	return ""
 }
@@ -137,7 +137,7 @@ func (m *MsgCreateBaseledgerTransactionResponse) GetId() uint64 {
 type MsgUpdateBaseledgerTransaction struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Id      uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	Baseid  string `protobuf:"bytes,3,opt,name=baseid,proto3" json:"baseid,omitempty"`
+	BaseId  string `protobuf:"bytes,3,opt,name=baseId,proto3" json:"baseId,omitempty"`
 	Payload string `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
@@ -188,9 +188,9 @@ func (m *MsgUpdateBaseledgerTransaction) GetId() uint64 {
 	return 0
 }
 
-func (m *MsgUpdateBaseledgerTransaction) GetBaseid() string {
+func (m *MsgUpdateBaseledgerTransaction) GetBaseId() string {
 	if m != nil {
-		return m.Baseid
+		return m.BaseId
 	}
 	return ""
 }
@@ -331,39 +331,40 @@ func (m *MsgDeleteBaseledgerTransactionResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgDeleteBaseledgerTransactionResponse proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*MsgCreateBaseledgerTransaction)(nil), "example.baseledger.baseledger.MsgCreateBaseledgerTransaction")
-	proto.RegisterType((*MsgCreateBaseledgerTransactionResponse)(nil), "example.baseledger.baseledger.MsgCreateBaseledgerTransactionResponse")
-	proto.RegisterType((*MsgUpdateBaseledgerTransaction)(nil), "example.baseledger.baseledger.MsgUpdateBaseledgerTransaction")
-	proto.RegisterType((*MsgUpdateBaseledgerTransactionResponse)(nil), "example.baseledger.baseledger.MsgUpdateBaseledgerTransactionResponse")
-	proto.RegisterType((*MsgDeleteBaseledgerTransaction)(nil), "example.baseledger.baseledger.MsgDeleteBaseledgerTransaction")
-	proto.RegisterType((*MsgDeleteBaseledgerTransactionResponse)(nil), "example.baseledger.baseledger.MsgDeleteBaseledgerTransactionResponse")
+	proto.RegisterType((*MsgCreateBaseledgerTransaction)(nil), "unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransaction")
+	proto.RegisterType((*MsgCreateBaseledgerTransactionResponse)(nil), "unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransactionResponse")
+	proto.RegisterType((*MsgUpdateBaseledgerTransaction)(nil), "unibrightio.baseledger.baseledger.MsgUpdateBaseledgerTransaction")
+	proto.RegisterType((*MsgUpdateBaseledgerTransactionResponse)(nil), "unibrightio.baseledger.baseledger.MsgUpdateBaseledgerTransactionResponse")
+	proto.RegisterType((*MsgDeleteBaseledgerTransaction)(nil), "unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransaction")
+	proto.RegisterType((*MsgDeleteBaseledgerTransactionResponse)(nil), "unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransactionResponse")
 }
 
 func init() { proto.RegisterFile("baseledger/tx.proto", fileDescriptor_a950a50e793e692a) }
 
 var fileDescriptor_a950a50e793e692a = []byte{
-	// 330 bytes of a gzipped FileDescriptorProto
+	// 343 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4e, 0x4a, 0x2c, 0x4e,
 	0xcd, 0x49, 0x4d, 0x49, 0x4f, 0x2d, 0xd2, 0x2f, 0xa9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
-	0x92, 0x4d, 0xad, 0x48, 0xcc, 0x2d, 0xc8, 0x49, 0xd5, 0x43, 0x48, 0x22, 0x31, 0x95, 0x72, 0xb8,
-	0xe4, 0x7c, 0x8b, 0xd3, 0x9d, 0x8b, 0x52, 0x13, 0x4b, 0x52, 0x9d, 0xe0, 0xc2, 0x21, 0x45, 0x89,
-	0x79, 0xc5, 0x89, 0xc9, 0x25, 0x99, 0xf9, 0x79, 0x42, 0x12, 0x5c, 0xec, 0xc9, 0x20, 0xe9, 0xfc,
-	0x22, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xce, 0x20, 0x18, 0x57, 0x48, 0x8c, 0x8b, 0x0d, 0x64, 0x52,
-	0x66, 0x8a, 0x04, 0x13, 0x58, 0x02, 0xca, 0x03, 0xe9, 0x28, 0x48, 0xac, 0xcc, 0xc9, 0x4f, 0x4c,
-	0x91, 0x60, 0x86, 0xe8, 0x80, 0x72, 0x95, 0x2c, 0xb8, 0xd4, 0xf0, 0xdb, 0x16, 0x94, 0x5a, 0x5c,
-	0x90, 0x9f, 0x57, 0x9c, 0x2a, 0xc4, 0xc7, 0xc5, 0x94, 0x99, 0x02, 0xb6, 0x90, 0x25, 0x88, 0x29,
-	0x33, 0x45, 0xa9, 0x06, 0xec, 0xce, 0xd0, 0x82, 0x14, 0x32, 0xdc, 0x09, 0x31, 0x8b, 0x09, 0x66,
-	0x16, 0x92, 0xbb, 0x99, 0x71, 0xb9, 0x9b, 0x05, 0xd5, 0xdd, 0x1a, 0x60, 0x77, 0xe3, 0xb1, 0x1d,
-	0xe6, 0x6e, 0x25, 0x2f, 0xb0, 0x3b, 0x5d, 0x52, 0x73, 0x52, 0x29, 0x76, 0x27, 0xd4, 0x56, 0x3c,
-	0x66, 0xc1, 0x6c, 0x35, 0xfa, 0xce, 0xcc, 0xc5, 0xec, 0x5b, 0x9c, 0x2e, 0xb4, 0x98, 0x91, 0x4b,
-	0x1a, 0x5f, 0x5c, 0xda, 0xea, 0xe1, 0x4d, 0x0d, 0x7a, 0xf8, 0x23, 0x47, 0xca, 0x95, 0x22, 0xed,
-	0xf0, 0xb8, 0x05, 0xb9, 0x12, 0x5f, 0x4c, 0x12, 0xe1, 0x4a, 0x3c, 0xda, 0x89, 0x71, 0x25, 0x11,
-	0x31, 0x09, 0x76, 0x25, 0xbe, 0x78, 0x24, 0xc2, 0x95, 0x78, 0xb4, 0x13, 0xe3, 0x4a, 0x22, 0x62,
-	0xde, 0xc9, 0xeb, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c,
-	0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0xa2, 0x0c, 0xd2, 0x33,
-	0x4b, 0x32, 0x4a, 0x93, 0xf4, 0x92, 0xf3, 0x73, 0xf5, 0xa1, 0x56, 0xe9, 0x23, 0x15, 0x10, 0x15,
-	0xc8, 0x9c, 0x92, 0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0x70, 0x89, 0x61, 0x0c, 0x08, 0x00, 0x00,
-	0xff, 0xff, 0x20, 0x15, 0x6a, 0xfc, 0x48, 0x04, 0x00, 0x00,
+	0x52, 0x2c, 0xcd, 0xcb, 0x4c, 0x2a, 0xca, 0x4c, 0xcf, 0x28, 0xc9, 0xcc, 0xd7, 0x43, 0x28, 0x40,
+	0x62, 0x4a, 0xa9, 0x21, 0xe9, 0x73, 0x82, 0x33, 0x43, 0x8a, 0x12, 0xf3, 0x8a, 0x13, 0x93, 0x4b,
+	0x32, 0xf3, 0xf3, 0x20, 0x46, 0x29, 0xe5, 0x70, 0xc9, 0xf9, 0x16, 0xa7, 0x3b, 0x17, 0xa5, 0x26,
+	0x96, 0xa4, 0x62, 0x55, 0x27, 0x24, 0xc1, 0xc5, 0x9e, 0x0c, 0x92, 0xce, 0x2f, 0x92, 0x60, 0x54,
+	0x60, 0xd4, 0xe0, 0x0c, 0x82, 0x71, 0x85, 0xc4, 0xb8, 0xd8, 0x40, 0xb6, 0x78, 0xa6, 0x48, 0x30,
+	0x81, 0x25, 0xa0, 0x3c, 0x90, 0x8e, 0x82, 0xc4, 0xca, 0x9c, 0xfc, 0xc4, 0x14, 0x09, 0x66, 0x88,
+	0x0e, 0x28, 0x57, 0xc9, 0x82, 0x4b, 0x0d, 0xbf, 0x6d, 0x41, 0xa9, 0xc5, 0x05, 0xf9, 0x79, 0xc5,
+	0xa9, 0x42, 0x7c, 0x5c, 0x4c, 0x99, 0x29, 0x60, 0x0b, 0x59, 0x82, 0x98, 0x32, 0x53, 0x94, 0x6a,
+	0xc0, 0xee, 0x0c, 0x2d, 0x48, 0x21, 0xc3, 0x9d, 0x10, 0xb3, 0x98, 0x60, 0x66, 0x21, 0xb9, 0x9b,
+	0x19, 0x97, 0xbb, 0x59, 0x50, 0xdd, 0xad, 0x01, 0x76, 0x37, 0x1e, 0xdb, 0x61, 0xee, 0x56, 0xf2,
+	0x02, 0xbb, 0xd3, 0x25, 0x35, 0x27, 0x95, 0x62, 0x77, 0x42, 0x6d, 0xc5, 0x63, 0x16, 0xcc, 0x56,
+	0xa3, 0x7e, 0x16, 0x2e, 0x66, 0xdf, 0xe2, 0x74, 0xa1, 0xd5, 0x8c, 0x5c, 0xd2, 0xf8, 0xe2, 0xd2,
+	0x51, 0x8f, 0x60, 0xca, 0xd1, 0xc3, 0x1f, 0x41, 0x52, 0x9e, 0x14, 0x1b, 0x01, 0x8f, 0x63, 0x90,
+	0x6b, 0xf1, 0xc5, 0x28, 0x91, 0xae, 0xc5, 0x63, 0x04, 0xb1, 0xae, 0x25, 0x22, 0x66, 0xc1, 0xae,
+	0xc5, 0x17, 0xaf, 0x44, 0xba, 0x16, 0x8f, 0x11, 0xc4, 0xba, 0x96, 0x88, 0x14, 0xe1, 0xe4, 0x77,
+	0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f, 0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c, 0xc7,
+	0x70, 0xe1, 0xb1, 0x1c, 0xc3, 0x8d, 0xc7, 0x72, 0x0c, 0x51, 0x26, 0xe9, 0x99, 0x25, 0x19, 0xa5,
+	0x49, 0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0x48, 0xd6, 0xe9, 0x23, 0x15, 0x18, 0x15, 0xc8, 0x9c, 0x92,
+	0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0x70, 0x71, 0x61, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xf4,
+	0x45, 0x7a, 0xd0, 0x90, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -394,7 +395,7 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 
 func (c *msgClient) CreateBaseledgerTransaction(ctx context.Context, in *MsgCreateBaseledgerTransaction, opts ...grpc.CallOption) (*MsgCreateBaseledgerTransactionResponse, error) {
 	out := new(MsgCreateBaseledgerTransactionResponse)
-	err := c.cc.Invoke(ctx, "/example.baseledger.baseledger.Msg/CreateBaseledgerTransaction", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/unibrightio.baseledger.baseledger.Msg/CreateBaseledgerTransaction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +404,7 @@ func (c *msgClient) CreateBaseledgerTransaction(ctx context.Context, in *MsgCrea
 
 func (c *msgClient) UpdateBaseledgerTransaction(ctx context.Context, in *MsgUpdateBaseledgerTransaction, opts ...grpc.CallOption) (*MsgUpdateBaseledgerTransactionResponse, error) {
 	out := new(MsgUpdateBaseledgerTransactionResponse)
-	err := c.cc.Invoke(ctx, "/example.baseledger.baseledger.Msg/UpdateBaseledgerTransaction", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/unibrightio.baseledger.baseledger.Msg/UpdateBaseledgerTransaction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -412,7 +413,7 @@ func (c *msgClient) UpdateBaseledgerTransaction(ctx context.Context, in *MsgUpda
 
 func (c *msgClient) DeleteBaseledgerTransaction(ctx context.Context, in *MsgDeleteBaseledgerTransaction, opts ...grpc.CallOption) (*MsgDeleteBaseledgerTransactionResponse, error) {
 	out := new(MsgDeleteBaseledgerTransactionResponse)
-	err := c.cc.Invoke(ctx, "/example.baseledger.baseledger.Msg/DeleteBaseledgerTransaction", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/unibrightio.baseledger.baseledger.Msg/DeleteBaseledgerTransaction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -455,7 +456,7 @@ func _Msg_CreateBaseledgerTransaction_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/example.baseledger.baseledger.Msg/CreateBaseledgerTransaction",
+		FullMethod: "/unibrightio.baseledger.baseledger.Msg/CreateBaseledgerTransaction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreateBaseledgerTransaction(ctx, req.(*MsgCreateBaseledgerTransaction))
@@ -473,7 +474,7 @@ func _Msg_UpdateBaseledgerTransaction_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/example.baseledger.baseledger.Msg/UpdateBaseledgerTransaction",
+		FullMethod: "/unibrightio.baseledger.baseledger.Msg/UpdateBaseledgerTransaction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).UpdateBaseledgerTransaction(ctx, req.(*MsgUpdateBaseledgerTransaction))
@@ -491,7 +492,7 @@ func _Msg_DeleteBaseledgerTransaction_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/example.baseledger.baseledger.Msg/DeleteBaseledgerTransaction",
+		FullMethod: "/unibrightio.baseledger.baseledger.Msg/DeleteBaseledgerTransaction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).DeleteBaseledgerTransaction(ctx, req.(*MsgDeleteBaseledgerTransaction))
@@ -500,7 +501,7 @@ func _Msg_DeleteBaseledgerTransaction_Handler(srv interface{}, ctx context.Conte
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "example.baseledger.baseledger.Msg",
+	ServiceName: "unibrightio.baseledger.baseledger.Msg",
 	HandlerType: (*MsgServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -547,10 +548,10 @@ func (m *MsgCreateBaseledgerTransaction) MarshalToSizedBuffer(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Baseid) > 0 {
-		i -= len(m.Baseid)
-		copy(dAtA[i:], m.Baseid)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Baseid)))
+	if len(m.BaseId) > 0 {
+		i -= len(m.BaseId)
+		copy(dAtA[i:], m.BaseId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BaseId)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -619,10 +620,10 @@ func (m *MsgUpdateBaseledgerTransaction) MarshalToSizedBuffer(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Baseid) > 0 {
-		i -= len(m.Baseid)
-		copy(dAtA[i:], m.Baseid)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Baseid)))
+	if len(m.BaseId) > 0 {
+		i -= len(m.BaseId)
+		copy(dAtA[i:], m.BaseId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.BaseId)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -743,7 +744,7 @@ func (m *MsgCreateBaseledgerTransaction) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Baseid)
+	l = len(m.BaseId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -779,7 +780,7 @@ func (m *MsgUpdateBaseledgerTransaction) Size() (n int) {
 	if m.Id != 0 {
 		n += 1 + sovTx(uint64(m.Id))
 	}
-	l = len(m.Baseid)
+	l = len(m.BaseId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -893,7 +894,7 @@ func (m *MsgCreateBaseledgerTransaction) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Baseid", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BaseId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -921,7 +922,7 @@ func (m *MsgCreateBaseledgerTransaction) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Baseid = string(dAtA[iNdEx:postIndex])
+			m.BaseId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1127,7 +1128,7 @@ func (m *MsgUpdateBaseledgerTransaction) Unmarshal(dAtA []byte) error {
 			}
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Baseid", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BaseId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1155,7 +1156,7 @@ func (m *MsgUpdateBaseledgerTransaction) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Baseid = string(dAtA[iNdEx:postIndex])
+			m.BaseId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {

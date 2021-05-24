@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<div class="container">
-      	<!-- this line is used by starport scaffolding # 4 -->
-		<SpType modulePath="example.baseledger.baseledger" moduleType="BaseledgerTransaction"  />
+			<!-- this line is used by starport scaffolding # 4 -->
+		<SpType modulePath="unibrightio.baseledger.baseledger" moduleType="BaseledgerTransaction"  />
 		</div>
 	</div>
 </template>
@@ -12,4 +12,3 @@ export default {
 	name: 'Types'
 }
 </script>
-

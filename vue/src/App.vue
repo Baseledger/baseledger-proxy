@@ -12,7 +12,6 @@
 	</div>
 </template>
 
-
 <style>
 body {
 	margin: 0;
@@ -35,7 +34,7 @@ export default {
 	},
 	computed: {
 		hasWallet() {
-			return this.$store.hasModule([ 'common', 'wallet'])
+			return this.$store.hasModule(['common', 'wallet'])
 		}
 	},
 	async created() {

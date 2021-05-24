@@ -7,9 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	baseledgerTypes "github.com/example/baseledger/x/baseledger/types"
-	"github.com/example/baseledger/x/trustmesh/proxy"
-	"github.com/example/baseledger/x/trustmesh/types"
+	baseledgerTypes "github.com/unibrightio/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/trustmesh/proxy"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"

@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/example/baseledger/x/trustmesh/types"
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 	// "github.com/cosmos/cosmos-sdk/client/tx"
 )
 

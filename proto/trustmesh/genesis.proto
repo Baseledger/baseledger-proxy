@@ -1,9 +1,9 @@
 syntax = "proto3";
-package example.baseledger.trustmesh;
+package unibrightio.baseledger.trustmesh;
 
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/example/baseledger/x/trustmesh/types";
+option go_package = "github.com/unibrightio/baseledger/x/trustmesh/types";
 
 // GenesisState defines the trustmesh module's genesis state.
 message GenesisState {
