@@ -4,8 +4,8 @@ import (
 	"os"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/example/baseledger/app"
-	"github.com/example/baseledger/cmd/baseledgerd/cmd"
+	"github.com/unibrightio/baseledger/app"
+	"github.com/unibrightio/baseledger/cmd/baseledgerd/cmd"
 )
 
 func main() {

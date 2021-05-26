@@ -2,13 +2,14 @@ package app
 
 import (
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/spf13/cast"
-
+	"github.com/tendermint/spm/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
@@ -79,22 +80,23 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	appparams "github.com/example/baseledger/app/params"
-	"github.com/example/baseledger/x/baseledger"
-	baseledgerkeeper "github.com/example/baseledger/x/baseledger/keeper"
-	baseledgertypes "github.com/example/baseledger/x/baseledger/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	appparams "github.com/unibrightio/baseledger/app/params"
+	"github.com/unibrightio/baseledger/docs"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
-	"github.com/example/baseledger/x/trustmesh"
-	trustmeshkeeper "github.com/example/baseledger/x/trustmesh/keeper"
-	trustmeshtypes "github.com/example/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/baseledger"
+	baseledgerkeeper "github.com/unibrightio/baseledger/x/baseledger/keeper"
+	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/trustmesh"
+	trustmeshkeeper "github.com/unibrightio/baseledger/x/trustmesh/keeper"
+	trustmeshtypes "github.com/unibrightio/baseledger/x/trustmesh/types"
 )
 
 const Name = "baseledger"
 
-// this line is used  by starport scaffolding # stargate/wasm/app/enabledProposals
+// this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
@@ -135,9 +137,9 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		baseledger.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		trustmesh.AppModuleBasic{},
+		baseledger.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -203,10 +205,11 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	baseledgerKeeper baseledgerkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	trustmeshKeeper trustmeshkeeper.Keeper
+	TrustmeshKeeper trustmeshkeeper.Keeper
+
+	BaseledgerKeeper baseledgerkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -235,9 +238,9 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		baseledgertypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		trustmeshtypes.StoreKey,
+		baseledgertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -264,6 +267,7 @@ func New(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -327,18 +331,21 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.baseledgerKeeper = *baseledgerkeeper.NewKeeper(
-		appCodec, keys[baseledgertypes.StoreKey], keys[baseledgertypes.MemStoreKey],
-	)
-
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	app.trustmeshKeeper = *trustmeshkeeper.NewKeeper(
+	app.TrustmeshKeeper = *trustmeshkeeper.NewKeeper(
 		appCodec,
 		keys[trustmeshtypes.StoreKey],
 		keys[trustmeshtypes.MemStoreKey],
 	)
-	trustmeshModule := trustmesh.NewAppModule(appCodec, app.trustmeshKeeper)
+	trustmeshModule := trustmesh.NewAppModule(appCodec, app.TrustmeshKeeper)
+
+	app.BaseledgerKeeper = *baseledgerkeeper.NewKeeper(
+		appCodec,
+		keys[baseledgertypes.StoreKey],
+		keys[baseledgertypes.MemStoreKey],
+	)
+	baseledgerModule := baseledger.NewAppModule(appCodec, app.BaseledgerKeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -380,9 +387,9 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		baseledger.NewAppModule(appCodec, app.baseledgerKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 		trustmeshModule,
+		baseledgerModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -415,9 +422,9 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		baseledgertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		trustmeshtypes.ModuleName,
+		baseledgertypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -458,6 +465,7 @@ func New(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
 }
@@ -564,6 +572,10 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+
+	// register app's OpenAPI routes.
+	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
+	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -601,6 +613,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(trustmeshtypes.ModuleName)
+	paramsKeeper.Subspace(baseledgertypes.ModuleName)
 
 	return paramsKeeper
 }

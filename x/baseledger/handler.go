@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/example/baseledger/x/baseledger/keeper"
-	"github.com/example/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/baseledger/keeper"
+	"github.com/unibrightio/baseledger/x/baseledger/types"
 )
 
 // NewHandler ...

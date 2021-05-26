@@ -6,17 +6,21 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/example/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/baseledger/types"
 )
 
 func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types.MsgCreateBaseledgerTransaction) (*types.MsgCreateBaseledgerTransactionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	var BaseledgerTransaction = types.BaseledgerTransaction{
+		Creator: msg.Creator,
+		BaseId:  msg.BaseId,
+		Payload: msg.Payload,
+	}
+
 	id := k.AppendBaseledgerTransaction(
 		ctx,
-		msg.Creator,
-		msg.Baseid,
-		msg.Payload,
+		BaseledgerTransaction,
 	)
 
 	return &types.MsgCreateBaseledgerTransactionResponse{
@@ -30,7 +34,7 @@ func (k msgServer) UpdateBaseledgerTransaction(goCtx context.Context, msg *types
 	var BaseledgerTransaction = types.BaseledgerTransaction{
 		Creator: msg.Creator,
 		Id:      msg.Id,
-		Baseid:  msg.Baseid,
+		BaseId:  msg.BaseId,
 		Payload: msg.Payload,
 	}
 

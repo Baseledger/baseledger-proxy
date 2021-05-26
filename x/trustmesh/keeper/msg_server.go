@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/example/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 )
 
 type msgServer struct {

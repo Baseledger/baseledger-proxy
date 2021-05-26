@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/example/baseledger/app/params"
+	"github.com/unibrightio/baseledger/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing

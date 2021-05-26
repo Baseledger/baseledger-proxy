@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/example/baseledger/app/params"
+	"github.com/unibrightio/baseledger/app/params"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -33,7 +33,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/example/baseledger/app"
+	"github.com/unibrightio/baseledger/app"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 
@@ -192,6 +192,8 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	if err != nil {
 		panic(err)
 	}
+
+	// this line is used by starport scaffolding # stargate/root/appBeforeInit
 
 	return app.New(
 		logger, db, traceStore, true, skipUpgradeHeights,

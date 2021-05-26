@@ -6,8 +6,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/example/baseledger/x/baseledger/types"
 	"github.com/spf13/cobra"
+	"github.com/unibrightio/baseledger/x/baseledger/types"
 )
 
 func CmdListBaseledgerTransaction() *cobra.Command {
@@ -37,6 +37,7 @@ func CmdListBaseledgerTransaction() *cobra.Command {
 		},
 	}
 
+	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd

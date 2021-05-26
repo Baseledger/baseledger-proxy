@@ -1,9 +1,10 @@
 package trustmesh
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+
+	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -16,10 +17,10 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/example/baseledger/x/trustmesh/client/cli"
-	"github.com/example/baseledger/x/trustmesh/client/rest"
-	"github.com/example/baseledger/x/trustmesh/keeper"
-	"github.com/example/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/trustmesh/client/cli"
+	"github.com/unibrightio/baseledger/x/trustmesh/client/rest"
+	"github.com/unibrightio/baseledger/x/trustmesh/keeper"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 	// this line is used by starport scaffolding # ibc/module/import
 )
 
@@ -81,7 +82,7 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
+	// this line is used by starport scaffolding # 2
 }
 
 // GetTxCmd returns the capability module's root tx command.
@@ -127,7 +128,7 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // LegacyQuerierHandler returns the capability module's Querier.
 func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
+	return nil
 }
 
 // RegisterServices registers a GRPC query service to respond to the

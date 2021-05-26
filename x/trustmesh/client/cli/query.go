@@ -10,7 +10,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/example/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/trustmesh/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -25,12 +25,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	// this line is used by starport scaffolding # 1
-
-	cmd.AddCommand(CmdListSynchronizationFeedback())
-	cmd.AddCommand(CmdShowSynchronizationFeedback())
-
-	cmd.AddCommand(CmdListSynchronizationRequest())
-	cmd.AddCommand(CmdShowSynchronizationRequest())
 
 	return cmd
 }

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/example/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/baseledger/types"
 )
 
 type msgServer struct {

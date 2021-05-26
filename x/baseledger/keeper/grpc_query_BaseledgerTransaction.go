@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/example/baseledger/x/baseledger/types"
+	"github.com/unibrightio/baseledger/x/baseledger/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

@@ -14,7 +14,7 @@ const (
 	QuerierRoute = ModuleName
 
 	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_capability"
+	MemStoreKey = "mem_trustmesh"
 
 	// this line is used by starport scaffolding # ibc/keys/name
 )
@@ -24,13 +24,3 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
-
-const (
-	SynchronizationRequestKey      = "SynchronizationRequest-value-"
-	SynchronizationRequestCountKey = "SynchronizationRequest-count-"
-)
-
-const (
-	SynchronizationFeedbackKey      = "SynchronizationFeedback-value-"
-	SynchronizationFeedbackCountKey = "SynchronizationFeedback-count-"
-)

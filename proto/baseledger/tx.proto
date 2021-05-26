@@ -1,9 +1,10 @@
 syntax = "proto3";
-package example.baseledger.baseledger;
+package unibrightio.baseledger.baseledger;
 
 // this line is used by starport scaffolding # proto/tx/import
+import "baseledger/BaseledgerTransaction.proto";
 
-option go_package = "github.com/example/baseledger/x/baseledger/types";
+option go_package = "github.com/unibrightio/baseledger/x/baseledger/types";
 
 // Msg defines the Msg service.
 service Msg {
@@ -16,7 +17,7 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/message
 message MsgCreateBaseledgerTransaction {
   string creator = 1;
-  string baseid = 2;
+  string baseId = 2;
   string payload = 3;
 }
 
@@ -27,7 +28,7 @@ message MsgCreateBaseledgerTransactionResponse {
 message MsgUpdateBaseledgerTransaction {
   string creator = 1;
   uint64 id = 2;
-  string baseid = 3;
+  string baseId = 3;
   string payload = 4;
 }
 
