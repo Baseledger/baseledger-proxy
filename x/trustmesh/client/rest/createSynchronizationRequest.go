@@ -63,6 +63,7 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 		msg.Creator = baseReq.From
 		if err := msg.ValidateBasic(); err != nil {
 			fmt.Printf("msg validate basic failed %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
 		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
@@ -70,20 +71,27 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, fromAddress)
 
 		if err != nil {
-			fmt.Printf("error while retrieving acc %v\n", err)
+			fmt.Printf("error while retrieving acc %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
 		fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
 
-		kr, err := keyring.New("baseledger", "test", "/root/.baseledger", nil)
+		kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
 
 		if err != nil {
-			fmt.Printf("error when getting key by name %v\n", err)
+			fmt.Printf("error fetching test key ring %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
+		key, err := kr.Key(req.CreatorName)
+
 		if err != nil {
-			fmt.Printf("error fetching test key ring %v\n", err)
+			fmt.Printf("error when getting key by name %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
+
+		fmt.Printf("key found for address %v\n", key.GetAddress().String())
 
 		clientCtx = clientCtx.
 			WithKeyring(kr).
@@ -104,6 +112,7 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 
 		if err != nil {
 			fmt.Printf("error while broadcasting tx %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
 		w.Header().Set("Content-Type", "application/json")
