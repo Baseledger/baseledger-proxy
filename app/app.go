@@ -570,6 +570,7 @@ func New(
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 
+	// TODO: Better error handling
 	initDbIfNotExists()
 	performMigrations()
 

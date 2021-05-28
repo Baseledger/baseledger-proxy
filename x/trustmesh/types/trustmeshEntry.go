@@ -57,7 +57,6 @@ func (t *TrustmeshEntry) Create() bool {
 			fmt.Printf("errors while creating new entry %v\n", errors)
 			return false
 		}
-		fmt.Printf("ROWS AFFECTED %v\n", rowsAffected)
 		return rowsAffected > 0
 	}
 

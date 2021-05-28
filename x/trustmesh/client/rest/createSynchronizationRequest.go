@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -98,6 +99,10 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 			WithFromAddress(fromAddress).
 			WithSkipConfirmation(true).
 			WithFromName(req.CreatorName)
+			// TODO: check this with team
+			// WithBroadcastMode("sync")
+
+		fmt.Printf("broadcast mode %v\n", clientCtx.BroadcastMode)
 
 		txFactory := tx.Factory{}.
 			WithChainID(clientCtx.ChainID).
@@ -108,28 +113,57 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 			WithAccountRetriever(clientCtx.AccountRetriever).
 			WithKeybase(clientCtx.Keyring)
 
-		err = tx.BroadcastTx(clientCtx, txFactory, msg)
+		txFactory, err = tx.PrepareFactory(clientCtx, txFactory)
+		if err != nil {
+			fmt.Printf("prepare factory error %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
 
+		transaction, err := tx.BuildUnsignedTx(txFactory, msg)
+		if err != nil {
+			fmt.Printf("build unsigned tx error %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
+
+		err = tx.Sign(txFactory, clientCtx.GetFromName(), transaction, true)
+		if err != nil {
+			fmt.Printf("sign tx error %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
+
+		txBytes, err := clientCtx.TxConfig.TxEncoder()(transaction.GetTx())
+		if err != nil {
+			fmt.Printf("tx encoder %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
+
+		// broadcast to a Tendermint node
+		res, err := clientCtx.BroadcastTx(txBytes)
 		if err != nil {
 			fmt.Printf("error while broadcasting tx %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		// TODO: fix this mocked entry
+		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v %v\n", res, res.Timestamp)
+
+		// TODO: fix this mocked entry with proper entries, discuss unkown props with team
 		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintBlockId:                    "123",
-			TendermintTransactionId:              "123",
+			// TODO: what should we use here? this is only availabe in "block" broadcast mode which is not recommended because of timeout
+			TendermintBlockId: strconv.FormatUint(uint64(res.Height), 10),
+			// TODO: what should we use here?
+			TendermintTransactionId: res.TxHash,
+			// TODO: what should we use here? timestamp not available
 			TendermintTransactionTimestamp:       "2021-05-28T21:42:59.1948424Z",
 			Sender:                               "123",
 			Receiver:                             "123",
-			WorkgroupId:                          "123",
-			WorkstepType:                         "123",
-			BaseledgerTransactionType:            "123",
-			BaseledgerTransactionId:              "123",
+			WorkgroupId:                          req.WorkgroupId,
+			WorkstepType:                         req.WorkstepType,
+			BaseledgerTransactionType:            "Suggest",
+			BaseledgerTransactionId:              transactionId,
 			ReferencedBaseledgerTransactionId:    "123",
-			BusinessObjectType:                   "123",
-			BaseledgerBusinessObjectId:           "123",
-			ReferencedBaseledgerBusinessObjectId: "123",
+			BusinessObjectType:                   req.BusinessObjectType,
+			BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
+			ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
 			OffchainProcessMessageId:             "123",
 			ReferencedProcessMessageId:           "123",
 		}
