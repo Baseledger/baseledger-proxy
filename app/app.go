@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -172,13 +173,22 @@ func init() {
 
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
 
+	err = initDbIfNotExists()
+
+	if err != nil && !strings.Contains(err.Error(), "exists") { // try with query
+		fmt.Printf("init db failed; %s", err.Error())
+		panic(err)
+	}
+
+}
+
+func initDbIfNotExists() error {
 	args := "host=localhost user=ub password=ub123 dbname=ub sslmode=disable"
 	db, err := gorm.Open("postgres", args)
 
-	// db.LogMode(true)
-
 	if err != nil {
 		fmt.Printf("db connection failed %v\n", err.Error())
+		return err
 	}
 
 	fmt.Printf("db connection successful %v\n", db)
@@ -187,9 +197,17 @@ func init() {
 
 	if result.Error != nil {
 		fmt.Printf("failed to create user %v\n", result.Error)
+		return result.Error
 	}
 
 	result = db.Exec("create database baseledger owner baseledger")
+
+	if result.Error != nil {
+		fmt.Printf("failed to baseledger db %v\n", result.Error)
+		return result.Error
+	}
+
+	return nil
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
