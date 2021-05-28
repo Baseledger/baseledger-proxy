@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
+	"github.com/spf13/viper"
 )
 
 type TrustmeshEntry struct {
@@ -26,9 +27,21 @@ type TrustmeshEntry struct {
 }
 
 func (t *TrustmeshEntry) Create() bool {
-	args := "host=localhost user=baseledger password=ub123 dbname=baseledger sslmode=disable"
+	dbHost, _ := viper.Get("DB_HOST").(string)
+	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
+	sslMode, _ := viper.Get("DB_SSLMODE").(string)
+	dbUser, _ := viper.Get("DB_BASELEDGER_USER").(string)
+	dbName, _ := viper.Get("DB_BASELEDGER_NAME").(string)
 
-	// TODO: use kyle's package
+	args := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=%s",
+		dbHost,
+		dbUser,
+		dbPwd,
+		dbName,
+		sslMode,
+	)
+
 	db, err := gorm.Open("postgres", args)
 
 	if err != nil {
