@@ -115,6 +115,29 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
+		// TODO: fix this mocked entry
+		trustmeshEntry := &types.TrustmeshEntry{
+			TendermintBlockId:                    "123",
+			TendermintTransactionId:              "123",
+			TendermintTransactionTimestamp:       "2021-05-28T21:42:59.1948424Z",
+			Sender:                               "123",
+			Receiver:                             "123",
+			WorkgroupId:                          "123",
+			WorkstepType:                         "123",
+			BaseledgerTransactionType:            "123",
+			BaseledgerTransactionId:              "123",
+			ReferencedBaseledgerTransactionId:    "123",
+			BusinessObjectType:                   "123",
+			BaseledgerBusinessObjectId:           "123",
+			ReferencedBaseledgerBusinessObjectId: "123",
+			OffchainProcessMessageId:             "123",
+			ReferencedProcessMessageId:           "123",
+		}
+
+		if !trustmeshEntry.Create() {
+			fmt.Printf("error when creating new trustmesh entry")
+		}
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	}

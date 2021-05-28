@@ -1,1 +1,1 @@
-DROP TABLE public.trustmeshes;
+DROP TABLE public.trustmesh_entries;

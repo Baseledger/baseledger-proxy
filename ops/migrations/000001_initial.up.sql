@@ -13,28 +13,28 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
-CREATE TABLE public.trustmeshes (
+CREATE TABLE public.trustmesh_entries (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    tendermintBlockId text,
-    tendermintTransactionId text,
-    tendermintTransactionTimestamp timestamp with time zone,
+    tendermint_block_id text,
+    tendermint_transaction_id text,
+    tendermint_transaction_timestamp timestamp with time zone,
 
     sender text,
     receiver text,
-    workgroupId text,
+    workgroup_id text,
 
-    workstepType text,
-    baseledgerTransactionType text,
+    workstep_type text,
+    baseledger_transaction_type text,
 
-    baseledgerTransactionId text,
-    referencedBaseledgerTransactionId text,
+    baseledger_transaction_id text,
+    referenced_baseledger_transaction_id text,
 
-    businessObjectType text,
-    baseledgerBusinessObjectID text,
-    referencedBaseledgerBusinessObjectID text,
+    business_object_type text,
+    baseledger_business_object_id text,
+    referenced_baseledger_business_object_id text,
 
-    offchainProcessMessageID text,
-    referencedProcessMessageID text
+    offchain_process_message_id text,
+    referenced_process_message_id text
 );
 
-ALTER TABLE public.trustmeshes OWNER TO baseledger;
+ALTER TABLE public.trustmesh_entries OWNER TO baseledger;
