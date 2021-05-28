@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"net/http"
@@ -97,6 +98,10 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
+
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
 )
 
 const Name = "baseledger"
@@ -207,6 +212,32 @@ func initDbIfNotExists() error {
 	}
 
 	return nil
+}
+
+func performMigrations() {
+	dsn := "postgres://localhost/baseledger?user=baseledger&password=ub123&sslmode=disable"
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		fmt.Printf("migrations failed 1: %s", err.Error())
+		panic(err)
+	}
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		fmt.Printf("migrations failed 2; %s", err.Error())
+		panic(err)
+	}
+
+	m, err := migrate.NewWithDatabaseInstance("file://./ops/migrations", "baseledger", driver)
+	if err != nil {
+		fmt.Printf("migrations failed 3: %s", err.Error())
+		panic(err)
+	}
+
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		fmt.Printf("migrations failed 4: %s", err.Error())
+	}
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -508,6 +539,7 @@ func New(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 	initDbIfNotExists()
+	performMigrations()
 
 	return app
 }

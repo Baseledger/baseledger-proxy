@@ -3,8 +3,12 @@ module github.com/unibrightio/baseledger
 go 1.16
 
 require (
+	github.com/containerd/containerd v1.5.2 // indirect
 	github.com/cosmos/cosmos-sdk v0.42.4
+	github.com/docker/docker v20.10.6+incompatible // indirect
+	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.3
+	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
