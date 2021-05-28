@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -173,13 +172,6 @@ func init() {
 
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
 
-	err = initDbIfNotExists()
-
-	if err != nil && !strings.Contains(err.Error(), "exists") { // try with query
-		fmt.Printf("init db failed; %s", err.Error())
-		panic(err)
-	}
-
 }
 
 func initDbIfNotExists() error {
@@ -191,7 +183,14 @@ func initDbIfNotExists() error {
 		return err
 	}
 
-	fmt.Printf("db connection successful %v\n", db)
+	fmt.Printf("db connection successful")
+
+	exists := db.Exec("SELECT 1 FROM pg_roles WHERE rolname='baseledger'")
+
+	if exists.RowsAffected == 1 {
+		fmt.Printf("row already exits")
+		return nil
+	}
 
 	result := db.Exec("create user baseledger with superuser password 'ub123'")
 
@@ -508,6 +507,7 @@ func New(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
+	initDbIfNotExists()
 
 	return app
 }
