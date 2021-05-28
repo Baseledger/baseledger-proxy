@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -86,12 +87,16 @@ import (
 	"github.com/unibrightio/baseledger/docs"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+
 	"github.com/unibrightio/baseledger/x/baseledger"
 	baseledgerkeeper "github.com/unibrightio/baseledger/x/baseledger/keeper"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
 	"github.com/unibrightio/baseledger/x/trustmesh"
 	trustmeshkeeper "github.com/unibrightio/baseledger/x/trustmesh/keeper"
 	trustmeshtypes "github.com/unibrightio/baseledger/x/trustmesh/types"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 )
 
 const Name = "baseledger"
@@ -166,6 +171,25 @@ func init() {
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
+
+	args := "host=localhost user=ub password=ub123 dbname=ub sslmode=disable"
+	db, err := gorm.Open("postgres", args)
+
+	// db.LogMode(true)
+
+	if err != nil {
+		fmt.Printf("db connection failed %v\n", err.Error())
+	}
+
+	fmt.Printf("db connection successful %v\n", db)
+
+	result := db.Exec("create user baseledger with superuser password 'ub123'")
+
+	if result.Error != nil {
+		fmt.Printf("failed to create user %v\n", result.Error)
+	}
+
+	result = db.Exec("create database baseledger owner baseledger")
 }
 
 // App extends an ABCI application, but with most of its parameters exported.

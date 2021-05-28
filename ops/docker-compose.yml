@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=ub
+      - POSTGRES_USER=ub
+      - POSTGRES_PASSWORD=ub123
+    hostname:
+      postgres
+    volumes:
+      - baseledger-db:/var/lib/postgresql/data
+    networks:
+      - baseledger
+    ports:
+      - 5432:5432
+    restart: always
+
+networks:
+  baseledger:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.40.0.0/24
+
+volumes:
+  baseledger-db:
+    
