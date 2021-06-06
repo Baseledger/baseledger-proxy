@@ -181,7 +181,7 @@ func init() {
 
 }
 
-func initDbIfNotExists() error {
+func initDbIfNotExists() {
 	dbHost, _ := viper.Get("DB_HOST").(string)
 	dbSuperUser, _ := viper.Get("DB_UB_USER").(string)
 	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
@@ -202,7 +202,7 @@ func initDbIfNotExists() error {
 
 	if err != nil {
 		fmt.Printf("db connection failed %v\n", err.Error())
-		return err
+		panic(err)
 	}
 
 	fmt.Printf("db connection successful")
@@ -211,24 +211,22 @@ func initDbIfNotExists() error {
 
 	if exists.RowsAffected == 1 {
 		fmt.Printf("row already exits")
-		return nil
+		return
 	}
 
 	result := db.Exec(fmt.Sprintf("create user %s with superuser password '%s'", dbUser, dbPwd))
 
 	if result.Error != nil {
 		fmt.Printf("failed to create user %v\n", result.Error)
-		return result.Error
+		panic(result.Error)
 	}
 
 	result = db.Exec(fmt.Sprintf("create database %s owner %s", dbName, dbUser))
 
 	if result.Error != nil {
-		fmt.Printf("failed to baseledger db %v\n", result.Error)
-		return result.Error
+		fmt.Printf("failed to create baseledger db %v\n", result.Error)
+		panic(result.Error)
 	}
-
-	return nil
 }
 
 func performMigrations() {
@@ -253,7 +251,7 @@ func performMigrations() {
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		fmt.Printf("migrations failed 2; %s", err.Error())
+		fmt.Printf("migrations failed 2: %s", err.Error())
 		panic(err)
 	}
 

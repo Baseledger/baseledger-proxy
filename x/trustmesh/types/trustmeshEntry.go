@@ -1,6 +1,7 @@
 package types
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -11,9 +12,9 @@ import (
 const defaultTransactionStatus = "UNCOMMITTED"
 
 type TrustmeshEntry struct {
-	TendermintBlockId                    string
+	TendermintBlockId                    sql.NullString
 	TendermintTransactionId              string
-	TendermintTransactionTimestamp       string
+	TendermintTransactionTimestamp       sql.NullString
 	Sender                               string
 	Receiver                             string
 	WorkgroupId                          string
@@ -53,7 +54,8 @@ func (t *TrustmeshEntry) Create() bool {
 	}
 
 	t.TransactionStatus = defaultTransactionStatus
-
+	t.TendermintBlockId = sql.NullString{Valid: false}
+	t.TendermintTransactionTimestamp = sql.NullString{Valid: false}
 	if db.NewRecord(t) {
 		result := db.Create(&t)
 		rowsAffected := result.RowsAffected

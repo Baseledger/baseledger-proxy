@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -68,12 +67,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		// TODO: fix this mocked entry with proper entries, discuss unkown props with team
 		trustmeshEntry := &types.TrustmeshEntry{
-			// TODO: what should we use here? this is only availabe in "block" broadcast mode which is not recommended because of timeout
-			TendermintBlockId: strconv.FormatUint(uint64(res.Height), 10),
-			// TODO: what should we use here?
-			TendermintTransactionId: res.TxHash,
-			// TODO: what should we use here? timestamp not available
-			TendermintTransactionTimestamp:       "",
+			TendermintTransactionId:              res.TxHash,
 			Sender:                               "123",
 			Receiver:                             "123",
 			WorkgroupId:                          req.WorkgroupId,
