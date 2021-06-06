@@ -25,6 +25,7 @@ type createInitialSuggestionRequest struct {
 	BaseledgerBusinessObjectId           string       `json:"baseledger_business_object_id"`
 	BusinessObject                       string       `json:"business_object"`
 	ReferencedBaseledgerBusinessObjectId string       `json:"referenced_baseledger_business_object_id"`
+	ReferencedBaseledgerTransactionId    string       `json:"referenced_baseledger_transaction_id"`
 }
 
 func createInitialSuggestionRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -65,21 +66,22 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
-		// TODO: fix this mocked entry with proper entries, discuss unkown props with team
 		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId:              res.TxHash,
+			TendermintTransactionId: res.TxHash,
+			// TODO: define proxy identifier
 			Sender:                               "123",
-			Receiver:                             "123",
+			Receiver:                             req.Recipient,
 			WorkgroupId:                          req.WorkgroupId,
 			WorkstepType:                         req.WorkstepType,
 			BaseledgerTransactionType:            "Suggest",
 			BaseledgerTransactionId:              transactionId,
-			ReferencedBaseledgerTransactionId:    "123",
+			ReferencedBaseledgerTransactionId:    req.ReferencedBaseledgerTransactionId,
 			BusinessObjectType:                   req.BusinessObjectType,
 			BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
 			ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
-			OffchainProcessMessageId:             "123",
-			ReferencedProcessMessageId:           "123",
+			// TODO: next 2 fields are from offchain message
+			OffchainProcessMessageId:   "123",
+			ReferencedProcessMessageId: "123",
 		}
 
 		if !trustmeshEntry.Create() {
