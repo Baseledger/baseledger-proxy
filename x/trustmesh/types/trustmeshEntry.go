@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultTransactionStatus = "UNCOMMITTED"
+
 type TrustmeshEntry struct {
 	TendermintBlockId                    string
 	TendermintTransactionId              string
@@ -24,6 +26,7 @@ type TrustmeshEntry struct {
 	ReferencedBaseledgerBusinessObjectId string
 	OffchainProcessMessageId             string
 	ReferencedProcessMessageId           string
+	TransactionStatus                    string
 }
 
 func (t *TrustmeshEntry) Create() bool {
@@ -48,6 +51,8 @@ func (t *TrustmeshEntry) Create() bool {
 		fmt.Printf("error when connecting to db %v\n", err)
 		return false
 	}
+
+	t.TransactionStatus = defaultTransactionStatus
 
 	if db.NewRecord(t) {
 		result := db.Create(&t)

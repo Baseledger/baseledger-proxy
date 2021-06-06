@@ -34,7 +34,9 @@ CREATE TABLE public.trustmesh_entries (
     referenced_baseledger_business_object_id text,
 
     offchain_process_message_id text,
-    referenced_process_message_id text
+    referenced_process_message_id text,
+
+    transaction_status text
 );
 
 ALTER TABLE public.trustmesh_entries OWNER TO baseledger;
