@@ -178,7 +178,6 @@ func init() {
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
-
 }
 
 func initDbIfNotExists() {
@@ -568,7 +567,6 @@ func New(
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 
-	// TODO: Better error handling
 	initDbIfNotExists()
 	performMigrations()
 

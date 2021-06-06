@@ -141,7 +141,7 @@ func buildClientCtx(clientCtx client.Context, from string) (*client.Context, err
 	return &clientCtx, nil
 }
 
-// TODO: change test keyring with other (file?)
+// TODO: change test keyring with other (file?) - new ticket for this
 func newKeyringInstance() (keyring.Keyring, error) {
 	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
 
