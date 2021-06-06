@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,7 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 )
 
-type createSynchronizationRequest struct {
+type createInitialSuggestionRequest struct {
 	BaseReq                              rest.BaseReq `json:"base_req"`
 	Creator                              string       `json:"creator"`
 	CreatorName                          string       `json:"creatorName"`
@@ -29,18 +30,9 @@ type createSynchronizationRequest struct {
 	ReferencedBaseledgerBusinessObjectId string       `json:"referenced_baseledger_business_object_id"`
 }
 
-func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerFunc {
+func createInitialSuggestionRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req createSynchronizationRequest
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
-
-		baseReq := req.BaseReq.Sanitize()
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+		req := parseRequest(w, r, clientCtx)
 
 		fromAddress, err := sdk.AccAddressFromBech32(req.BaseReq.From)
 		if err != nil {
@@ -48,20 +40,12 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 			return
 		}
 
-		createSyncReq := &types.SynchronizationRequest{
-			WorkgroupId:                          req.WorkgroupId,
-			Recipient:                            req.Recipient,
-			WorkstepType:                         req.WorkstepType,
-			BusinessObjectType:                   req.BusinessObjectType,
-			BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
-			BusinessObject:                       req.BusinessObject,
-			ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
-		}
+		createSyncReq := newSynchronizationRequest(*req)
 
 		payload, transactionId := proxy.SynchronizeBusinessObject(createSyncReq)
 
 		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), transactionId, string(payload))
-		msg.Creator = baseReq.From
+		msg.Creator = req.BaseReq.From
 		if err := msg.ValidateBasic(); err != nil {
 			fmt.Printf("msg validate basic failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -69,71 +53,30 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 
 		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
 
-		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, fromAddress)
+		keyring, err := newKeyringInstance()
 
 		if err != nil {
-			fmt.Printf("error while retrieving acc %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
+		// key, err := kr.Key(req.CreatorName)
 
-		kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
+		// if err != nil {
+		// 	fmt.Printf("error when getting key by name %v\n", err.Error())
+		// 	rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		// }
 
-		if err != nil {
-			fmt.Printf("error fetching test key ring %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		key, err := kr.Key(req.CreatorName)
-
-		if err != nil {
-			fmt.Printf("error when getting key by name %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		fmt.Printf("key found for address %v\n", key.GetAddress().String())
+		// fmt.Printf("key found for address %v\n", key.GetAddress().String())
 
 		clientCtx = clientCtx.
-			WithKeyring(kr).
+			WithKeyring(*keyring).
 			WithFromAddress(fromAddress).
 			WithSkipConfirmation(true).
-			WithFromName(req.CreatorName)
-			// TODO: check this with team
-			// WithBroadcastMode("sync")
+			WithFromName(req.CreatorName).
+			WithBroadcastMode("sync")
 
-		fmt.Printf("broadcast mode %v\n", clientCtx.BroadcastMode)
-
-		txFactory := tx.Factory{}.
-			WithChainID(clientCtx.ChainID).
-			WithGas(100000).
-			WithTxConfig(clientCtx.TxConfig).
-			WithAccountNumber(accNum).
-			WithSequence(accSeq).
-			WithAccountRetriever(clientCtx.AccountRetriever).
-			WithKeybase(clientCtx.Keyring)
-
-		txFactory, err = tx.PrepareFactory(clientCtx, txFactory)
+		txBytes, err := signTxAndGetTxBytes(clientCtx, msg)
 		if err != nil {
-			fmt.Printf("prepare factory error %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		transaction, err := tx.BuildUnsignedTx(txFactory, msg)
-		if err != nil {
-			fmt.Printf("build unsigned tx error %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		err = tx.Sign(txFactory, clientCtx.GetFromName(), transaction, true)
-		if err != nil {
-			fmt.Printf("sign tx error %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		txBytes, err := clientCtx.TxConfig.TxEncoder()(transaction.GetTx())
-		if err != nil {
-			fmt.Printf("tx encoder %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
@@ -175,4 +118,87 @@ func createSynchronizationRequestHandler(clientCtx client.Context) http.HandlerF
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func parseRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createInitialSuggestionRequest {
+	var req createInitialSuggestionRequest
+	if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+		return nil
+	}
+
+	baseReq := req.BaseReq.Sanitize()
+	if !baseReq.ValidateBasic(w) {
+		rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+		return nil
+	}
+
+	return &req
+}
+
+func newSynchronizationRequest(req createInitialSuggestionRequest) *types.SynchronizationRequest {
+	return &types.SynchronizationRequest{
+		WorkgroupId:                          req.WorkgroupId,
+		Recipient:                            req.Recipient,
+		WorkstepType:                         req.WorkstepType,
+		BusinessObjectType:                   req.BusinessObjectType,
+		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
+		BusinessObject:                       req.BusinessObject,
+		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
+	}
+}
+
+// TODO: change test keyring with other (file?)
+func newKeyringInstance() (*keyring.Keyring, error) {
+	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
+
+	if err != nil {
+		fmt.Printf("error fetching test keyring %v\n", err.Error())
+		return nil, errors.New("error fetching key ring")
+	}
+
+	return &kr, nil
+}
+
+func signTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg) ([]byte, error) {
+	accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, clientCtx.FromAddress)
+
+	if err != nil {
+		fmt.Printf("error while retrieving acc %v\n", err.Error())
+		return nil, errors.New("sign tx error")
+	}
+	fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
+	txFactory := tx.Factory{}.
+		WithChainID(clientCtx.ChainID).
+		WithGas(100000).
+		WithTxConfig(clientCtx.TxConfig).
+		WithAccountNumber(accNum).
+		WithSequence(accSeq).
+		WithAccountRetriever(clientCtx.AccountRetriever).
+		WithKeybase(clientCtx.Keyring)
+
+	txFactory, err = tx.PrepareFactory(clientCtx, txFactory)
+	if err != nil {
+		fmt.Printf("prepare factory error %v\n", err.Error())
+		return nil, errors.New("sign tx error")
+	}
+
+	transaction, err := tx.BuildUnsignedTx(txFactory, msg)
+	if err != nil {
+		fmt.Printf("build unsigned tx error %v\n", err.Error())
+		return nil, errors.New("sign tx error")
+	}
+
+	err = tx.Sign(txFactory, clientCtx.GetFromName(), transaction, true)
+	if err != nil {
+		fmt.Printf("sign tx error %v\n", err.Error())
+		return nil, errors.New("sign tx error")
+	}
+
+	txBytes, err := clientCtx.TxConfig.TxEncoder()(transaction.GetTx())
+	if err != nil {
+		fmt.Printf("tx encoder %v\n", err.Error())
+		return nil, errors.New("sign tx error")
+	}
+
+	return txBytes, nil
 }

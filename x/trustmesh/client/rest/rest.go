@@ -25,5 +25,5 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
-	r.HandleFunc("/trustmesh/SynchronizationRequest", createSynchronizationRequestHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/trustmesh/suggestion", createInitialSuggestionRequestHandler(clientCtx)).Methods("POST")
 }
