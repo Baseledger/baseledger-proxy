@@ -19,8 +19,6 @@ import (
 
 type createInitialSuggestionRequest struct {
 	BaseReq                              rest.BaseReq `json:"base_req"`
-	Creator                              string       `json:"creator"`
-	CreatorName                          string       `json:"creatorName"`
 	WorkgroupId                          string       `json:"workgroup_id"`
 	Recipient                            string       `json:"recipient"`
 	WorkstepType                         string       `json:"workstep_type"`
@@ -33,11 +31,10 @@ type createInitialSuggestionRequest struct {
 func createInitialSuggestionRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := parseRequest(w, r, clientCtx)
+		clientCtx, err := buildClientCtx(clientCtx, req.BaseReq.From)
 
-		fromAddress, err := sdk.AccAddressFromBech32(req.BaseReq.From)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
 		createSyncReq := newSynchronizationRequest(*req)
@@ -45,7 +42,6 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		payload, transactionId := proxy.SynchronizeBusinessObject(createSyncReq)
 
 		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), transactionId, string(payload))
-		msg.Creator = req.BaseReq.From
 		if err := msg.ValidateBasic(); err != nil {
 			fmt.Printf("msg validate basic failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -53,41 +49,22 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
 
-		keyring, err := newKeyringInstance()
-
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		// key, err := kr.Key(req.CreatorName)
-
-		// if err != nil {
-		// 	fmt.Printf("error when getting key by name %v\n", err.Error())
-		// 	rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		// }
-
-		// fmt.Printf("key found for address %v\n", key.GetAddress().String())
-
-		clientCtx = clientCtx.
-			WithKeyring(*keyring).
-			WithFromAddress(fromAddress).
-			WithSkipConfirmation(true).
-			WithFromName(req.CreatorName).
-			WithBroadcastMode("sync")
-
-		txBytes, err := signTxAndGetTxBytes(clientCtx, msg)
+		txBytes, err := signTxAndGetTxBytes(*clientCtx, msg)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		// broadcast to a Tendermint node
 		res, err := clientCtx.BroadcastTx(txBytes)
 		if err != nil {
 			fmt.Printf("error while broadcasting tx %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v %v\n", res, res.Timestamp)
+		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
 		// TODO: fix this mocked entry with proper entries, discuss unkown props with team
 		trustmeshEntry := &types.TrustmeshEntry{
@@ -96,7 +73,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			// TODO: what should we use here?
 			TendermintTransactionId: res.TxHash,
 			// TODO: what should we use here? timestamp not available
-			TendermintTransactionTimestamp:       "2021-05-28T21:42:59.1948424Z",
+			TendermintTransactionTimestamp:       "",
 			Sender:                               "123",
 			Receiver:                             "123",
 			WorkgroupId:                          req.WorkgroupId,
@@ -147,8 +124,31 @@ func newSynchronizationRequest(req createInitialSuggestionRequest) *types.Synchr
 	}
 }
 
+func buildClientCtx(clientCtx client.Context, from string) (*client.Context, error) {
+	fromAddress, err := sdk.AccAddressFromBech32(from)
+
+	keyring, err := newKeyringInstance()
+	key, err := keyring.KeyByAddress(fromAddress)
+
+	if err != nil {
+		fmt.Printf("error getting key %v\n", err.Error())
+		return nil, errors.New("")
+	}
+
+	fmt.Printf("key found %v %v\n", key, key.GetName())
+
+	clientCtx = clientCtx.
+		WithKeyring(keyring).
+		WithFromAddress(fromAddress).
+		WithSkipConfirmation(true).
+		WithFromName(key.GetName()).
+		WithBroadcastMode("sync")
+
+	return &clientCtx, nil
+}
+
 // TODO: change test keyring with other (file?)
-func newKeyringInstance() (*keyring.Keyring, error) {
+func newKeyringInstance() (keyring.Keyring, error) {
 	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
 
 	if err != nil {
@@ -156,7 +156,7 @@ func newKeyringInstance() (*keyring.Keyring, error) {
 		return nil, errors.New("error fetching key ring")
 	}
 
-	return &kr, nil
+	return kr, nil
 }
 
 func signTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg) ([]byte, error) {
