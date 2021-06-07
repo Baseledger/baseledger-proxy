@@ -74,7 +74,6 @@ func SynchronizeBusinessObject(synchronizationRequest *types.SynchronizationRequ
 	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
 	fmt.Printf("dec %s\n", dec)
 
-	//TODO: store trust mesh entry in local db
 	return enc, transactionIdUuid.String()
 }
 
