@@ -1,4 +1,4 @@
-package trustmesh
+package proxy
 
 import (
 	"encoding/json"
@@ -17,10 +17,10 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/unibrightio/baseledger/x/trustmesh/client/cli"
-	"github.com/unibrightio/baseledger/x/trustmesh/client/rest"
-	"github.com/unibrightio/baseledger/x/trustmesh/keeper"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/baseledger/client/cli"
+	"github.com/unibrightio/baseledger/x/proxy/client/rest"
+	"github.com/unibrightio/baseledger/x/proxy/keeper"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 	// this line is used by starport scaffolding # ibc/module/import
 )
 
@@ -85,9 +85,8 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 	// this line is used by starport scaffolding # 2
 }
 
-// GetTxCmd returns the capability module's root tx command.
 func (a AppModuleBasic) GetTxCmd() *cobra.Command {
-	return cli.GetTxCmd()
+	return nil
 }
 
 // GetQueryCmd returns the capability module's root query command.

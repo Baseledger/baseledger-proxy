@@ -11,37 +11,40 @@ import (
 	"io"
 
 	uuid "github.com/kthomas/go.uuid"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy/messaging"
+	"github.com/unibrightio/baseledger/x/proxy/types"
+	"github.com/unibrightio/baseledger/x/proxy/workgroups"
 	// "github.com/cosmos/cosmos-sdk/client/tx"
 )
 
-// TODO: just a mock for now
-type workgroupMock struct {
-	BaselineWorkgroupID string
-	Description         string
-	PrivatizeKey        string
+type IBaseledgerProxy interface {
+	CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string)
+	SendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string)
 }
 
-//Implements IBaseledgerProxyInterface from /baseledger/x/trustmesh/types/types.go
-
-var (
-//global vars
-)
-
-const (
-//global constants
-)
-
-func init() {
-	//anything to initialize?
-	/*userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}*/
-
+type BaseledgerProxy struct {
+	config          BaseledgerProxyConfig
+	messagingClient messaging.IMessagingClient
+	workgroupClient workgroups.IWorkgroupClient
 }
 
-func SynchronizeBusinessObject(synchronizationRequest *types.SynchronizationRequest) (string, string) {
+type BaseledgerProxyConfig struct {
+	connectionString string
+}
+
+func NewBaseledgerProxy() BaseledgerProxy {
+	proxy := BaseledgerProxy{}
+	proxy.config = BaseledgerProxyConfig{"das connection string"}
+
+	proxy.messagingClient = &messaging.NatsMessagingClient{}
+	proxy.messagingClient.Subscribe("local server conn string", "baseledger", receiveOffchainProcessMessage)
+
+	proxy.workgroupClient = &workgroups.PostgresWorkgroupClient{}
+
+	return proxy
+}
+
+func CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string) {
 	hash := createHashFromBusinessObject(synchronizationRequest.BusinessObject)
 	offchainProcessMessage := newOffchainProcessMessage(
 		synchronizationRequest.WorkstepType,
@@ -52,7 +55,7 @@ func SynchronizeBusinessObject(synchronizationRequest *types.SynchronizationRequ
 		synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 		synchronizationRequest.WorkstepType+" suggested")
 
-	workgroup := findWorkgroupMock(synchronizationRequest.WorkgroupId)
+	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
 
 	transactionIdUuid, _ := uuid.NewV4()
 	payload := &types.BaseledgerTransactionPayload{
@@ -69,12 +72,23 @@ func SynchronizeBusinessObject(synchronizationRequest *types.SynchronizationRequ
 	}
 
 	fmt.Printf("\n payload %v \n", *payload)
-	enc := privatizePayload(payload, workgroup.PrivatizeKey)
+	enc := privatizePayload(payload, "workgroup.PrivatizeKey")
 	fmt.Printf("enc %s\n\n", enc)
-	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
+	dec := deprivatizePayload(enc, "workgroup.PrivatizeKey")
 	fmt.Printf("dec %s\n", dec)
 
 	return enc, transactionIdUuid.String()
+}
+
+func sendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string) {
+	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
+	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
+	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)
+}
+
+func receiveOffchainProcessMessage(sender string, message string) {
+	fmt.Printf("\n sender %v \n", sender)
+	fmt.Printf("\n message %v \n", message)
 }
 
 func newOffchainProcessMessage(
@@ -95,15 +109,6 @@ func newOffchainProcessMessage(
 		BaseledgerBusinessObjectId:           baseledgerBusinessObjectID,
 		ReferencedBaseledgerBusinessObjectId: referencedBaseledgerBusinessObjectID,
 		StatusTextMessage:                    statusTextMessage,
-	}
-}
-
-func findWorkgroupMock(workgroupId string) *workgroupMock {
-	newUuid, _ := uuid.NewV4()
-	return &workgroupMock{
-		BaselineWorkgroupID: newUuid.String(),
-		Description:         "Mocked workgroup",
-		PrivatizeKey:        "0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314",
 	}
 }
 
@@ -183,9 +188,3 @@ func decrypt(encryptedString string, keyString string) (decryptedString string) 
 
 	return fmt.Sprintf("%s", plaintext)
 }
-
-//Implements IBaseledgerProxyInterface from /baseledger/x/trustmesh/types/types.go
-//privatize(text string) string
-//deprivatize(textEncrypted string) string
-
-//hash(payload string) string

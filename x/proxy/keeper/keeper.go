@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 	// this line is used by starport scaffolding # ibc/keeper/import
 )
 

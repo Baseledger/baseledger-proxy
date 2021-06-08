@@ -11,7 +11,7 @@ const (
 	MethodGet = "GET"
 )
 
-// RegisterRoutes registers trustmesh-related REST handlers to a router
+// RegisterRoutes registers REST handlers to a router
 func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 2
 	registerTxHandlers(clientCtx, r)
@@ -20,10 +20,10 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 3
-	r.HandleFunc("/trustmesh/trustmesh_entries", listTrustmeshEntriesHandler(clientCtx)).Methods("GET")
+	r.HandleFunc("/proxy/trustmesh_entries", listTrustmeshEntriesHandler(clientCtx)).Methods("GET")
 }
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
-	r.HandleFunc("/trustmesh/suggestion", createInitialSuggestionRequestHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/proxy/suggestion", createInitialSuggestionRequestHandler(clientCtx)).Methods("POST")
 }

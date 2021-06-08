@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 )
 
 func setupKeeper(t testing.TB) (*Keeper, sdk.Context) {

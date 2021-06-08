@@ -11,7 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 	"github.com/spf13/viper"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 )
 
 func listTrustmeshEntriesHandler(clientCtx client.Context) http.HandlerFunc {

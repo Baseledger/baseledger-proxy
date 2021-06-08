@@ -1,12 +1,12 @@
-package trustmesh
+package proxy
 
 import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/unibrightio/baseledger/x/trustmesh/keeper"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy/keeper"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 )
 
 // NewHandler ...

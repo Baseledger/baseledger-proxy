@@ -18,6 +18,34 @@ services:
     ports:
       - 5432:5432
     restart: always
+  nats:
+    image: nats
+    container_name: nats
+    environment:
+      - NATS_USER=bla
+    hostname:
+      nats
+    networks:
+      - baseledger
+    ports:
+      - 4222:4222 
+    restart: always
+  starport:
+      # build: <starport dockerfile>
+      image: starport/cli
+      command: ["serve"]
+      container_name: starport
+      volumes:
+        - ../:/apps
+      working_dir: /apps
+      hostname:
+        starport
+      networks:
+        - baseledger
+      ports:
+        - 1317:1317
+        - 26657:26657
+      restart: always
 
 networks:
   baseledger:

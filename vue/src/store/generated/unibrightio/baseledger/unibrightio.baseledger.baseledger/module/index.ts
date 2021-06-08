@@ -4,18 +4,17 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgDeleteBaseledgerTransaction } from "./types/baseledger/tx";
-import { MsgCreateBaseledgerTransaction } from "./types/baseledger/tx";
 import { MsgUpdateBaseledgerTransaction } from "./types/baseledger/tx";
+import { MsgCreateBaseledgerTransaction } from "./types/baseledger/tx";
+import { MsgDeleteBaseledgerTransaction } from "./types/baseledger/tx";
 
 
 const types = [
-  ["/unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransaction", MsgDeleteBaseledgerTransaction],
-  ["/unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransaction", MsgCreateBaseledgerTransaction],
   ["/unibrightio.baseledger.baseledger.MsgUpdateBaseledgerTransaction", MsgUpdateBaseledgerTransaction],
+  ["/unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransaction", MsgCreateBaseledgerTransaction],
+  ["/unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransaction", MsgDeleteBaseledgerTransaction],
   
 ];
-export const MissingWalletError = new Error("wallet is required");
 
 const registry = new Registry(<any>types);
 
@@ -34,16 +33,16 @@ interface SignAndBroadcastOptions {
 }
 
 const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions = { addr: "http://localhost:26657" }) => {
-  if (!wallet) throw MissingWalletError;
+  if (!wallet) throw new Error("wallet is required");
 
   const client = await SigningStargateClient.connectWithSigner(addr, wallet, { registry });
   const { address } = (await wallet.getAccounts())[0];
 
   return {
-    signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgDeleteBaseledgerTransaction: (data: MsgDeleteBaseledgerTransaction): EncodeObject => ({ typeUrl: "/unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransaction", value: data }),
-    msgCreateBaseledgerTransaction: (data: MsgCreateBaseledgerTransaction): EncodeObject => ({ typeUrl: "/unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransaction", value: data }),
+    signAndBroadcast: (msgs: EncodeObject[], { fee=defaultFee, memo=null }: SignAndBroadcastOptions) => memo?client.signAndBroadcast(address, msgs, fee,memo):client.signAndBroadcast(address, msgs, fee),
     msgUpdateBaseledgerTransaction: (data: MsgUpdateBaseledgerTransaction): EncodeObject => ({ typeUrl: "/unibrightio.baseledger.baseledger.MsgUpdateBaseledgerTransaction", value: data }),
+    msgCreateBaseledgerTransaction: (data: MsgCreateBaseledgerTransaction): EncodeObject => ({ typeUrl: "/unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransaction", value: data }),
+    msgDeleteBaseledgerTransaction: (data: MsgDeleteBaseledgerTransaction): EncodeObject => ({ typeUrl: "/unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransaction", value: data }),
     
   };
 };

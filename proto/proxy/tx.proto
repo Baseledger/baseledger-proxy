@@ -1,9 +1,9 @@
 syntax = "proto3";
-package unibrightio.baseledger.trustmesh;
+package unibrightio.baseledger.proxy;
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/unibrightio/baseledger/x/trustmesh/types";
+option go_package = "github.com/unibrightio/baseledger/x/proxy/types";
 
 // Msg defines the Msg service.
 service Msg {

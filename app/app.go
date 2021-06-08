@@ -92,9 +92,9 @@ import (
 	"github.com/unibrightio/baseledger/x/baseledger"
 	baseledgerkeeper "github.com/unibrightio/baseledger/x/baseledger/keeper"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
-	"github.com/unibrightio/baseledger/x/trustmesh"
-	trustmeshkeeper "github.com/unibrightio/baseledger/x/trustmesh/keeper"
-	trustmeshtypes "github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy"
+	proxykeeper "github.com/unibrightio/baseledger/x/proxy/keeper"
+	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
@@ -150,7 +150,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
-		trustmesh.AppModuleBasic{},
+		proxy.AppModuleBasic{},
 		baseledger.AppModuleBasic{},
 	)
 
@@ -305,7 +305,7 @@ type App struct {
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	TrustmeshKeeper trustmeshkeeper.Keeper
+	ProxyKeeper proxykeeper.Keeper
 
 	BaseledgerKeeper baseledgerkeeper.Keeper
 
@@ -337,7 +337,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		trustmeshtypes.StoreKey,
+		proxytypes.StoreKey,
 		baseledgertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -431,12 +431,13 @@ func New(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	app.TrustmeshKeeper = *trustmeshkeeper.NewKeeper(
+	app.ProxyKeeper = *proxykeeper.NewKeeper(
 		appCodec,
-		keys[trustmeshtypes.StoreKey],
-		keys[trustmeshtypes.MemStoreKey],
+		keys[proxytypes.StoreKey],
+		keys[proxytypes.MemStoreKey],
 	)
-	trustmeshModule := trustmesh.NewAppModule(appCodec, app.TrustmeshKeeper)
+
+	proxyModule := proxy.NewAppModule(appCodec, app.ProxyKeeper)
 
 	app.BaseledgerKeeper = *baseledgerkeeper.NewKeeper(
 		appCodec,
@@ -486,7 +487,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
-		trustmeshModule,
+		proxyModule,
 		baseledgerModule,
 	)
 
@@ -521,7 +522,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		trustmeshtypes.ModuleName,
+		proxytypes.ModuleName,
 		baseledgertypes.ModuleName,
 	)
 
@@ -715,7 +716,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(trustmeshtypes.ModuleName)
+	paramsKeeper.Subspace(proxytypes.ModuleName)
 	paramsKeeper.Subspace(baseledgertypes.ModuleName)
 
 	return paramsKeeper

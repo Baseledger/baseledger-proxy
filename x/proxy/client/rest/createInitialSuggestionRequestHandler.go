@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	baseledgerTypes "github.com/unibrightio/baseledger/x/baseledger/types"
-	"github.com/unibrightio/baseledger/x/trustmesh/proxy"
-	"github.com/unibrightio/baseledger/x/trustmesh/types"
+	"github.com/unibrightio/baseledger/x/proxy/proxy"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -39,7 +39,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		createSyncReq := newSynchronizationRequest(*req)
 
-		payload, transactionId := proxy.SynchronizeBusinessObject(createSyncReq)
+		payload, transactionId := proxy.CreateBaseledgerTransactionPayload(createSyncReq)
 
 		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), transactionId, string(payload))
 		if err := msg.ValidateBasic(); err != nil {
