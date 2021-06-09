@@ -368,7 +368,7 @@ func setupCron() {
 	fmt.Printf("Setting up CRON")
 
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(5).Seconds().Do(queryTrustmeshes)
+	s.Every(5).Seconds().SingletonMode().Do(queryTrustmeshes)
 
 	s.StartAsync()
 }
