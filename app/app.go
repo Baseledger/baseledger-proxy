@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -104,6 +105,8 @@ import (
 	_ "github.com/golang-migrate/migrate/source/file"
 
 	"github.com/spf13/viper"
+
+	"github.com/go-co-op/gocron"
 )
 
 const Name = "baseledger"
@@ -264,6 +267,43 @@ func performMigrations() {
 	if err != nil && err != migrate.ErrNoChange {
 		fmt.Printf("migrations failed 4: %s", err.Error())
 	}
+}
+
+func queryTrustmeshes() {
+	dbHost, _ := viper.Get("DB_HOST").(string)
+	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
+	sslMode, _ := viper.Get("DB_SSLMODE").(string)
+	dbUser, _ := viper.Get("DB_BASELEDGER_USER").(string)
+	dbName, _ := viper.Get("DB_BASELEDGER_NAME").(string)
+
+	args := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=%s",
+		dbHost,
+		dbUser,
+		dbPwd,
+		dbName,
+		sslMode,
+	)
+
+	db, err := gorm.Open("postgres", args)
+
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+	}
+
+	var trustmeshEntries []proxytypes.TrustmeshEntry
+	db.Where("transaction_status='UNCOMMITTED'").Find(&trustmeshEntries)
+
+	fmt.Printf("GOT ENTRIES %v %v\n", trustmeshEntries, len(trustmeshEntries))
+}
+
+func setupCron() {
+	fmt.Printf("Setting up CRON")
+
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(5).Seconds().Do(queryTrustmeshes)
+
+	s.StartAsync()
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -570,6 +610,8 @@ func New(
 
 	initDbIfNotExists()
 	performMigrations()
+
+	setupCron()
 
 	return app
 }
