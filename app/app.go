@@ -2,6 +2,7 @@ package app
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -110,6 +111,32 @@ import (
 )
 
 const Name = "baseledger"
+
+// TODO: full structs, move them out of this file
+type txResult struct {
+	Hash   string `json:"hash"`
+	Height string `json:"height"`
+}
+
+type header struct {
+	Time string `json:"time"`
+}
+
+type block struct {
+	Header header `json:"header"`
+}
+
+type blockResult struct {
+	Block block `json:"block"`
+}
+
+type txResp struct {
+	TxResult txResult `json:"result"`
+}
+
+type blockResp struct {
+	BlockResult blockResult `json:"result"`
+}
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -294,7 +321,47 @@ func queryTrustmeshes() {
 	var trustmeshEntries []proxytypes.TrustmeshEntry
 	db.Where("transaction_status='UNCOMMITTED'").Find(&trustmeshEntries)
 
-	fmt.Printf("GOT ENTRIES %v %v\n", trustmeshEntries, len(trustmeshEntries))
+	fmt.Printf("FOUND %v ENTRIES\n", len(trustmeshEntries))
+	for _, trustmeshEntry := range trustmeshEntries {
+		fmt.Printf("FOUND ENTRY WITH HASH %v\n", trustmeshEntry.TendermintTransactionId)
+		getTxInfo(trustmeshEntry.TendermintTransactionId)
+	}
+}
+
+func getTxInfo(txHash string) {
+	// fetching tx details, if it's not found it will return 500, otherwise 200
+	str := "http://localhost:26657/tx?hash=0x" + txHash
+	httpRes, err := http.Get(str)
+	if err != nil {
+		fmt.Printf("error during http tx req %v\n", err)
+		return
+	}
+
+	if httpRes.StatusCode == 500 {
+		fmt.Printf("tx not committed yet")
+		return
+	}
+	// if it's found should be committed at this point, decode
+	if httpRes.StatusCode == 200 {
+		var committedTx txResp
+		err = json.NewDecoder(httpRes.Body).Decode(&committedTx)
+		if err != nil {
+			fmt.Printf("error decoding tx %v\n", err)
+		}
+		// query for block at specific height to find timestamp
+		str = "http://localhost:26657/block?height" + committedTx.TxResult.Height
+		httpRes, err = http.Get(str)
+		if err != nil {
+			fmt.Printf("error during http block req %v\n", err)
+		}
+		var commitedBlock blockResp
+		err = json.NewDecoder(httpRes.Body).Decode(&commitedBlock)
+		if err != nil {
+			fmt.Printf("error decoding block %v\n", err)
+		}
+		// EXAMPLE OF RESULT: DECODED COMMITTED TX HEIGHT 10 AND TIMESTAMP 2021-06-08T16:15:44.8835491Z
+		fmt.Printf("DECODED COMMITTED TX HEIGHT %v AND TIMESTAMP %v\n", committedTx.TxResult.Height, commitedBlock.BlockResult.Block.Header.Time)
+	}
 }
 
 func setupCron() {
