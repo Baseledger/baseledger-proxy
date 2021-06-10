@@ -11,6 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 
+	businessprocess "github.com/unibrightio/baseledger/app/business_process"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 )
 
@@ -95,6 +96,9 @@ func queryTrustmeshes() {
 
 	for result := range results {
 		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.job.txHash, result.txInfo.txHeight, result.txInfo.txTimestamp)
+		if result.txInfo.txHeight != "" && result.txInfo.txTimestamp != "" {
+			businessprocess.SetTxStatusToCommitted(result.job.txHash, db)
+		}
 	}
 	fmt.Println("query trustmeshes end")
 }
