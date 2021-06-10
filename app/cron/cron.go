@@ -12,49 +12,9 @@ import (
 	"github.com/spf13/viper"
 
 	businessprocess "github.com/unibrightio/baseledger/app/business_process"
+	"github.com/unibrightio/baseledger/app/types"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 )
-
-// these structs are related to tendermint jsonrpc
-type txResult struct {
-	Hash   string `json:"hash"`
-	Height string `json:"height"`
-}
-
-type header struct {
-	Time string `json:"time"`
-}
-
-type block struct {
-	Header header `json:"header"`
-}
-
-type blockResult struct {
-	Block block `json:"block"`
-}
-
-type txResp struct {
-	TxResult txResult `json:"result"`
-}
-
-type blockResp struct {
-	BlockResult blockResult `json:"result"`
-}
-
-// these structs are related to worker pool
-type Job struct {
-	txHash string
-}
-type Result struct {
-	job    Job
-	txInfo TxInfo
-}
-
-type TxInfo struct {
-	txHeight    string
-	txTimestamp string
-	txCommitted bool
-}
 
 func queryTrustmeshes() {
 	fmt.Println("query trustmeshes start")
@@ -83,92 +43,86 @@ func queryTrustmeshes() {
 	db.Where("transaction_status='UNCOMMITTED'").Find(&trustmeshEntries)
 
 	fmt.Printf("found %v trustmesh entries\n", len(trustmeshEntries))
-	var jobs = make(chan Job, len(trustmeshEntries))
-	var results = make(chan Result, len(trustmeshEntries))
+	var jobs = make(chan types.Job, len(trustmeshEntries))
+	var results = make(chan types.Result, len(trustmeshEntries))
 	createWorkerPool(1, jobs, results)
+
 	for _, trustmeshEntry := range trustmeshEntries {
 		fmt.Printf("creating job for %v\n", trustmeshEntry.TendermintTransactionId)
-		job := Job{txHash: trustmeshEntry.TendermintTransactionId}
+		job := types.Job{TxHash: trustmeshEntry.TendermintTransactionId}
 		jobs <- job
 	}
-
 	close(jobs)
 
 	for result := range results {
-		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.job.txHash, result.txInfo.txHeight, result.txInfo.txTimestamp)
-		if result.txInfo.txHeight != "" && result.txInfo.txTimestamp != "" {
-			businessprocess.SetTxStatusToCommitted(result.job.txHash, db)
+		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TxHash, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
+		if result.TxInfo.TxHeight != "" && result.TxInfo.TxTimestamp != "" {
+			businessprocess.SetTxStatusToCommitted(result, db)
 		}
 	}
 	fmt.Println("query trustmeshes end")
 }
 
-func getTxInfo(txHash string) (txInfo *TxInfo, err error) {
-	// fetching tx details, if it's not found it will return 500, otherwise 200
+func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
+	// fetching tx details
 	str := "http://localhost:26657/tx?hash=0x" + txHash
 	httpRes, err := http.Get(str)
 	if err != nil {
 		fmt.Printf("error during http tx req %v\n", err)
-		return &TxInfo{}, errors.New("get tx info error")
+		return &types.TxInfo{}, errors.New("get tx info error")
 	}
 
-	if httpRes.StatusCode == 500 {
+	// if transaction is not found it is not yet committed
+	if httpRes.StatusCode != 200 {
 		fmt.Println("tx not committed yet")
-		return &TxInfo{txCommitted: false}, errors.New("get tx info error")
+		return &types.TxInfo{TxCommitted: false}, errors.New("get tx info error")
 	}
 
 	// if it's found should be committed at this point, decode
-	if httpRes.StatusCode == 200 {
-		var committedTx txResp
-		err = json.NewDecoder(httpRes.Body).Decode(&committedTx)
-		if err != nil {
-			fmt.Printf("error decoding tx %v\n", err)
-			return &TxInfo{}, errors.New("error decoding tx")
-		}
-		// query for block at specific height to find timestamp
-		str = "http://localhost:26657/block?height" + committedTx.TxResult.Height
-		httpRes, err = http.Get(str)
-		if err != nil {
-			fmt.Printf("error during http block req %v\n", err)
-			return &TxInfo{}, errors.New("get blcok info error")
-		}
-		var commitedBlock blockResp
-		err = json.NewDecoder(httpRes.Body).Decode(&commitedBlock)
-		if err != nil {
-			fmt.Printf("error decoding block %v\n", err)
-			return &TxInfo{}, errors.New("error decoding block")
-		}
-		// EXAMPLE OF RESULT: DECODED COMMITTED TX HEIGHT 10 AND TIMESTAMP 2021-06-08T16:15:44.8835491Z
-		fmt.Printf("DECODED COMMITTED TX HEIGHT %v AND TIMESTAMP %v\n", committedTx.TxResult.Height, commitedBlock.BlockResult.Block.Header.Time)
-		return &TxInfo{
-			txHeight:    committedTx.TxResult.Height,
-			txTimestamp: commitedBlock.BlockResult.Block.Header.Time,
-			txCommitted: true,
-		}, nil
+	var committedTx types.TxResp
+	err = json.NewDecoder(httpRes.Body).Decode(&committedTx)
+	if err != nil {
+		fmt.Printf("error decoding tx %v\n", err)
+		return &types.TxInfo{}, errors.New("error decoding tx")
 	}
-
-	// TODO: refactor, this should not happen
-	return &TxInfo{}, nil
+	// query for block at specific height to find timestamp
+	str = "http://localhost:26657/block?height" + committedTx.TxResult.Height
+	httpRes, err = http.Get(str)
+	if err != nil {
+		fmt.Printf("error during http block req %v\n", err)
+		return &types.TxInfo{}, errors.New("get blcok info error")
+	}
+	var commitedBlock types.BlockResp
+	err = json.NewDecoder(httpRes.Body).Decode(&commitedBlock)
+	if err != nil {
+		fmt.Printf("error decoding block %v\n", err)
+		return &types.TxInfo{}, errors.New("error decoding block")
+	}
+	fmt.Printf("DECODED COMMITTED TX HEIGHT %v AND TIMESTAMP %v\n", committedTx.TxResult.Height, commitedBlock.BlockResult.Block.Header.Time)
+	return &types.TxInfo{
+		TxHeight:    committedTx.TxResult.Height,
+		TxTimestamp: commitedBlock.BlockResult.Block.Header.Time,
+		TxCommitted: true,
+	}, nil
 }
 
-func worker(jobs chan Job, results chan Result) {
+func worker(jobs chan types.Job, results chan types.Result) {
 	for job := range jobs {
-		txInfo, err := getTxInfo(job.txHash)
+		txInfo, err := getTxInfo(job.TxHash)
 		if err != nil {
-			// TODO: what to do here? it would be http error
+			// here it would be http error
 			// it seems that we can just let it go through result channel
 			fmt.Printf("result error %v\n", err)
 		}
 		fmt.Printf("result tx %v\n", txInfo)
-		output := Result{job: job, txInfo: *txInfo}
+		output := types.Result{Job: job, TxInfo: *txInfo}
 		results <- output
 	}
 	close(results)
 }
 
-func createWorkerPool(noOfWorkers int, jobs chan Job, results chan Result) {
+func createWorkerPool(noOfWorkers int, jobs chan types.Job, results chan types.Result) {
 	for i := 0; i < noOfWorkers; i++ {
-		fmt.Printf("worker no %v\n", i)
 		go worker(jobs, results)
 	}
 }
