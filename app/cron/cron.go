@@ -107,6 +107,7 @@ func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 }
 
 func worker(jobs chan types.Job, results chan types.Result) {
+	defer close(results)
 	for job := range jobs {
 		txInfo, err := getTxInfo(job.TxHash)
 		if err != nil {
@@ -118,7 +119,6 @@ func worker(jobs chan types.Job, results chan types.Result) {
 		output := types.Result{Job: job, TxInfo: *txInfo}
 		results <- output
 	}
-	close(results)
 }
 
 func createWorkerPool(noOfWorkers int, jobs chan types.Job, results chan types.Result) {
