@@ -34,13 +34,13 @@ func queryTrustmeshes() {
 
 	for _, trustmeshEntry := range trustmeshEntries {
 		fmt.Printf("creating job for %v\n", trustmeshEntry.TendermintTransactionId)
-		job := types.Job{TxHash: trustmeshEntry.TendermintTransactionId}
+		job := types.Job{TrustmeshEntry: trustmeshEntry}
 		jobs <- job
 	}
 	close(jobs)
 
 	for result := range results {
-		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TxHash, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
+		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TendermintTransactionId, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
 		if result.TxInfo.TxHeight != "" && result.TxInfo.TxTimestamp != "" {
 			businessprocess.SetTxStatusToCommitted(result, db)
 		}
@@ -94,14 +94,15 @@ func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 func worker(jobs chan types.Job, results chan types.Result) {
 	defer close(results)
 	for job := range jobs {
-		txInfo, err := getTxInfo(job.TxHash)
+		txInfo, err := getTxInfo(job.TrustmeshEntry.TendermintTransactionId)
 		if err != nil {
 			// here it would be http error
 			// it seems that we can just let it go through result channel
 			fmt.Printf("result error %v\n", err)
 		}
-		fmt.Printf("result tx %v\n", txInfo)
+		fmt.Printf("result tx %v transaction type %v\n", txInfo, job.TrustmeshEntry.BaseledgerTransactionType)
 		output := types.Result{Job: job, TxInfo: *txInfo}
+		businessprocess.ExecuteBusinessLogic(output)
 		results <- output
 	}
 }

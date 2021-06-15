@@ -1,5 +1,9 @@
 package types
 
+import (
+	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
+)
+
 // these structs are related to tendermint jsonrpc
 type TxResult struct {
 	Hash   string `json:"hash"`
@@ -28,7 +32,7 @@ type BlockResp struct {
 
 // these structs are related to worker pool
 type Job struct {
-	TxHash string
+	TrustmeshEntry proxytypes.TrustmeshEntry
 }
 type Result struct {
 	Job    Job

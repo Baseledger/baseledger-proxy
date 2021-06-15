@@ -14,7 +14,7 @@ type OffchainProcessMessage struct {
 	WorkstepType                         string
 	Hash                                 string
 	TendermintTransactionIdOfStoredProof string
-	BlockchainTransactionIdOfStoredProof string
+	BaseledgerTransactionIdOfStoredProof string
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
 	StatusTextMessage                    string
