@@ -30,6 +30,9 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Println("SUGGEST BUSINESS LOGIC")
 		offchainMessage := createSuggestOffchainMessage(txResult)
 		proxy.SendOffchainProcessMessage(offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
+
+		// JUST FOR TESTING
+		proxy.OffchainProcessMessageReceived(offchainMessage)
 	case "Feedback":
 		fmt.Println("FEEDBACK BUSSINESS LOGIC")
 	default:
