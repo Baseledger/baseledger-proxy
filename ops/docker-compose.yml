@@ -30,22 +30,22 @@ services:
     ports:
       - 4222:4222 
     restart: always
-  starport:
-      # build: <starport dockerfile>
-      image: starport/cli
-      command: ["serve"]
-      container_name: starport
-      volumes:
-        - ../:/apps
-      working_dir: /apps
-      hostname:
-        starport
-      networks:
-        - baseledger
-      ports:
-        - 1317:1317
-        - 26657:26657
-      restart: always
+  # starport:
+  #     # build: <starport dockerfile>
+  #     image: starport/cli
+  #     command: ["serve"]
+  #     container_name: starport
+  #     volumes:
+  #       - ../:/apps
+  #     working_dir: /apps
+  #     hostname:
+  #       starport
+  #     networks:
+  #       - baseledger
+  #     ports:
+  #       - 1317:1317
+  #       - 26657:26657
+  #     restart: always
 
 networks:
   baseledger:

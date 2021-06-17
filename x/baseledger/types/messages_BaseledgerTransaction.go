@@ -46,7 +46,7 @@ func (msg *MsgCreateBaseledgerTransaction) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateBaseledgerTransaction{}
 
-func NewMsgUpdateBaseledgerTransaction(creator string, id uint64, baseledgerTransactionId string, payload string) *MsgUpdateBaseledgerTransaction {
+func NewMsgUpdateBaseledgerTransaction(creator string, id string, baseledgerTransactionId string, payload string) *MsgUpdateBaseledgerTransaction {
 	return &MsgUpdateBaseledgerTransaction{
 		Id:                      id,
 		Creator:                 creator,
@@ -86,7 +86,7 @@ func (msg *MsgUpdateBaseledgerTransaction) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgDeleteBaseledgerTransaction{}
 
-func NewMsgDeleteBaseledgerTransaction(creator string, id uint64) *MsgDeleteBaseledgerTransaction {
+func NewMsgDeleteBaseledgerTransaction(creator string, id string) *MsgDeleteBaseledgerTransaction {
 	return &MsgDeleteBaseledgerTransaction{
 		Id:      id,
 		Creator: creator,

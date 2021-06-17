@@ -19293,7 +19293,6 @@ paths:
                       type: string
                     id:
                       type: string
-                      format: uint64
                     baseledgerTransactionId:
                       type: string
                     payload:
@@ -19411,7 +19410,6 @@ paths:
                     type: string
                   id:
                     type: string
-                    format: uint64
                   baseledgerTransactionId:
                     type: string
                   payload:
@@ -19441,7 +19439,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
 definitions:
@@ -29665,7 +29662,6 @@ definitions:
         type: string
       id:
         type: string
-        format: uint64
       baseledgerTransactionId:
         type: string
       payload:
@@ -29675,7 +29671,6 @@ definitions:
     properties:
       id:
         type: string
-        format: uint64
   unibrightio.baseledger.baseledger.MsgDeleteBaseledgerTransactionResponse:
     type: object
   unibrightio.baseledger.baseledger.MsgUpdateBaseledgerTransactionResponse:
@@ -29692,7 +29687,6 @@ definitions:
               type: string
             id:
               type: string
-              format: uint64
             baseledgerTransactionId:
               type: string
             payload:
@@ -29732,7 +29726,6 @@ definitions:
             type: string
           id:
             type: string
-            format: uint64
           baseledgerTransactionId:
             type: string
           payload:

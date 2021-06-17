@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"strconv"
-
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/cast"
@@ -52,11 +50,6 @@ func CmdUpdateBaseledgerTransaction() *cobra.Command {
 		Short: "Update a BaseledgerTransaction",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
 			argsBaseledgerTransactionId, err := cast.ToStringE(args[1])
 			if err != nil {
 				return err
@@ -72,7 +65,7 @@ func CmdUpdateBaseledgerTransaction() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateBaseledgerTransaction(clientCtx.GetFromAddress().String(), id, argsBaseledgerTransactionId, argsPayload)
+			msg := types.NewMsgUpdateBaseledgerTransaction(clientCtx.GetFromAddress().String(), args[0], argsBaseledgerTransactionId, argsPayload)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -91,17 +84,12 @@ func CmdDeleteBaseledgerTransaction() *cobra.Command {
 		Short: "Delete a BaseledgerTransaction by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgDeleteBaseledgerTransaction(clientCtx.GetFromAddress().String(), id)
+			msg := types.NewMsgDeleteBaseledgerTransaction(clientCtx.GetFromAddress().String(), args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -40,7 +40,7 @@ func (k msgServer) UpdateBaseledgerTransaction(goCtx context.Context, msg *types
 
 	// Checks that the element exists
 	if !k.HasBaseledgerTransaction(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Id))
 	}
 
 	// Checks if the the msg sender is the same as the current owner
@@ -57,7 +57,7 @@ func (k msgServer) DeleteBaseledgerTransaction(goCtx context.Context, msg *types
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if !k.HasBaseledgerTransaction(ctx, msg.Id) {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %s doesn't exist", msg.Id))
 	}
 	if msg.Creator != k.GetBaseledgerTransactionOwner(ctx, msg.Id) {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")

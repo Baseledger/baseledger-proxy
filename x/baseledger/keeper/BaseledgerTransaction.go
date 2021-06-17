@@ -1,11 +1,12 @@
 package keeper
 
 import (
-	"encoding/binary"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/x/baseledger/types"
-	"strconv"
 )
 
 // GetBaseledgerTransactionCount get the total number of BaseledgerTransaction
@@ -41,53 +42,53 @@ func (k Keeper) SetBaseledgerTransactionCount(ctx sdk.Context, count uint64) {
 func (k Keeper) AppendBaseledgerTransaction(
 	ctx sdk.Context,
 	BaseledgerTransaction types.BaseledgerTransaction,
-) uint64 {
+) string {
 	// Create the BaseledgerTransaction
 	count := k.GetBaseledgerTransactionCount(ctx)
 
 	// Set the ID of the appended value
-	BaseledgerTransaction.Id = count
+	// BaseledgerTransaction.Id = count
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
 	appendedValue := k.cdc.MustMarshalBinaryBare(&BaseledgerTransaction)
-	store.Set(GetBaseledgerTransactionIDBytes(BaseledgerTransaction.Id), appendedValue)
+	store.Set(GetBaseledgerTransactionUUIDBytes(BaseledgerTransaction.Id), appendedValue)
 
 	// Update BaseledgerTransaction count
 	k.SetBaseledgerTransactionCount(ctx, count+1)
 
-	return count
+	return BaseledgerTransaction.Id
 }
 
 // SetBaseledgerTransaction set a specific BaseledgerTransaction in the store
 func (k Keeper) SetBaseledgerTransaction(ctx sdk.Context, BaseledgerTransaction types.BaseledgerTransaction) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
 	b := k.cdc.MustMarshalBinaryBare(&BaseledgerTransaction)
-	store.Set(GetBaseledgerTransactionIDBytes(BaseledgerTransaction.Id), b)
+	store.Set(GetBaseledgerTransactionUUIDBytes(BaseledgerTransaction.Id), b)
 }
 
 // GetBaseledgerTransaction returns a BaseledgerTransaction from its id
-func (k Keeper) GetBaseledgerTransaction(ctx sdk.Context, id uint64) types.BaseledgerTransaction {
+func (k Keeper) GetBaseledgerTransaction(ctx sdk.Context, id string) types.BaseledgerTransaction {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
 	var BaseledgerTransaction types.BaseledgerTransaction
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetBaseledgerTransactionIDBytes(id)), &BaseledgerTransaction)
+	k.cdc.MustUnmarshalBinaryBare(store.Get(GetBaseledgerTransactionUUIDBytes(id)), &BaseledgerTransaction)
 	return BaseledgerTransaction
 }
 
 // HasBaseledgerTransaction checks if the BaseledgerTransaction exists in the store
-func (k Keeper) HasBaseledgerTransaction(ctx sdk.Context, id uint64) bool {
+func (k Keeper) HasBaseledgerTransaction(ctx sdk.Context, id string) bool {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
-	return store.Has(GetBaseledgerTransactionIDBytes(id))
+	return store.Has(GetBaseledgerTransactionUUIDBytes(id))
 }
 
 // GetBaseledgerTransactionOwner returns the creator of the BaseledgerTransaction
-func (k Keeper) GetBaseledgerTransactionOwner(ctx sdk.Context, id uint64) string {
+func (k Keeper) GetBaseledgerTransactionOwner(ctx sdk.Context, id string) string {
 	return k.GetBaseledgerTransaction(ctx, id).Creator
 }
 
 // RemoveBaseledgerTransaction removes a BaseledgerTransaction from the store
-func (k Keeper) RemoveBaseledgerTransaction(ctx sdk.Context, id uint64) {
+func (k Keeper) RemoveBaseledgerTransaction(ctx sdk.Context, id string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
-	store.Delete(GetBaseledgerTransactionIDBytes(id))
+	store.Delete(GetBaseledgerTransactionUUIDBytes(id))
 }
 
 // GetAllBaseledgerTransaction returns all BaseledgerTransaction
@@ -106,14 +107,19 @@ func (k Keeper) GetAllBaseledgerTransaction(ctx sdk.Context) (list []types.Basel
 	return
 }
 
-// GetBaseledgerTransactionIDBytes returns the byte representation of the ID
-func GetBaseledgerTransactionIDBytes(id uint64) []byte {
-	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, id)
-	return bz
+func GetBaseledgerTransactionUUIDBytes(id string) []byte {
+	uuidFromString, _ := uuid.FromString(id)
+	return uuidFromString.Bytes()
 }
 
+// GetBaseledgerTransactionIDBytes returns the byte representation of the ID
+// func GetBaseledgerTransactionIDBytes(id uint64) []byte {
+// 	bz := make([]byte, 8)
+// 	binary.BigEndian.PutUint64(bz, id)
+// 	return bz
+// }
+
 // GetBaseledgerTransactionIDFromBytes returns ID in uint64 format from a byte array
-func GetBaseledgerTransactionIDFromBytes(bz []byte) uint64 {
-	return binary.BigEndian.Uint64(bz)
-}
+// func GetBaseledgerTransactionIDFromBytes(bz []byte) uint64 {
+// 	return binary.BigEndian.Uint64(bz)
+// }
