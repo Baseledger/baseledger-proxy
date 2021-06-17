@@ -3,7 +3,7 @@ export declare const protobufPackage = "unibrightio.baseledger.baseledger";
 /** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgCreateBaseledgerTransaction {
     creator: string;
-    baseId: string;
+    baseledgerTransactionId: string;
     payload: string;
 }
 export interface MsgCreateBaseledgerTransactionResponse {
@@ -12,7 +12,7 @@ export interface MsgCreateBaseledgerTransactionResponse {
 export interface MsgUpdateBaseledgerTransaction {
     creator: string;
     id: number;
-    baseId: string;
+    baseledgerTransactionId: string;
     payload: string;
 }
 export interface MsgUpdateBaseledgerTransactionResponse {

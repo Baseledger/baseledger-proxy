@@ -13,9 +13,9 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var BaseledgerTransaction = types.BaseledgerTransaction{
-		Creator: msg.Creator,
-		BaseId:  msg.BaseId,
-		Payload: msg.Payload,
+		Creator:                 msg.Creator,
+		BaseledgerTransactionId: msg.BaseledgerTransactionId,
+		Payload:                 msg.Payload,
 	}
 
 	id := k.AppendBaseledgerTransaction(
@@ -32,10 +32,10 @@ func (k msgServer) UpdateBaseledgerTransaction(goCtx context.Context, msg *types
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var BaseledgerTransaction = types.BaseledgerTransaction{
-		Creator: msg.Creator,
-		Id:      msg.Id,
-		BaseId:  msg.BaseId,
-		Payload: msg.Payload,
+		Creator:                 msg.Creator,
+		Id:                      msg.Id,
+		BaseledgerTransactionId: msg.BaseledgerTransactionId,
+		Payload:                 msg.Payload,
 	}
 
 	// Checks that the element exists

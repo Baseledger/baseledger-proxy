@@ -19294,7 +19294,7 @@ paths:
                     id:
                       type: string
                       format: uint64
-                    baseId:
+                    baseledgerTransactionId:
                       type: string
                     payload:
                       type: string
@@ -19412,7 +19412,7 @@ paths:
                   id:
                     type: string
                     format: uint64
-                  baseId:
+                  baseledgerTransactionId:
                     type: string
                   payload:
                     type: string
@@ -29666,7 +29666,7 @@ definitions:
       id:
         type: string
         format: uint64
-      baseId:
+      baseledgerTransactionId:
         type: string
       payload:
         type: string
@@ -29693,7 +29693,7 @@ definitions:
             id:
               type: string
               format: uint64
-            baseId:
+            baseledgerTransactionId:
               type: string
             payload:
               type: string
@@ -29733,7 +29733,7 @@ definitions:
           id:
             type: string
             format: uint64
-          baseId:
+          baseledgerTransactionId:
             type: string
           payload:
             type: string

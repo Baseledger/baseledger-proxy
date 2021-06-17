@@ -2,14 +2,14 @@
 import { Reader, util, configure, Writer } from 'protobufjs/minimal';
 import * as Long from 'long';
 export const protobufPackage = 'unibrightio.baseledger.baseledger';
-const baseMsgCreateBaseledgerTransaction = { creator: '', baseId: '', payload: '' };
+const baseMsgCreateBaseledgerTransaction = { creator: '', baseledgerTransactionId: '', payload: '' };
 export const MsgCreateBaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
             writer.uint32(10).string(message.creator);
         }
-        if (message.baseId !== '') {
-            writer.uint32(18).string(message.baseId);
+        if (message.baseledgerTransactionId !== '') {
+            writer.uint32(18).string(message.baseledgerTransactionId);
         }
         if (message.payload !== '') {
             writer.uint32(26).string(message.payload);
@@ -27,7 +27,7 @@ export const MsgCreateBaseledgerTransaction = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.baseId = reader.string();
+                    message.baseledgerTransactionId = reader.string();
                     break;
                 case 3:
                     message.payload = reader.string();
@@ -47,11 +47,11 @@ export const MsgCreateBaseledgerTransaction = {
         else {
             message.creator = '';
         }
-        if (object.baseId !== undefined && object.baseId !== null) {
-            message.baseId = String(object.baseId);
+        if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+            message.baseledgerTransactionId = String(object.baseledgerTransactionId);
         }
         else {
-            message.baseId = '';
+            message.baseledgerTransactionId = '';
         }
         if (object.payload !== undefined && object.payload !== null) {
             message.payload = String(object.payload);
@@ -64,7 +64,7 @@ export const MsgCreateBaseledgerTransaction = {
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
-        message.baseId !== undefined && (obj.baseId = message.baseId);
+        message.baseledgerTransactionId !== undefined && (obj.baseledgerTransactionId = message.baseledgerTransactionId);
         message.payload !== undefined && (obj.payload = message.payload);
         return obj;
     },
@@ -76,11 +76,11 @@ export const MsgCreateBaseledgerTransaction = {
         else {
             message.creator = '';
         }
-        if (object.baseId !== undefined && object.baseId !== null) {
-            message.baseId = object.baseId;
+        if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+            message.baseledgerTransactionId = object.baseledgerTransactionId;
         }
         else {
-            message.baseId = '';
+            message.baseledgerTransactionId = '';
         }
         if (object.payload !== undefined && object.payload !== null) {
             message.payload = object.payload;
@@ -142,7 +142,7 @@ export const MsgCreateBaseledgerTransactionResponse = {
         return message;
     }
 };
-const baseMsgUpdateBaseledgerTransaction = { creator: '', id: 0, baseId: '', payload: '' };
+const baseMsgUpdateBaseledgerTransaction = { creator: '', id: 0, baseledgerTransactionId: '', payload: '' };
 export const MsgUpdateBaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
@@ -151,8 +151,8 @@ export const MsgUpdateBaseledgerTransaction = {
         if (message.id !== 0) {
             writer.uint32(16).uint64(message.id);
         }
-        if (message.baseId !== '') {
-            writer.uint32(26).string(message.baseId);
+        if (message.baseledgerTransactionId !== '') {
+            writer.uint32(26).string(message.baseledgerTransactionId);
         }
         if (message.payload !== '') {
             writer.uint32(34).string(message.payload);
@@ -173,7 +173,7 @@ export const MsgUpdateBaseledgerTransaction = {
                     message.id = longToNumber(reader.uint64());
                     break;
                 case 3:
-                    message.baseId = reader.string();
+                    message.baseledgerTransactionId = reader.string();
                     break;
                 case 4:
                     message.payload = reader.string();
@@ -199,11 +199,11 @@ export const MsgUpdateBaseledgerTransaction = {
         else {
             message.id = 0;
         }
-        if (object.baseId !== undefined && object.baseId !== null) {
-            message.baseId = String(object.baseId);
+        if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+            message.baseledgerTransactionId = String(object.baseledgerTransactionId);
         }
         else {
-            message.baseId = '';
+            message.baseledgerTransactionId = '';
         }
         if (object.payload !== undefined && object.payload !== null) {
             message.payload = String(object.payload);
@@ -217,7 +217,7 @@ export const MsgUpdateBaseledgerTransaction = {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
         message.id !== undefined && (obj.id = message.id);
-        message.baseId !== undefined && (obj.baseId = message.baseId);
+        message.baseledgerTransactionId !== undefined && (obj.baseledgerTransactionId = message.baseledgerTransactionId);
         message.payload !== undefined && (obj.payload = message.payload);
         return obj;
     },
@@ -235,11 +235,11 @@ export const MsgUpdateBaseledgerTransaction = {
         else {
             message.id = 0;
         }
-        if (object.baseId !== undefined && object.baseId !== null) {
-            message.baseId = object.baseId;
+        if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+            message.baseledgerTransactionId = object.baseledgerTransactionId;
         }
         else {
-            message.baseId = '';
+            message.baseledgerTransactionId = '';
         }
         if (object.payload !== undefined && object.payload !== null) {
             message.payload = object.payload;
