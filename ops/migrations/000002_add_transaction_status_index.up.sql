@@ -1,0 +1,1 @@
+CREATE INDEX idx_transaction_status ON public.trustmesh_entries USING btree (transaction_status);

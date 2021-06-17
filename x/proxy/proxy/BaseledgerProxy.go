@@ -17,6 +17,12 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/tx"
 )
 
+type workgroupMock struct {
+	BaselineWorkgroupID string
+	Description         string
+	PrivatizeKey        string
+}
+
 type IBaseledgerProxy interface {
 	CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string)
 	SendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string)
@@ -55,6 +61,7 @@ func CreateBaseledgerTransactionPayload(synchronizationRequest *types.Synchroniz
 		synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 		synchronizationRequest.WorkstepType+" suggested")
 
+	workgroup := findWorkgroupMock(synchronizationRequest.WorkgroupId)
 	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
 
 	transactionIdUuid, _ := uuid.NewV4()
@@ -72,12 +79,21 @@ func CreateBaseledgerTransactionPayload(synchronizationRequest *types.Synchroniz
 	}
 
 	fmt.Printf("\n payload %v \n", *payload)
-	enc := privatizePayload(payload, "workgroup.PrivatizeKey")
+	enc := privatizePayload(payload, workgroup.PrivatizeKey)
 	fmt.Printf("enc %s\n\n", enc)
-	dec := deprivatizePayload(enc, "workgroup.PrivatizeKey")
+	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
 	fmt.Printf("dec %s\n", dec)
 
 	return enc, transactionIdUuid.String()
+}
+
+func findWorkgroupMock(workgroupId string) *workgroupMock {
+	newUuid, _ := uuid.NewV4()
+	return &workgroupMock{
+		BaselineWorkgroupID: newUuid.String(),
+		Description:         "Mocked workgroup",
+		PrivatizeKey:        "0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314",
+	}
 }
 
 func sendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string) {

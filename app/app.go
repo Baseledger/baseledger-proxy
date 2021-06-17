@@ -87,6 +87,8 @@ import (
 	appparams "github.com/unibrightio/baseledger/app/params"
 	"github.com/unibrightio/baseledger/docs"
 
+	"github.com/unibrightio/baseledger/app/cron"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/unibrightio/baseledger/x/baseledger"
@@ -570,6 +572,8 @@ func New(
 
 	initDbIfNotExists()
 	performMigrations()
+
+	cron.StartCron()
 
 	return app
 }
