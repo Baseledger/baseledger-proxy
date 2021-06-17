@@ -14,7 +14,7 @@ export interface BaseledgerBaseledgerTransaction {
 
   /** @format uint64 */
   id?: string;
-  baseId?: string;
+  baseledgerTransactionId?: string;
   payload?: string;
 }
 

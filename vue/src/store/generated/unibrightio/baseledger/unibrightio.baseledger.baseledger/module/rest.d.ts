@@ -2,7 +2,7 @@ export interface BaseledgerBaseledgerTransaction {
     creator?: string;
     /** @format uint64 */
     id?: string;
-    baseId?: string;
+    baseledgerTransactionId?: string;
     payload?: string;
 }
 export interface BaseledgerMsgCreateBaseledgerTransactionResponse {

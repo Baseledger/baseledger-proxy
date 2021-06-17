@@ -17,7 +17,7 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/message
 message MsgCreateBaseledgerTransaction {
   string creator = 1;
-  string baseId = 2;
+  string baseledgerTransactionId = 2;
   string payload = 3;
 }
 
@@ -28,7 +28,7 @@ message MsgCreateBaseledgerTransactionResponse {
 message MsgUpdateBaseledgerTransaction {
   string creator = 1;
   uint64 id = 2;
-  string baseId = 3;
+  string baseledgerTransactionId = 3;
   string payload = 4;
 }
 
