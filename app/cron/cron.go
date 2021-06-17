@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-co-op/gocron"
 
-	businessprocess "github.com/unibrightio/baseledger/app/business_process"
+	businesslogic "github.com/unibrightio/baseledger/app/business_logic"
 	"github.com/unibrightio/baseledger/app/types"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
@@ -34,7 +34,7 @@ func queryTrustmeshes() {
 
 	for _, trustmeshEntry := range trustmeshEntries {
 		fmt.Printf("creating job for %v\n", trustmeshEntry.TransactionHash)
-		job := types.Job{TxHash: trustmeshEntry.TransactionHash}
+		job := types.Job{TrustmeshEntry: trustmeshEntry}
 		jobs <- job
 	}
 	close(jobs)
@@ -42,7 +42,7 @@ func queryTrustmeshes() {
 	for result := range results {
 		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TendermintTransactionId, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
 		if result.TxInfo.TxHeight != "" && result.TxInfo.TxTimestamp != "" {
-			businessprocess.SetTxStatusToCommitted(result, db)
+			businesslogic.SetTxStatusToCommitted(result, db)
 		}
 	}
 	fmt.Println("query trustmeshes end")
@@ -102,7 +102,7 @@ func worker(jobs chan types.Job, results chan types.Result) {
 		}
 		fmt.Printf("result tx %v transaction type %v\n", txInfo, job.TrustmeshEntry.BaseledgerTransactionType)
 		output := types.Result{Job: job, TxInfo: *txInfo}
-		businessprocess.ExecuteBusinessLogic(output)
+		businesslogic.ExecuteBusinessLogic(output)
 		results <- output
 	}
 }

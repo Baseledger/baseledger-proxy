@@ -1,4 +1,4 @@
-package businessprocess
+package businesslogic
 
 import (
 	"fmt"
@@ -26,15 +26,18 @@ func SetTxStatusToCommitted(txResult types.Result, db *gorm.DB) {
 
 func ExecuteBusinessLogic(txResult types.Result) {
 	switch txResult.Job.TrustmeshEntry.BaseledgerTransactionType {
-	case "Suggest":
-		fmt.Println("SUGGEST BUSINESS LOGIC")
+	case "SuggestionSent":
+		fmt.Println("SuggestionSent")
+		// send offchain msg to all receivers
 		offchainMessage := createSuggestOffchainMessage(txResult)
 		proxy.SendOffchainProcessMessage(offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
-
-		// JUST FOR TESTING
-		proxy.OffchainProcessMessageReceived(offchainMessage)
-	case "Feedback":
-		fmt.Println("FEEDBACK BUSSINESS LOGIC")
+	case "SuggestionReceived":
+		fmt.Println("SuggestionReceived")
+	case "FeedbackSent":
+		fmt.Println("FeedbackSent")
+		// send offchain msg to sender of sugestion
+	case "FeedbackReceived":
+		fmt.Println("FeedbackReceived")
 	default:
 		// TODO panic
 		fmt.Println("UNKNOWN BUSINESS LOGIC")

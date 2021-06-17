@@ -122,7 +122,8 @@ func OffchainProcessMessageReceived(processMessage types.OffchainProcessMessage)
 
 	queryClient := baseledgertypes.NewQueryClient(grpcConn)
 
-	response, err := queryClient.BaseledgerTransaction(context.Background(), &baseledgertypes.QueryGetBaseledgerTransactionRequest{Id: 0})
+	// TODO: just a hack to fix build, check
+	response, err := queryClient.BaseledgerTransaction(context.Background(), &baseledgertypes.QueryGetBaseledgerTransactionRequest{Id: "0"})
 
 	if err != nil {
 		// should we panic here?
