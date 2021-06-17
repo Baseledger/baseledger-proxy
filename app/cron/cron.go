@@ -33,8 +33,8 @@ func queryTrustmeshes() {
 	createWorkerPool(1, jobs, results)
 
 	for _, trustmeshEntry := range trustmeshEntries {
-		fmt.Printf("creating job for %v\n", trustmeshEntry.TendermintTransactionId)
-		job := types.Job{TrustmeshEntry: trustmeshEntry}
+		fmt.Printf("creating job for %v\n", trustmeshEntry.TransactionHash)
+		job := types.Job{TxHash: trustmeshEntry.TransactionHash}
 		jobs <- job
 	}
 	close(jobs)

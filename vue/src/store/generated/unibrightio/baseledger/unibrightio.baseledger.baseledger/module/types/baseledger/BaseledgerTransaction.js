@@ -1,15 +1,14 @@
 /* eslint-disable */
-import * as Long from 'long';
-import { util, configure, Writer, Reader } from 'protobufjs/minimal';
+import { Writer, Reader } from 'protobufjs/minimal';
 export const protobufPackage = 'unibrightio.baseledger.baseledger';
-const baseBaseledgerTransaction = { creator: '', id: 0, baseledgerTransactionId: '', payload: '' };
+const baseBaseledgerTransaction = { creator: '', id: '', baseledgerTransactionId: '', payload: '' };
 export const BaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
             writer.uint32(10).string(message.creator);
         }
-        if (message.id !== 0) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== '') {
+            writer.uint32(18).string(message.id);
         }
         if (message.baseledgerTransactionId !== '') {
             writer.uint32(26).string(message.baseledgerTransactionId);
@@ -30,7 +29,7 @@ export const BaseledgerTransaction = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = longToNumber(reader.uint64());
+                    message.id = reader.string();
                     break;
                 case 3:
                     message.baseledgerTransactionId = reader.string();
@@ -54,10 +53,10 @@ export const BaseledgerTransaction = {
             message.creator = '';
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
             message.baseledgerTransactionId = String(object.baseledgerTransactionId);
@@ -93,7 +92,7 @@ export const BaseledgerTransaction = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
             message.baseledgerTransactionId = object.baseledgerTransactionId;
@@ -110,24 +109,3 @@ export const BaseledgerTransaction = {
         return message;
     }
 };
-var globalThis = (() => {
-    if (typeof globalThis !== 'undefined')
-        return globalThis;
-    if (typeof self !== 'undefined')
-        return self;
-    if (typeof window !== 'undefined')
-        return window;
-    if (typeof global !== 'undefined')
-        return global;
-    throw 'Unable to locate global object';
-})();
-function longToNumber(long) {
-    if (long.gt(Number.MAX_SAFE_INTEGER)) {
-        throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
-    }
-    return long.toNumber();
-}
-if (util.Long !== Long) {
-    util.Long = Long;
-    configure();
-}

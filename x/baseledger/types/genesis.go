@@ -24,7 +24,7 @@ func (gs GenesisState) Validate() error {
 
 	// this line is used by starport scaffolding # genesis/types/validate
 	// Check for duplicated ID in BaseledgerTransaction
-	BaseledgerTransactionIdMap := make(map[uint64]bool)
+	BaseledgerTransactionIdMap := make(map[string]bool)
 
 	for _, elem := range gs.BaseledgerTransactionList {
 		if _, ok := BaseledgerTransactionIdMap[elem.Id]; ok {

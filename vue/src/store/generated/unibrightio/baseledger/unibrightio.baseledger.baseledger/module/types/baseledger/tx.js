@@ -1,18 +1,20 @@
 /* eslint-disable */
-import { Reader, util, configure, Writer } from 'protobufjs/minimal';
-import * as Long from 'long';
+import { Reader, Writer } from 'protobufjs/minimal';
 export const protobufPackage = 'unibrightio.baseledger.baseledger';
-const baseMsgCreateBaseledgerTransaction = { creator: '', baseledgerTransactionId: '', payload: '' };
+const baseMsgCreateBaseledgerTransaction = { creator: '', id: '', baseledgerTransactionId: '', payload: '' };
 export const MsgCreateBaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
             writer.uint32(10).string(message.creator);
         }
+        if (message.id !== '') {
+            writer.uint32(18).string(message.id);
+        }
         if (message.baseledgerTransactionId !== '') {
-            writer.uint32(18).string(message.baseledgerTransactionId);
+            writer.uint32(26).string(message.baseledgerTransactionId);
         }
         if (message.payload !== '') {
-            writer.uint32(26).string(message.payload);
+            writer.uint32(34).string(message.payload);
         }
         return writer;
     },
@@ -27,9 +29,12 @@ export const MsgCreateBaseledgerTransaction = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.baseledgerTransactionId = reader.string();
+                    message.id = reader.string();
                     break;
                 case 3:
+                    message.baseledgerTransactionId = reader.string();
+                    break;
+                case 4:
                     message.payload = reader.string();
                     break;
                 default:
@@ -46,6 +51,12 @@ export const MsgCreateBaseledgerTransaction = {
         }
         else {
             message.creator = '';
+        }
+        if (object.id !== undefined && object.id !== null) {
+            message.id = String(object.id);
+        }
+        else {
+            message.id = '';
         }
         if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
             message.baseledgerTransactionId = String(object.baseledgerTransactionId);
@@ -64,6 +75,7 @@ export const MsgCreateBaseledgerTransaction = {
     toJSON(message) {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
+        message.id !== undefined && (obj.id = message.id);
         message.baseledgerTransactionId !== undefined && (obj.baseledgerTransactionId = message.baseledgerTransactionId);
         message.payload !== undefined && (obj.payload = message.payload);
         return obj;
@@ -75,6 +87,12 @@ export const MsgCreateBaseledgerTransaction = {
         }
         else {
             message.creator = '';
+        }
+        if (object.id !== undefined && object.id !== null) {
+            message.id = object.id;
+        }
+        else {
+            message.id = '';
         }
         if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
             message.baseledgerTransactionId = object.baseledgerTransactionId;
@@ -91,11 +109,11 @@ export const MsgCreateBaseledgerTransaction = {
         return message;
     }
 };
-const baseMsgCreateBaseledgerTransactionResponse = { id: 0 };
+const baseMsgCreateBaseledgerTransactionResponse = { id: '' };
 export const MsgCreateBaseledgerTransactionResponse = {
     encode(message, writer = Writer.create()) {
-        if (message.id !== 0) {
-            writer.uint32(8).uint64(message.id);
+        if (message.id !== '') {
+            writer.uint32(10).string(message.id);
         }
         return writer;
     },
@@ -107,7 +125,7 @@ export const MsgCreateBaseledgerTransactionResponse = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.id = longToNumber(reader.uint64());
+                    message.id = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -119,10 +137,10 @@ export const MsgCreateBaseledgerTransactionResponse = {
     fromJSON(object) {
         const message = { ...baseMsgCreateBaseledgerTransactionResponse };
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         return message;
     },
@@ -137,19 +155,19 @@ export const MsgCreateBaseledgerTransactionResponse = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         return message;
     }
 };
-const baseMsgUpdateBaseledgerTransaction = { creator: '', id: 0, baseledgerTransactionId: '', payload: '' };
+const baseMsgUpdateBaseledgerTransaction = { creator: '', id: '', baseledgerTransactionId: '', payload: '' };
 export const MsgUpdateBaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
             writer.uint32(10).string(message.creator);
         }
-        if (message.id !== 0) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== '') {
+            writer.uint32(18).string(message.id);
         }
         if (message.baseledgerTransactionId !== '') {
             writer.uint32(26).string(message.baseledgerTransactionId);
@@ -170,7 +188,7 @@ export const MsgUpdateBaseledgerTransaction = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = longToNumber(reader.uint64());
+                    message.id = reader.string();
                     break;
                 case 3:
                     message.baseledgerTransactionId = reader.string();
@@ -194,10 +212,10 @@ export const MsgUpdateBaseledgerTransaction = {
             message.creator = '';
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
             message.baseledgerTransactionId = String(object.baseledgerTransactionId);
@@ -233,7 +251,7 @@ export const MsgUpdateBaseledgerTransaction = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
             message.baseledgerTransactionId = object.baseledgerTransactionId;
@@ -282,14 +300,14 @@ export const MsgUpdateBaseledgerTransactionResponse = {
         return message;
     }
 };
-const baseMsgDeleteBaseledgerTransaction = { creator: '', id: 0 };
+const baseMsgDeleteBaseledgerTransaction = { creator: '', id: '' };
 export const MsgDeleteBaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
             writer.uint32(10).string(message.creator);
         }
-        if (message.id !== 0) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== '') {
+            writer.uint32(18).string(message.id);
         }
         return writer;
     },
@@ -304,7 +322,7 @@ export const MsgDeleteBaseledgerTransaction = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = longToNumber(reader.uint64());
+                    message.id = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -322,10 +340,10 @@ export const MsgDeleteBaseledgerTransaction = {
             message.creator = '';
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         return message;
     },
@@ -347,7 +365,7 @@ export const MsgDeleteBaseledgerTransaction = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         return message;
     }
@@ -403,25 +421,4 @@ export class MsgClientImpl {
         const promise = this.rpc.request('unibrightio.baseledger.baseledger.Msg', 'DeleteBaseledgerTransaction', data);
         return promise.then((data) => MsgDeleteBaseledgerTransactionResponse.decode(new Reader(data)));
     }
-}
-var globalThis = (() => {
-    if (typeof globalThis !== 'undefined')
-        return globalThis;
-    if (typeof self !== 'undefined')
-        return self;
-    if (typeof window !== 'undefined')
-        return window;
-    if (typeof global !== 'undefined')
-        return global;
-    throw 'Unable to locate global object';
-})();
-function longToNumber(long) {
-    if (long.gt(Number.MAX_SAFE_INTEGER)) {
-        throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
-    }
-    return long.toNumber();
-}
-if (util.Long !== Long) {
-    util.Long = Long;
-    configure();
 }

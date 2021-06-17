@@ -1,14 +1,13 @@
 /* eslint-disable */
-import { Reader, util, configure, Writer } from 'protobufjs/minimal';
-import * as Long from 'long';
+import { Reader, Writer } from 'protobufjs/minimal';
 import { BaseledgerTransaction } from '../baseledger/BaseledgerTransaction';
 import { PageRequest, PageResponse } from '../cosmos/base/query/v1beta1/pagination';
 export const protobufPackage = 'unibrightio.baseledger.baseledger';
-const baseQueryGetBaseledgerTransactionRequest = { id: 0 };
+const baseQueryGetBaseledgerTransactionRequest = { id: '' };
 export const QueryGetBaseledgerTransactionRequest = {
     encode(message, writer = Writer.create()) {
-        if (message.id !== 0) {
-            writer.uint32(8).uint64(message.id);
+        if (message.id !== '') {
+            writer.uint32(10).string(message.id);
         }
         return writer;
     },
@@ -20,7 +19,7 @@ export const QueryGetBaseledgerTransactionRequest = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.id = longToNumber(reader.uint64());
+                    message.id = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -32,10 +31,10 @@ export const QueryGetBaseledgerTransactionRequest = {
     fromJSON(object) {
         const message = { ...baseQueryGetBaseledgerTransactionRequest };
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         return message;
     },
@@ -50,7 +49,7 @@ export const QueryGetBaseledgerTransactionRequest = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
         return message;
     }
@@ -248,25 +247,4 @@ export class QueryClientImpl {
         const promise = this.rpc.request('unibrightio.baseledger.baseledger.Query', 'BaseledgerTransactionAll', data);
         return promise.then((data) => QueryAllBaseledgerTransactionResponse.decode(new Reader(data)));
     }
-}
-var globalThis = (() => {
-    if (typeof globalThis !== 'undefined')
-        return globalThis;
-    if (typeof self !== 'undefined')
-        return self;
-    if (typeof window !== 'undefined')
-        return window;
-    if (typeof global !== 'undefined')
-        return global;
-    throw 'Unable to locate global object';
-})();
-function longToNumber(long) {
-    if (long.gt(Number.MAX_SAFE_INTEGER)) {
-        throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
-    }
-    return long.toNumber();
-}
-if (util.Long !== Long) {
-    util.Long = Long;
-    configure();
 }
