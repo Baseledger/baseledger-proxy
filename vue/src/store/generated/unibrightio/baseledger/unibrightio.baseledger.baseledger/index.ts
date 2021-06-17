@@ -1,9 +1,11 @@
-import { txClient, queryClient } from './module'
+import { txClient, queryClient, MissingWalletError } from './module'
 // @ts-ignore
 import { SpVuexError } from '@starport/vuex'
 
 import { BaseledgerTransaction } from "./module/types/baseledger/BaseledgerTransaction"
 
+
+export { BaseledgerTransaction };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -15,6 +17,17 @@ async function initQueryClient(vuexGetters) {
 	return await queryClient({
 		addr: vuexGetters['common/env/apiCosmos']
 	})
+}
+
+function mergeResults(value, next_values) {
+	for (let prop of Object.keys(next_values)) {
+		if (Array.isArray(next_values[prop])) {
+			value[prop]=[...value[prop], ...next_values[prop]]
+		}else{
+			value[prop]=next_values[prop]
+		}
+	}
+	return value
 }
 
 function getStructure(template) {
@@ -30,12 +43,12 @@ function getStructure(template) {
 
 const getDefaultState = () => {
 	return {
-        BaseledgerTransaction: {},
-        BaseledgerTransactionAll: {},
-        
-        _Structure: {
-            BaseledgerTransaction: getStructure(BaseledgerTransaction.fromPartial({})),
-            
+				BaseledgerTransaction: {},
+				BaseledgerTransactionAll: {},
+				
+				_Structure: {
+						BaseledgerTransaction: getStructure(BaseledgerTransaction.fromPartial({})),
+						
 		},
 		_Subscriptions: new Set(),
 	}
@@ -62,26 +75,26 @@ export default {
 		}
 	},
 	getters: {
-        getBaseledgerTransaction: (state) => (params = {}) => {
+				getBaseledgerTransaction: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
 			return state.BaseledgerTransaction[JSON.stringify(params)] ?? {}
 		},
-        getBaseledgerTransactionAll: (state) => (params = {}) => {
+				getBaseledgerTransactionAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
 			return state.BaseledgerTransactionAll[JSON.stringify(params)] ?? {}
 		},
-        
+				
 		getTypeStructure: (state) => (type) => {
 			return state._Structure[type].fields
 		}
 	},
 	actions: {
 		init({ dispatch, rootGetters }) {
-			console.log('init')
+			console.log('Vuex module: unibrightio.baseledger.baseledger initialized!')
 			if (rootGetters['common/env/client']) {
 				rootGetters['common/env/client'].on('newblock', () => {
 					dispatch('StoreUpdate')
@@ -95,124 +108,146 @@ export default {
 			commit('UNSUBSCRIBE', subscription)
 		},
 		async StoreUpdate({ state, dispatch }) {
-			state._Subscriptions.forEach((subscription) => {
-				dispatch(subscription.action, subscription.payload)
+			state._Subscriptions.forEach(async (subscription) => {
+				try {
+					await dispatch(subscription.action, subscription.payload)
+				}catch(e) {
+					throw new SpVuexError('Subscriptions: ' + e.message)
+				}
 			})
 		},
-		async QueryBaseledgerTransaction({ commit, rootGetters, getters }, { options: { subscribe = false , all = false}, params: {...key}, query=null }) {
+		
+		
+		
+		 		
+		
+		
+		async QueryBaseledgerTransaction({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params: {...key}, query=null }) {
 			try {
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryBaseledgerTransaction( key.id)).data
 				
-				let value = query?(await (await initQueryClient(rootGetters)).queryBaseledgerTransaction( key.id,  query)).data:(await (await initQueryClient(rootGetters)).queryBaseledgerTransaction( key.id )).data
-				
+					
 				commit('QUERY', { query: 'BaseledgerTransaction', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBaseledgerTransaction', payload: { options: { all }, params: {...key},query }})
 				return getters['getBaseledgerTransaction']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				console.error(new SpVuexError('QueryClient:QueryBaseledgerTransaction', 'API Node Unavailable. Could not perform query.'))
-				return {}
+				throw new SpVuexError('QueryClient:QueryBaseledgerTransaction', 'API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
-		async QueryBaseledgerTransactionAll({ commit, rootGetters, getters }, { options: { subscribe = false , all = false}, params: {...key}, query=null }) {
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryBaseledgerTransactionAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params: {...key}, query=null }) {
 			try {
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryBaseledgerTransactionAll(query)).data
 				
-				let value = query?(await (await initQueryClient(rootGetters)).queryBaseledgerTransactionAll( query)).data:(await (await initQueryClient(rootGetters)).queryBaseledgerTransactionAll()).data
-				
+					
 				while (all && (<any> value).pagination && (<any> value).pagination.nextKey!=null) {
-					let next_values=(await (await initQueryClient(rootGetters)).queryBaseledgerTransactionAll({...query, 'pagination.key':(<any> value).pagination.nextKey})).data
-					for (let prop of Object.keys(next_values)) {
-						if (Array.isArray(next_values[prop])) {
-							value[prop]=[...value[prop], ...next_values[prop]]
-						}else{
-							value[prop]=next_values[prop]
-						}
-					}
+					let next_values=(await queryClient.queryBaseledgerTransactionAll({...query, 'pagination.key':(<any> value).pagination.nextKey})).data
+					value = mergeResults(value, next_values);
 				}
-				
 				commit('QUERY', { query: 'BaseledgerTransactionAll', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBaseledgerTransactionAll', payload: { options: { all }, params: {...key},query }})
 				return getters['getBaseledgerTransactionAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				console.error(new SpVuexError('QueryClient:QueryBaseledgerTransactionAll', 'API Node Unavailable. Could not perform query.'))
-				return {}
+				throw new SpVuexError('QueryClient:QueryBaseledgerTransactionAll', 'API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
 		
-		async sendMsgUpdateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
+		
+		async sendMsgDeleteBaseledgerTransaction({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
-				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
-  gas: "200000" }, memo})
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeleteBaseledgerTransaction(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
 				return result
 			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
-				}
-			}
-		},
-		async sendMsgCreateBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
-			try {
-				const msg = await (await initTxClient(rootGetters)).msgCreateBaseledgerTransaction(value)
-				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
-  gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Send', 'Could not broadcast Tx.')
-				}
-			}
-		},
-		async sendMsgDeleteBaseledgerTransaction({ rootGetters }, { value, fee, memo }) {
-			try {
-				const msg = await (await initTxClient(rootGetters)).msgDeleteBaseledgerTransaction(value)
-				const result = await (await initTxClient(rootGetters)).signAndBroadcast([msg], {fee: { amount: fee, 
-  gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e.toString()=='wallet is required') {
+				if (e == MissingWalletError) {
 					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Send', 'Could not broadcast Tx.')
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Send', 'Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgCreateBaseledgerTransaction({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCreateBaseledgerTransaction(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Send', 'Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgUpdateBaseledgerTransaction({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgUpdateBaseledgerTransaction(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Send', 'Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
 		
-		async MsgUpdateBaseledgerTransaction({ rootGetters }, { value }) {
+		async MsgDeleteBaseledgerTransaction({ rootGetters }, { value }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgUpdateBaseledgerTransaction(value)
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeleteBaseledgerTransaction(value)
 				return msg
 			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Create', 'Could not create message.')
+					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},
 		async MsgCreateBaseledgerTransaction({ rootGetters }, { value }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgCreateBaseledgerTransaction(value)
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCreateBaseledgerTransaction(value)
 				return msg
 			} catch (e) {
-				if (e.toString()=='wallet is required') {
+				if (e == MissingWalletError) {
 					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Create', 'Could not create message.')
+					throw new SpVuexError('TxClient:MsgCreateBaseledgerTransaction:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},
-		async MsgDeleteBaseledgerTransaction({ rootGetters }, { value }) {
+		async MsgUpdateBaseledgerTransaction({ rootGetters }, { value }) {
 			try {
-				const msg = await (await initTxClient(rootGetters)).msgDeleteBaseledgerTransaction(value)
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgUpdateBaseledgerTransaction(value)
 				return msg
 			} catch (e) {
-				if (e.toString()=='wallet is required') {
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
+				if (e == MissingWalletError) {
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Init', 'Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new SpVuexError('TxClient:MsgDeleteBaseledgerTransaction:Create', 'Could not create message.')
+					throw new SpVuexError('TxClient:MsgUpdateBaseledgerTransaction:Create', 'Could not create message: ' + e.message)
+					
 				}
 			}
 		},

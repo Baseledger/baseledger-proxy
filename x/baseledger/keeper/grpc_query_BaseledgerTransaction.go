@@ -53,7 +53,7 @@ func (k Keeper) BaseledgerTransaction(c context.Context, req *types.QueryGetBase
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseledgerTransactionKey))
-	k.cdc.MustUnmarshalBinaryBare(store.Get(GetBaseledgerTransactionIDBytes(req.Id)), &BaseledgerTransaction)
+	k.cdc.MustUnmarshalBinaryBare(store.Get(GetBaseledgerTransactionUUIDBytes(req.Id)), &BaseledgerTransaction)
 
 	return &types.QueryGetBaseledgerTransactionResponse{BaseledgerTransaction: &BaseledgerTransaction}, nil
 }

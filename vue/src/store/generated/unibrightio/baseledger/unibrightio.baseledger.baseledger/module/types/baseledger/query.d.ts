@@ -4,7 +4,7 @@ import { PageRequest, PageResponse } from '../cosmos/base/query/v1beta1/paginati
 export declare const protobufPackage = "unibrightio.baseledger.baseledger";
 /** this line is used by starport scaffolding # 3 */
 export interface QueryGetBaseledgerTransactionRequest {
-    id: number;
+    id: string;
 }
 export interface QueryGetBaseledgerTransactionResponse {
     BaseledgerTransaction: BaseledgerTransaction | undefined;

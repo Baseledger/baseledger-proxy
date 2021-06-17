@@ -1,12 +1,10 @@
 export interface BaseledgerBaseledgerTransaction {
     creator?: string;
-    /** @format uint64 */
     id?: string;
-    baseId?: string;
+    baseledgerTransactionId?: string;
     payload?: string;
 }
 export interface BaseledgerMsgCreateBaseledgerTransactionResponse {
-    /** @format uint64 */
     id?: string;
 }
 export declare type BaseledgerMsgDeleteBaseledgerTransactionResponse = object;

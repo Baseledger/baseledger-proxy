@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,6 +15,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+
+	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
 )
 
 type createInitialSuggestionRequest struct {
@@ -26,6 +30,38 @@ type createInitialSuggestionRequest struct {
 	BusinessObject                       string       `json:"business_object"`
 	ReferencedBaseledgerBusinessObjectId string       `json:"referenced_baseledger_business_object_id"`
 	ReferencedBaseledgerTransactionId    string       `json:"referenced_baseledger_transaction_id"`
+}
+
+// just for testing, remove before merge
+func testKeeperByKey(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		paramType := vars["id"]
+
+		grpcConn, err := grpc.Dial(
+			"127.0.0.1:9090",    // your gRPC server address.
+			grpc.WithInsecure(), // The SDK doesn't support any transport security mechanism.
+		)
+		defer grpcConn.Close()
+
+		if err != nil {
+			fmt.Printf("grpc conn failed %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
+
+		queryClient := baseledgerTypes.NewQueryClient(grpcConn)
+
+		res, err := queryClient.BaseledgerTransaction(context.Background(), &baseledgerTypes.QueryGetBaseledgerTransactionRequest{Id: paramType})
+
+		if err != nil {
+			fmt.Printf("query client failed %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+		}
+
+		fmt.Printf("FOUND IT %v\n", res)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
 func createInitialSuggestionRequestHandler(clientCtx client.Context) http.HandlerFunc {
@@ -41,7 +77,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		payload, transactionId := proxy.CreateBaseledgerTransactionPayload(createSyncReq)
 
-		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), transactionId, string(payload))
+		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(transactionId, clientCtx.GetFromAddress().String(), transactionId, string(payload))
 		if err := msg.ValidateBasic(); err != nil {
 			fmt.Printf("msg validate basic failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -67,7 +103,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
 		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId: res.TxHash,
+			TendermintTransactionId: transactionId,
 			// TODO: define proxy identifier
 			Sender:                               "123",
 			Receiver:                             req.Recipient,
@@ -82,6 +118,8 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			// TODO: next 2 fields are from offchain message
 			OffchainProcessMessageId:   "123",
 			ReferencedProcessMessageId: "123",
+			TransactionHash:            res.TxHash,
+			Type:                       "SuggestionSent",
 		}
 
 		if !trustmeshEntry.Create() {

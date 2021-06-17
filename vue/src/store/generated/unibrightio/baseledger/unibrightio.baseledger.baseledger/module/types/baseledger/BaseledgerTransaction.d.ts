@@ -2,8 +2,8 @@ import { Writer, Reader } from 'protobufjs/minimal';
 export declare const protobufPackage = "unibrightio.baseledger.baseledger";
 export interface BaseledgerTransaction {
     creator: string;
-    id: number;
-    baseId: string;
+    id: string;
+    baseledgerTransactionId: string;
     payload: string;
 }
 export declare const BaseledgerTransaction: {

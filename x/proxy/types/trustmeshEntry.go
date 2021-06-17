@@ -28,6 +28,8 @@ type TrustmeshEntry struct {
 	OffchainProcessMessageId             string
 	ReferencedProcessMessageId           string
 	TransactionStatus                    string
+	TransactionHash                      string
+	Type                                 string
 }
 
 func (t *TrustmeshEntry) Create() bool {

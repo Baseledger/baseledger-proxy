@@ -1,24 +1,24 @@
 /* eslint-disable */
-import { Reader, util, configure, Writer } from 'protobufjs/minimal'
-import * as Long from 'long'
+import { Reader, Writer } from 'protobufjs/minimal'
 
 export const protobufPackage = 'unibrightio.baseledger.baseledger'
 
 /** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgCreateBaseledgerTransaction {
   creator: string
-  baseId: string
+  id: string
+  baseledgerTransactionId: string
   payload: string
 }
 
 export interface MsgCreateBaseledgerTransactionResponse {
-  id: number
+  id: string
 }
 
 export interface MsgUpdateBaseledgerTransaction {
   creator: string
-  id: number
-  baseId: string
+  id: string
+  baseledgerTransactionId: string
   payload: string
 }
 
@@ -26,23 +26,26 @@ export interface MsgUpdateBaseledgerTransactionResponse {}
 
 export interface MsgDeleteBaseledgerTransaction {
   creator: string
-  id: number
+  id: string
 }
 
 export interface MsgDeleteBaseledgerTransactionResponse {}
 
-const baseMsgCreateBaseledgerTransaction: object = { creator: '', baseId: '', payload: '' }
+const baseMsgCreateBaseledgerTransaction: object = { creator: '', id: '', baseledgerTransactionId: '', payload: '' }
 
 export const MsgCreateBaseledgerTransaction = {
   encode(message: MsgCreateBaseledgerTransaction, writer: Writer = Writer.create()): Writer {
     if (message.creator !== '') {
       writer.uint32(10).string(message.creator)
     }
-    if (message.baseId !== '') {
-      writer.uint32(18).string(message.baseId)
+    if (message.id !== '') {
+      writer.uint32(18).string(message.id)
+    }
+    if (message.baseledgerTransactionId !== '') {
+      writer.uint32(26).string(message.baseledgerTransactionId)
     }
     if (message.payload !== '') {
-      writer.uint32(26).string(message.payload)
+      writer.uint32(34).string(message.payload)
     }
     return writer
   },
@@ -58,9 +61,12 @@ export const MsgCreateBaseledgerTransaction = {
           message.creator = reader.string()
           break
         case 2:
-          message.baseId = reader.string()
+          message.id = reader.string()
           break
         case 3:
+          message.baseledgerTransactionId = reader.string()
+          break
+        case 4:
           message.payload = reader.string()
           break
         default:
@@ -78,10 +84,15 @@ export const MsgCreateBaseledgerTransaction = {
     } else {
       message.creator = ''
     }
-    if (object.baseId !== undefined && object.baseId !== null) {
-      message.baseId = String(object.baseId)
+    if (object.id !== undefined && object.id !== null) {
+      message.id = String(object.id)
     } else {
-      message.baseId = ''
+      message.id = ''
+    }
+    if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+      message.baseledgerTransactionId = String(object.baseledgerTransactionId)
+    } else {
+      message.baseledgerTransactionId = ''
     }
     if (object.payload !== undefined && object.payload !== null) {
       message.payload = String(object.payload)
@@ -94,7 +105,8 @@ export const MsgCreateBaseledgerTransaction = {
   toJSON(message: MsgCreateBaseledgerTransaction): unknown {
     const obj: any = {}
     message.creator !== undefined && (obj.creator = message.creator)
-    message.baseId !== undefined && (obj.baseId = message.baseId)
+    message.id !== undefined && (obj.id = message.id)
+    message.baseledgerTransactionId !== undefined && (obj.baseledgerTransactionId = message.baseledgerTransactionId)
     message.payload !== undefined && (obj.payload = message.payload)
     return obj
   },
@@ -106,10 +118,15 @@ export const MsgCreateBaseledgerTransaction = {
     } else {
       message.creator = ''
     }
-    if (object.baseId !== undefined && object.baseId !== null) {
-      message.baseId = object.baseId
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id
     } else {
-      message.baseId = ''
+      message.id = ''
+    }
+    if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+      message.baseledgerTransactionId = object.baseledgerTransactionId
+    } else {
+      message.baseledgerTransactionId = ''
     }
     if (object.payload !== undefined && object.payload !== null) {
       message.payload = object.payload
@@ -120,12 +137,12 @@ export const MsgCreateBaseledgerTransaction = {
   }
 }
 
-const baseMsgCreateBaseledgerTransactionResponse: object = { id: 0 }
+const baseMsgCreateBaseledgerTransactionResponse: object = { id: '' }
 
 export const MsgCreateBaseledgerTransactionResponse = {
   encode(message: MsgCreateBaseledgerTransactionResponse, writer: Writer = Writer.create()): Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint64(message.id)
+    if (message.id !== '') {
+      writer.uint32(10).string(message.id)
     }
     return writer
   },
@@ -138,7 +155,7 @@ export const MsgCreateBaseledgerTransactionResponse = {
       const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
-          message.id = longToNumber(reader.uint64() as Long)
+          message.id = reader.string()
           break
         default:
           reader.skipType(tag & 7)
@@ -151,9 +168,9 @@ export const MsgCreateBaseledgerTransactionResponse = {
   fromJSON(object: any): MsgCreateBaseledgerTransactionResponse {
     const message = { ...baseMsgCreateBaseledgerTransactionResponse } as MsgCreateBaseledgerTransactionResponse
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id)
+      message.id = String(object.id)
     } else {
-      message.id = 0
+      message.id = ''
     }
     return message
   },
@@ -169,24 +186,24 @@ export const MsgCreateBaseledgerTransactionResponse = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id
     } else {
-      message.id = 0
+      message.id = ''
     }
     return message
   }
 }
 
-const baseMsgUpdateBaseledgerTransaction: object = { creator: '', id: 0, baseId: '', payload: '' }
+const baseMsgUpdateBaseledgerTransaction: object = { creator: '', id: '', baseledgerTransactionId: '', payload: '' }
 
 export const MsgUpdateBaseledgerTransaction = {
   encode(message: MsgUpdateBaseledgerTransaction, writer: Writer = Writer.create()): Writer {
     if (message.creator !== '') {
       writer.uint32(10).string(message.creator)
     }
-    if (message.id !== 0) {
-      writer.uint32(16).uint64(message.id)
+    if (message.id !== '') {
+      writer.uint32(18).string(message.id)
     }
-    if (message.baseId !== '') {
-      writer.uint32(26).string(message.baseId)
+    if (message.baseledgerTransactionId !== '') {
+      writer.uint32(26).string(message.baseledgerTransactionId)
     }
     if (message.payload !== '') {
       writer.uint32(34).string(message.payload)
@@ -205,10 +222,10 @@ export const MsgUpdateBaseledgerTransaction = {
           message.creator = reader.string()
           break
         case 2:
-          message.id = longToNumber(reader.uint64() as Long)
+          message.id = reader.string()
           break
         case 3:
-          message.baseId = reader.string()
+          message.baseledgerTransactionId = reader.string()
           break
         case 4:
           message.payload = reader.string()
@@ -229,14 +246,14 @@ export const MsgUpdateBaseledgerTransaction = {
       message.creator = ''
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id)
+      message.id = String(object.id)
     } else {
-      message.id = 0
+      message.id = ''
     }
-    if (object.baseId !== undefined && object.baseId !== null) {
-      message.baseId = String(object.baseId)
+    if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+      message.baseledgerTransactionId = String(object.baseledgerTransactionId)
     } else {
-      message.baseId = ''
+      message.baseledgerTransactionId = ''
     }
     if (object.payload !== undefined && object.payload !== null) {
       message.payload = String(object.payload)
@@ -250,7 +267,7 @@ export const MsgUpdateBaseledgerTransaction = {
     const obj: any = {}
     message.creator !== undefined && (obj.creator = message.creator)
     message.id !== undefined && (obj.id = message.id)
-    message.baseId !== undefined && (obj.baseId = message.baseId)
+    message.baseledgerTransactionId !== undefined && (obj.baseledgerTransactionId = message.baseledgerTransactionId)
     message.payload !== undefined && (obj.payload = message.payload)
     return obj
   },
@@ -265,12 +282,12 @@ export const MsgUpdateBaseledgerTransaction = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id
     } else {
-      message.id = 0
+      message.id = ''
     }
-    if (object.baseId !== undefined && object.baseId !== null) {
-      message.baseId = object.baseId
+    if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+      message.baseledgerTransactionId = object.baseledgerTransactionId
     } else {
-      message.baseId = ''
+      message.baseledgerTransactionId = ''
     }
     if (object.payload !== undefined && object.payload !== null) {
       message.payload = object.payload
@@ -319,15 +336,15 @@ export const MsgUpdateBaseledgerTransactionResponse = {
   }
 }
 
-const baseMsgDeleteBaseledgerTransaction: object = { creator: '', id: 0 }
+const baseMsgDeleteBaseledgerTransaction: object = { creator: '', id: '' }
 
 export const MsgDeleteBaseledgerTransaction = {
   encode(message: MsgDeleteBaseledgerTransaction, writer: Writer = Writer.create()): Writer {
     if (message.creator !== '') {
       writer.uint32(10).string(message.creator)
     }
-    if (message.id !== 0) {
-      writer.uint32(16).uint64(message.id)
+    if (message.id !== '') {
+      writer.uint32(18).string(message.id)
     }
     return writer
   },
@@ -343,7 +360,7 @@ export const MsgDeleteBaseledgerTransaction = {
           message.creator = reader.string()
           break
         case 2:
-          message.id = longToNumber(reader.uint64() as Long)
+          message.id = reader.string()
           break
         default:
           reader.skipType(tag & 7)
@@ -361,9 +378,9 @@ export const MsgDeleteBaseledgerTransaction = {
       message.creator = ''
     }
     if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id)
+      message.id = String(object.id)
     } else {
-      message.id = 0
+      message.id = ''
     }
     return message
   },
@@ -385,7 +402,7 @@ export const MsgDeleteBaseledgerTransaction = {
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id
     } else {
-      message.id = 0
+      message.id = ''
     }
     return message
   }
@@ -465,16 +482,6 @@ interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>
 }
 
-declare var self: any | undefined
-declare var window: any | undefined
-var globalThis: any = (() => {
-  if (typeof globalThis !== 'undefined') return globalThis
-  if (typeof self !== 'undefined') return self
-  if (typeof window !== 'undefined') return window
-  if (typeof global !== 'undefined') return global
-  throw 'Unable to locate global object'
-})()
-
 type Builtin = Date | Function | Uint8Array | string | number | undefined
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -485,15 +492,3 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER')
-  }
-  return long.toNumber()
-}
-
-if (util.Long !== Long) {
-  util.Long = Long as any
-  configure()
-}

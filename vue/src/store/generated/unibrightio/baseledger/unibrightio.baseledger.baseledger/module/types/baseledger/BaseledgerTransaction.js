@@ -1,18 +1,17 @@
 /* eslint-disable */
-import * as Long from 'long';
-import { util, configure, Writer, Reader } from 'protobufjs/minimal';
+import { Writer, Reader } from 'protobufjs/minimal';
 export const protobufPackage = 'unibrightio.baseledger.baseledger';
-const baseBaseledgerTransaction = { creator: '', id: 0, baseId: '', payload: '' };
+const baseBaseledgerTransaction = { creator: '', id: '', baseledgerTransactionId: '', payload: '' };
 export const BaseledgerTransaction = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
             writer.uint32(10).string(message.creator);
         }
-        if (message.id !== 0) {
-            writer.uint32(16).uint64(message.id);
+        if (message.id !== '') {
+            writer.uint32(18).string(message.id);
         }
-        if (message.baseId !== '') {
-            writer.uint32(26).string(message.baseId);
+        if (message.baseledgerTransactionId !== '') {
+            writer.uint32(26).string(message.baseledgerTransactionId);
         }
         if (message.payload !== '') {
             writer.uint32(34).string(message.payload);
@@ -30,10 +29,10 @@ export const BaseledgerTransaction = {
                     message.creator = reader.string();
                     break;
                 case 2:
-                    message.id = longToNumber(reader.uint64());
+                    message.id = reader.string();
                     break;
                 case 3:
-                    message.baseId = reader.string();
+                    message.baseledgerTransactionId = reader.string();
                     break;
                 case 4:
                     message.payload = reader.string();
@@ -54,16 +53,16 @@ export const BaseledgerTransaction = {
             message.creator = '';
         }
         if (object.id !== undefined && object.id !== null) {
-            message.id = Number(object.id);
+            message.id = String(object.id);
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
-        if (object.baseId !== undefined && object.baseId !== null) {
-            message.baseId = String(object.baseId);
+        if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+            message.baseledgerTransactionId = String(object.baseledgerTransactionId);
         }
         else {
-            message.baseId = '';
+            message.baseledgerTransactionId = '';
         }
         if (object.payload !== undefined && object.payload !== null) {
             message.payload = String(object.payload);
@@ -77,7 +76,7 @@ export const BaseledgerTransaction = {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
         message.id !== undefined && (obj.id = message.id);
-        message.baseId !== undefined && (obj.baseId = message.baseId);
+        message.baseledgerTransactionId !== undefined && (obj.baseledgerTransactionId = message.baseledgerTransactionId);
         message.payload !== undefined && (obj.payload = message.payload);
         return obj;
     },
@@ -93,13 +92,13 @@ export const BaseledgerTransaction = {
             message.id = object.id;
         }
         else {
-            message.id = 0;
+            message.id = '';
         }
-        if (object.baseId !== undefined && object.baseId !== null) {
-            message.baseId = object.baseId;
+        if (object.baseledgerTransactionId !== undefined && object.baseledgerTransactionId !== null) {
+            message.baseledgerTransactionId = object.baseledgerTransactionId;
         }
         else {
-            message.baseId = '';
+            message.baseledgerTransactionId = '';
         }
         if (object.payload !== undefined && object.payload !== null) {
             message.payload = object.payload;
@@ -110,24 +109,3 @@ export const BaseledgerTransaction = {
         return message;
     }
 };
-var globalThis = (() => {
-    if (typeof globalThis !== 'undefined')
-        return globalThis;
-    if (typeof self !== 'undefined')
-        return self;
-    if (typeof window !== 'undefined')
-        return window;
-    if (typeof global !== 'undefined')
-        return global;
-    throw 'Unable to locate global object';
-})();
-function longToNumber(long) {
-    if (long.gt(Number.MAX_SAFE_INTEGER)) {
-        throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER');
-    }
-    return long.toNumber();
-}
-if (util.Long !== Long) {
-    util.Long = Long;
-    configure();
-}

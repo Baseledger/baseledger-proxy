@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"strconv"
-
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/cast"
@@ -15,11 +13,11 @@ import (
 
 func CmdCreateBaseledgerTransaction() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-BaseledgerTransaction [baseId] [payload]",
+		Use:   "create-BaseledgerTransaction [baseledgerTransactionId] [payload]",
 		Short: "Create a new BaseledgerTransaction",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			argsBaseId, err := cast.ToStringE(args[0])
+			argsBaseledgerTransactionId, err := cast.ToStringE(args[0])
 			if err != nil {
 				return err
 			}
@@ -33,7 +31,7 @@ func CmdCreateBaseledgerTransaction() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), argsBaseId, argsPayload)
+			msg := types.NewMsgCreateBaseledgerTransaction(argsBaseledgerTransactionId, clientCtx.GetFromAddress().String(), argsBaseledgerTransactionId, argsPayload)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -48,16 +46,11 @@ func CmdCreateBaseledgerTransaction() *cobra.Command {
 
 func CmdUpdateBaseledgerTransaction() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-BaseledgerTransaction [id] [baseId] [payload]",
+		Use:   "update-BaseledgerTransaction [id] [baseledgerTransactionId] [payload]",
 		Short: "Update a BaseledgerTransaction",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
-			argsBaseId, err := cast.ToStringE(args[1])
+			argsBaseledgerTransactionId, err := cast.ToStringE(args[1])
 			if err != nil {
 				return err
 			}
@@ -72,7 +65,7 @@ func CmdUpdateBaseledgerTransaction() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgUpdateBaseledgerTransaction(clientCtx.GetFromAddress().String(), id, argsBaseId, argsPayload)
+			msg := types.NewMsgUpdateBaseledgerTransaction(clientCtx.GetFromAddress().String(), args[0], argsBaseledgerTransactionId, argsPayload)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -91,17 +84,12 @@ func CmdDeleteBaseledgerTransaction() *cobra.Command {
 		Short: "Delete a BaseledgerTransaction by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgDeleteBaseledgerTransaction(clientCtx.GetFromAddress().String(), id)
+			msg := types.NewMsgDeleteBaseledgerTransaction(clientCtx.GetFromAddress().String(), args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
