@@ -7,8 +7,9 @@ import (
 
 var _ sdk.Msg = &MsgCreateBaseledgerTransaction{}
 
-func NewMsgCreateBaseledgerTransaction(creator string, baseledgerTransactionId string, payload string) *MsgCreateBaseledgerTransaction {
+func NewMsgCreateBaseledgerTransaction(id string, creator string, baseledgerTransactionId string, payload string) *MsgCreateBaseledgerTransaction {
 	return &MsgCreateBaseledgerTransaction{
+		Id:                      id,
 		Creator:                 creator,
 		BaseledgerTransactionId: baseledgerTransactionId,
 		Payload:                 payload,

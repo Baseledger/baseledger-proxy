@@ -31,7 +31,7 @@ func CmdCreateBaseledgerTransaction() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateBaseledgerTransaction(clientCtx.GetFromAddress().String(), argsBaseledgerTransactionId, argsPayload)
+			msg := types.NewMsgCreateBaseledgerTransaction(argsBaseledgerTransactionId, clientCtx.GetFromAddress().String(), argsBaseledgerTransactionId, argsPayload)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

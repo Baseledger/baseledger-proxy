@@ -13,6 +13,7 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var BaseledgerTransaction = types.BaseledgerTransaction{
+		Id:                      msg.Id,
 		Creator:                 msg.Creator,
 		BaseledgerTransactionId: msg.BaseledgerTransactionId,
 		Payload:                 msg.Payload,
