@@ -157,7 +157,7 @@ func findWorkgroupMock(workgroupId string) *workgroupMock {
 
 // Temporary change to make this available
 func SendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string) {
-	fmt.Println("SENDING OFFCHAIN PROCESS MESSAGE!")
+	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v\n!", message.Id)
 	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
 	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
 	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)

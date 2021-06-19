@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/unibrightio/baseledger/app/types"
+	"github.com/unibrightio/baseledger/x/proxy/proxy"
+	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
 	"github.com/jinzhu/gorm"
 )
@@ -25,7 +27,14 @@ func ExecuteBusinessLogic(txResult types.Result) {
 	case "SuggestionSent":
 		fmt.Println("SuggestionSent")
 		// send offchain msg to all receivers
-		// proxy.SendOffchainProcessMessage(offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
+		// should we reuse db connection here, or open new one?
+		offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
+		if err != nil {
+			// TODO: what do to here?
+			fmt.Println("Offchain process msg not found")
+			return
+		}
+		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
 	case "SuggestionReceived":
 		fmt.Println("SuggestionReceived")
 	case "FeedbackSent":

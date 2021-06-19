@@ -75,4 +75,23 @@ func (o *OffchainProcessMessage) Create() bool {
 	return false
 }
 
+func GetOffchainMsgById(id uuid.UUID) (msg *OffchainProcessMessage, err error) {
+	db, err := dbutil.InitBaseledgerDBConnection()
+
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+		return nil, err
+	}
+
+	var offchainMsg OffchainProcessMessage
+	res := db.First(&offchainMsg, "id = ?", id.String())
+
+	if res.Error != nil {
+		fmt.Printf("error when getting offchain msg from db %v\n", err)
+		return nil, res.Error
+	}
+
+	return &offchainMsg, nil
+}
+
 // all other types for hasing, privacy, off-chain messaging
