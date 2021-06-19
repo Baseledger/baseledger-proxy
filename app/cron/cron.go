@@ -94,7 +94,7 @@ func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 func worker(jobs chan types.Job, results chan types.Result) {
 	defer close(results)
 	for job := range jobs {
-		txInfo, err := getTxInfo(job.TrustmeshEntry.TendermintTransactionId)
+		txInfo, err := getTxInfo(job.TrustmeshEntry.TransactionHash)
 		if err != nil {
 			// here it would be http error
 			// it seems that we can just let it go through result channel
