@@ -41,6 +41,25 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
 	case "SuggestionReceived":
 		fmt.Println("SuggestionReceived")
+		offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
+		if err != nil {
+			// TODO: what do to here?
+			fmt.Println("Offchain process msg not found")
+			return
+		}
+		baseledgerTransaction := getCommittedBaseledgerTransactionId(offchainMessage.BaseledgerTransactionIdOfStoredProof)
+
+		if baseledgerTransaction == nil {
+			// TODO: what do to here?
+			return
+		}
+		proof := proxy.CreateHashFromBusinessObject(offchainMessage.BusinessObject)
+
+		if proof != offchainMessage.Hash {
+			fmt.Println("Hashes dont match")
+			return
+		}
+		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	case "FeedbackSent":
 		fmt.Println("FeedbackSent")
 		// send offchain msg to sender of sugestion
@@ -59,7 +78,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 			fmt.Println("Offchain process msg not found")
 			return
 		}
-		baseledgerTransaction := getCommittedBaseledgerTransactionId(txResult.Job.TrustmeshEntry.TendermintTransactionId)
+		baseledgerTransaction := getCommittedBaseledgerTransactionId(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 
 		if baseledgerTransaction == nil {
 			// TODO: what do to here?

@@ -57,7 +57,7 @@ func NewBaseledgerProxy() BaseledgerProxy {
 }
 
 func CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string) {
-	hash := createHashFromBusinessObject(synchronizationRequest.BusinessObject)
+	hash := CreateHashFromBusinessObject(synchronizationRequest.BusinessObject)
 	offchainProcessMessage := newOffchainProcessMessage(
 		synchronizationRequest.WorkstepType,
 		"",
@@ -190,7 +190,7 @@ func newOffchainProcessMessage(
 }
 
 // TODO: currently it assumes it is json string, refactor this
-func createHashFromBusinessObject(bo string) string {
+func CreateHashFromBusinessObject(bo string) string {
 	hash := md5.Sum([]byte(bo))
 	return hex.EncodeToString(hash[:])
 }
