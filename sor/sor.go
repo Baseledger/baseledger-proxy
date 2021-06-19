@@ -1,10 +1,11 @@
 package sor
 
 import (
+	"fmt"
 
+	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 )
 
-// Arguments? If this is called from go routine we don't have access to process message which was received
-func ProcessFeedback() {
-
+func ProcessFeedback(offchainProcessMessage proxytypes.OffchainProcessMessage, workgroupId string, payload string) {
+	fmt.Println("SOR PROCESSING FEEDBACK")
 }
