@@ -1,14 +1,23 @@
 package types
 
+import (
+	"fmt"
+
+	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
+
+	uuid "github.com/kthomas/go.uuid"
+	"github.com/unibrightio/baseledger/dbutil"
+)
+
 //Put here our Types needed for the proxy elements?
 type OffchainProcessMessageReferenceType string
 
 type OffchainProcessMessage struct {
-	SenderId                         string
-	ReceiverId                       string
-	Topic                            string
-	OffchainProcessMessageId         string
-	ReferencedOffchainProcessMessage string
+	Id                                 uuid.UUID
+	SenderId                           string
+	ReceiverId                         string
+	Topic                              string
+	ReferencedOffchainProcessMessageId string
 	// todo replace string with proper type?
 	BusinessObject                       string
 	WorkstepType                         string
@@ -42,6 +51,28 @@ type BaseledgerTransactionPayload struct {
 	Proof                                string `json:"proof"`
 	BaseledgerBusinessObjectId           string `json:"baseledgerBusinessObjectID"`
 	ReferencedBaseledgerBusinessObjectId string `json:"referencedBaseledgerBusinessObjectID"`
+}
+
+func (o *OffchainProcessMessage) Create() bool {
+	db, err := dbutil.InitBaseledgerDBConnection()
+
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+		return false
+	}
+
+	if db.NewRecord(o) {
+		result := db.Create(&o)
+		rowsAffected := result.RowsAffected
+		errors := result.GetErrors()
+		if len(errors) > 0 {
+			fmt.Printf("errors while creating new offchain process msg entry %v\n", errors)
+			return false
+		}
+		return rowsAffected > 0
+	}
+
+	return false
 }
 
 // all other types for hasing, privacy, off-chain messaging

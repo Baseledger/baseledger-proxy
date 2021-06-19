@@ -1,0 +1,3 @@
+ALTER TABLE ONLY public.offchain_process_messages DROP CONSTRAINT offchain_process_messagess_pkey;
+
+DROP TABLE public.offchain_process_messages;

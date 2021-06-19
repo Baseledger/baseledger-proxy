@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/dbutil"
 )
 
@@ -25,7 +26,7 @@ type TrustmeshEntry struct {
 	BusinessObjectType                   string
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
-	OffchainProcessMessageId             string
+	OffchainProcessMessageId             uuid.UUID
 	ReferencedProcessMessageId           string
 	TransactionStatus                    string
 	TransactionHash                      string

@@ -75,7 +75,7 @@ func CreateBaseledgerTransactionPayload(synchronizationRequest *types.Synchroniz
 		// TODO proper identifier
 		PhonebookIdentifier:                  "123",
 		TransactionType:                      "Suggest",
-		OffchainMessageId:                    offchainProcessMessage.OffchainProcessMessageId,
+		OffchainMessageId:                    offchainProcessMessage.Id.String(),
 		ReferencedOffchainMessageId:          "",
 		ReferencedBaseledgerTransactionId:    "",
 		BaseledgerTransactionID:              transactionIdUuid.String(),
@@ -178,9 +178,9 @@ func newOffchainProcessMessage(
 	statusTextMessage string) *types.OffchainProcessMessage {
 	newUuid, _ := uuid.NewV4()
 	return &types.OffchainProcessMessage{
-		OffchainProcessMessageId:             newUuid.String(),
+		Id:                                   newUuid,
 		WorkstepType:                         workstepType,
-		ReferencedOffchainProcessMessage:     referencedOffchainProcessMessage,
+		ReferencedOffchainProcessMessageId:   referencedOffchainProcessMessage,
 		Hash:                                 hashOfBusinessObject,
 		BusinessObject:                       businessObject,
 		BaseledgerBusinessObjectId:           baseledgerBusinessObjectID,

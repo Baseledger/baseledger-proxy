@@ -102,6 +102,8 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
+		offchainMsg := createSuggestOffchainMessage(*req, req.BusinessObject, payload)
+
 		trustmeshEntry := &types.TrustmeshEntry{
 			TendermintTransactionId: transactionId,
 			// TODO: define proxy identifier
@@ -109,19 +111,23 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			Receiver:                             req.Recipient,
 			WorkgroupId:                          req.WorkgroupId,
 			WorkstepType:                         req.WorkstepType,
-			BaseledgerTransactionType:            "Suggest",
+			BaseledgerTransactionType:            "SuggestionSent",
 			BaseledgerTransactionId:              transactionId,
 			ReferencedBaseledgerTransactionId:    req.ReferencedBaseledgerTransactionId,
 			BusinessObjectType:                   req.BusinessObjectType,
 			BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
 			ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
-			// TODO: next 2 fields are from offchain message
-			OffchainProcessMessageId:   "123",
-			ReferencedProcessMessageId: "123",
-			TransactionHash:            res.TxHash,
-			Type:                       "SuggestionSent",
+			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
+			TransactionHash:                      res.TxHash,
+			Type:                                 "SuggestionSent",
 		}
 
+		// TODO: next 2 creates should be in one db tx?
+		if !offchainMsg.Create() {
+			fmt.Printf("error when creating new offchain msg entry")
+		}
+
+		trustmeshEntry.OffchainProcessMessageId = offchainMsg.Id
 		if !trustmeshEntry.Create() {
 			fmt.Printf("error when creating new trustmesh entry")
 		}
@@ -129,6 +135,24 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId string, hash string) types.OffchainProcessMessage {
+	// offchainMsgId, _ := uuid.NewV4()
+
+	offchainMessage := types.OffchainProcessMessage{
+		// Id:                                   offchainMsgId,
+		WorkstepType:                         req.WorkstepType,
+		ReferencedOffchainProcessMessageId:   "",
+		BusinessObject:                       req.BusinessObject,
+		Hash:                                 hash,
+		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
+		StatusTextMessage:                    req.WorkstepType + " suggested",
+		BaseledgerTransactionIdOfStoredProof: transactionId,
+	}
+
+	return offchainMessage
 }
 
 func parseRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createInitialSuggestionRequest {
