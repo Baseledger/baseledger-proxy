@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"context"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
@@ -15,12 +14,7 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	"github.com/unibrightio/baseledger/x/proxy/types"
 	"github.com/unibrightio/baseledger/x/proxy/workgroups"
-
 	// "github.com/cosmos/cosmos-sdk/client/tx"
-
-	"google.golang.org/grpc"
-
-	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
 )
 
 type workgroupMock struct {
@@ -95,51 +89,6 @@ func CreateBaseledgerTransactionPayload(synchronizationRequest *types.Synchroniz
 
 func OffchainProcessMessageReceived(processMessage types.OffchainProcessMessage) {
 	fmt.Println("OffchainProcessMessageReceived")
-	// receiver check... missing proxy identifier (is this node identifier?)
-	// if not receiver, return
-
-	// workgroup check... missing querying group from db (?)
-	workgroup := findWorkgroupMock(processMessage.Topic)
-	if workgroup == nil {
-		// should we panic here?
-		fmt.Printf("Workgroup with id %v not found", processMessage.Topic)
-		return
-	}
-
-	// keeper
-	// Create a connection to the gRPC server.
-	grpcConn, err := grpc.Dial(
-		"127.0.0.1:9090",    // your gRPC server address.
-		grpc.WithInsecure(), // The SDK doesn't support any transport security mechanism.
-	)
-	defer grpcConn.Close()
-
-	if err != nil {
-		// should we panic here?
-		fmt.Printf("gRPC connection error %v\n", err.Error())
-		return
-	}
-
-	queryClient := baseledgertypes.NewQueryClient(grpcConn)
-
-	// TODO: just a hack to fix build, check
-	response, err := queryClient.BaseledgerTransaction(context.Background(), &baseledgertypes.QueryGetBaseledgerTransactionRequest{Id: "0"})
-
-	if err != nil {
-		// should we panic here?
-		fmt.Printf("query client error %v\n", err.Error())
-		return
-	}
-
-	fmt.Printf("baseledger transaction response %v\n", response)
-	dec := deprivatizePayload(response.BaseledgerTransaction.Payload, workgroup.PrivatizeKey)
-
-	fmt.Printf("DEPRIVATIZED PAYLOAD %v\n", dec)
-
-	// new entry
-
-	// dec := deprivatizePayload(processMessage., workgroup.PrivatizeKey)
-
 }
 
 func getBaseledgerTx(id string) {
