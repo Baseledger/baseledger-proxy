@@ -155,9 +155,9 @@ func findWorkgroupMock(workgroupId string) *workgroupMock {
 	}
 }
 
-// Temporary change to make this available
+// TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
 func SendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string) {
-	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v\n!", message.Id)
+	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v\n", message.Id)
 	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
 	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
 	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)

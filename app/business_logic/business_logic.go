@@ -2,6 +2,7 @@ package businesslogic
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/unibrightio/baseledger/app/types"
@@ -14,6 +15,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO: currently this is saving after result is written to output channel
+// do we save inside worker or after?
 func SetTxStatusToCommitted(txResult types.Result, db *gorm.DB) {
 	result := db.Exec("UPDATE trustmesh_entries SET transaction_status = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
 		txResult.TxInfo.TxHeight,
@@ -27,74 +30,55 @@ func SetTxStatusToCommitted(txResult types.Result, db *gorm.DB) {
 }
 
 func ExecuteBusinessLogic(txResult types.Result) {
+	// TODO: should we reuse db connection here, or open new one?
+	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
+	if err != nil {
+		// TODO: what do to here? is return enough?
+		fmt.Println("Offchain process msg not found")
+		return
+	}
 	switch txResult.Job.TrustmeshEntry.BaseledgerTransactionType {
 	case "SuggestionSent":
 		fmt.Println("SuggestionSent")
-		// send offchain msg to all receivers
-		// should we reuse db connection here, or open new one?
-		offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
-		if err != nil {
-			// TODO: what do to here?
-			fmt.Println("Offchain process msg not found")
-			return
-		}
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
 	case "SuggestionReceived":
 		fmt.Println("SuggestionReceived")
-		offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
-		if err != nil {
-			// TODO: what do to here?
-			fmt.Println("Offchain process msg not found")
-			return
-		}
-		baseledgerTransaction := getCommittedBaseledgerTransactionId(offchainMessage.BaseledgerTransactionIdOfStoredProof)
-
+		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
-			// TODO: what do to here?
+			// TODO: what do to here? is return enough?
 			return
 		}
 		proof := proxy.CreateHashFromBusinessObject(offchainMessage.BusinessObject)
-
 		if proof != offchainMessage.Hash {
-			fmt.Println("Hashes dont match")
+			fmt.Println("Hashes don't match")
+			// TODO: what do to here? is return enough?
 			return
 		}
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	case "FeedbackSent":
 		fmt.Println("FeedbackSent")
-		// send offchain msg to sender of sugestion
-		offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
-		if err != nil {
-			// TODO: what do to here?
-			fmt.Println("Offchain process msg not found")
-			return
-		}
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Sender)
 	case "FeedbackReceived":
 		fmt.Println("FeedbackReceived")
-		offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
-		if err != nil {
-			// TODO: what do to here?
-			fmt.Println("Offchain process msg not found")
-			return
-		}
-		baseledgerTransaction := getCommittedBaseledgerTransactionId(offchainMessage.BaseledgerTransactionIdOfStoredProof)
-
+		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
-			// TODO: what do to here?
+			// TODO: what do to here? is return enough?
 			return
 		}
+
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
-		// TODO panic
-		fmt.Println("UNKNOWN BUSINESS LOGIC")
+		// TODO: this should not happen, probably panic is ok to use here?
+		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.BaseledgerTransactionType)
+		panic(errors.New("uknown business process!"))
 	}
 }
 
-func getCommittedBaseledgerTransactionId(transactionId string) *baseledgertypes.BaseledgerTransaction {
+func getCommittedBaseledgerTransaction(transactionId string) *baseledgertypes.BaseledgerTransaction {
 	grpcConn, err := grpc.Dial(
-		"127.0.0.1:9090",    // your gRPC server address.
-		grpc.WithInsecure(), // The SDK doesn't support any transport security mechanism.
+		"127.0.0.1:9090",
+		// The SDK doesn't support any transport security mechanism.
+		grpc.WithInsecure(),
 	)
 	defer grpcConn.Close()
 
@@ -114,6 +98,6 @@ func getCommittedBaseledgerTransactionId(transactionId string) *baseledgertypes.
 		return nil
 	}
 
-	fmt.Printf("FOUND BASELEDGER TRANSACTION %v\n", res.BaseledgerTransaction)
+	fmt.Printf("found baseledger transaction %v\n", res.BaseledgerTransaction)
 	return res.BaseledgerTransaction
 }
