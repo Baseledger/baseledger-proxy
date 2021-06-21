@@ -112,17 +112,6 @@ func CreateBaseledgerTransactionFeedbackPayload(
 	return enc
 }
 
-type baseReq struct {
-	From    string `json:"from"`
-	ChainId string `json:"chain_id"`
-}
-
-type feedbackReq struct {
-	BaseReq  baseReq `json:"base_req"`
-	UserName string  `json:"username"`
-	Pwd      string  `json:"pwd"`
-}
-
 func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage) {
 	fmt.Println("OffchainProcessMessageReceived")
 
