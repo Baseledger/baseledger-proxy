@@ -41,16 +41,28 @@ type SynchronizationRequest struct {
 	ReferencedBaseledgerTransactionId    string
 }
 
+type SynchronizationFeedback struct {
+	WorkgroupId                                string
+	BusinessObject                             string
+	Recipient                                  string
+	Approved                                   bool
+	BaseledgerBusinessObjectIdOfApprovedObject string
+	HashOfObjectToApprove                      string
+	OriginalBaseledgerTransactionId            string
+	OriginalOffchainProcessMessageId           string
+	FeedbackMessage                            string
+}
+
 type BaseledgerTransactionPayload struct {
-	PhonebookIdentifier                  string `json:"phonebookIdentifier"`
-	TransactionType                      string `json:"baseledgerTransactionType"`
-	OffchainMessageId                    string `json:"offchainMessageId"`
-	ReferencedOffchainMessageId          string `json:"referencedOffchainMessageId"`
-	ReferencedBaseledgerTransactionId    string `json:"referencedBaseledgerTransactionId"`
-	BaseledgerTransactionID              string `json:"baseledgerTransactionID"`
-	Proof                                string `json:"proof"`
-	BaseledgerBusinessObjectId           string `json:"baseledgerBusinessObjectID"`
-	ReferencedBaseledgerBusinessObjectId string `json:"referencedBaseledgerBusinessObjectID"`
+	SenderId                             string
+	TransactionType                      string
+	OffchainMessageId                    string
+	ReferencedOffchainMessageId          string
+	ReferencedBaseledgerTransactionId    string
+	BaseledgerTransactionID              string
+	Proof                                string
+	BaseledgerBusinessObjectId           string
+	ReferencedBaseledgerBusinessObjectId string
 }
 
 func (o *OffchainProcessMessage) Create() bool {

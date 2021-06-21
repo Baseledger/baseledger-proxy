@@ -7,9 +7,11 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	"github.com/unibrightio/baseledger/x/proxy/types"
@@ -50,30 +52,22 @@ func NewBaseledgerProxy() BaseledgerProxy {
 	return proxy
 }
 
-func CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string) {
-	hash := CreateHashFromBusinessObject(synchronizationRequest.BusinessObject)
-	offchainProcessMessage := newOffchainProcessMessage(
-		synchronizationRequest.WorkstepType,
-		"",
-		synchronizationRequest.BusinessObject,
-		hash,
-		synchronizationRequest.BaseledgerBusinessObjectId,
-		synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
-		synchronizationRequest.WorkstepType+" suggested")
-
+func CreateBaseledgerTransactionPayload(
+	synchronizationRequest *types.SynchronizationRequest,
+	offchainProcessMessage *types.OffchainProcessMessage,
+) string {
 	workgroup := findWorkgroupMock(synchronizationRequest.WorkgroupId)
 	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
 
-	transactionIdUuid, _ := uuid.NewV4()
 	payload := &types.BaseledgerTransactionPayload{
 		// TODO proper identifier
-		PhonebookIdentifier:                  "123",
-		TransactionType:                      "Suggest",
+		SenderId:                             "123",
+		TransactionType:                      "SuggestionSent",
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
-		ReferencedOffchainMessageId:          "",
-		ReferencedBaseledgerTransactionId:    "",
-		BaseledgerTransactionID:              transactionIdUuid.String(),
-		Proof:                                hash,
+		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
+		ReferencedBaseledgerTransactionId:    synchronizationRequest.ReferencedBaseledgerTransactionId,
+		BaseledgerTransactionID:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		Proof:                                offchainProcessMessage.Hash,
 		BaseledgerBusinessObjectId:           synchronizationRequest.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 	}
@@ -84,11 +78,67 @@ func CreateBaseledgerTransactionPayload(synchronizationRequest *types.Synchroniz
 	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
 	fmt.Printf("dec %s\n", dec)
 
-	return enc, transactionIdUuid.String()
+	return enc
 }
 
-func OffchainProcessMessageReceived(processMessage types.OffchainProcessMessage) {
+func CreateBaseledgerTransactionFeedbackPayload(
+	synchronizationFeedback *types.SynchronizationFeedback,
+	offchainProcessMessage *types.OffchainProcessMessage,
+) string {
+	workgroup := findWorkgroupMock(synchronizationFeedback.WorkgroupId)
+	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
+
+	feedbackMsg := "Approve"
+	if !synchronizationFeedback.Approved {
+		feedbackMsg = "Reject"
+	}
+	payload := &types.BaseledgerTransactionPayload{
+		// TODO proper identifier
+		SenderId:                             "123",
+		TransactionType:                      feedbackMsg,
+		OffchainMessageId:                    offchainProcessMessage.Id.String(),
+		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
+		ReferencedBaseledgerTransactionId:    synchronizationFeedback.OriginalBaseledgerTransactionId,
+		BaseledgerTransactionID:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		Proof:                                offchainProcessMessage.Hash,
+		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
+	}
+
+	fmt.Printf("\n payload %v \n", *payload)
+	enc := privatizePayload(payload, workgroup.PrivatizeKey)
+	fmt.Printf("enc %s\n\n", enc)
+	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
+	fmt.Printf("dec %s\n", dec)
+
+	return enc
+}
+
+type baseReq struct {
+	From    string `json:"from"`
+	ChainId string `json:"chain_id"`
+}
+
+type feedbackReq struct {
+	BaseReq  baseReq `json:"base_req"`
+	UserName string  `json:"username"`
+	Pwd      string  `json:"pwd"`
+}
+
+func OffchainProcessMessageReceived() {
 	fmt.Println("OffchainProcessMessageReceived")
+}
+
+// TODO: change test keyring with other (file?) - new ticket for this
+func newKeyringInstance() (keyring.Keyring, error) {
+	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
+
+	if err != nil {
+		fmt.Printf("error fetching test keyring %v\n", err.Error())
+		return nil, errors.New("error fetching key ring")
+	}
+
+	return kr, nil
 }
 
 func getBaseledgerTx(id string) {

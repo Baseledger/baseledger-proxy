@@ -37,7 +37,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Println("Offchain process msg not found")
 		return
 	}
-	switch txResult.Job.TrustmeshEntry.BaseledgerTransactionType {
+	switch txResult.Job.TrustmeshEntry.Type {
 	case "SuggestionSent":
 		fmt.Println("SuggestionSent")
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
@@ -69,7 +69,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
 		// TODO: this should not happen, probably panic is ok to use here?
-		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.BaseledgerTransactionType)
+		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.Type)
 		panic(errors.New("uknown business process!"))
 	}
 }
