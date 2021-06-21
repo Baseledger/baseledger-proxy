@@ -2,6 +2,7 @@ package businesslogic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -48,12 +49,23 @@ func ExecuteBusinessLogic(txResult types.Result) {
 			// TODO: what do to here? is return enough?
 			return
 		}
-		proof := proxy.CreateHashFromBusinessObject(offchainMessage.BusinessObject)
-		if proof != offchainMessage.Hash {
+
+		baseledgerTransactionPayload := proxytypes.BaseledgerTransactionPayload{}
+		deprivitizedPayload := proxy.DeprivatizeBaseledgerTransactionPayload(baseledgerTransaction.Payload, txResult.Job.TrustmeshEntry.WorkgroupId)
+
+		err = json.Unmarshal(([]byte)(deprivitizedPayload), &baseledgerTransactionPayload)
+
+		if err != nil {
+			fmt.Println("Failed to unmarshal baseledger transaction payload")
+			return
+		}
+		// TODO: is this ok? comparing proof that is from baseledger transaction with one from offchain message that is referenced by trustmesh entry
+		if baseledgerTransactionPayload.Proof != offchainMessage.Hash {
 			fmt.Println("Hashes don't match")
 			// TODO: what do to here? is return enough?
 			return
 		}
+
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	case "FeedbackSent":
 		fmt.Println("FeedbackSent")

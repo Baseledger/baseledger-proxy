@@ -7,11 +7,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	"github.com/unibrightio/baseledger/x/proxy/types"
@@ -125,47 +123,35 @@ type feedbackReq struct {
 	Pwd      string  `json:"pwd"`
 }
 
-func OffchainProcessMessageReceived() {
+func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage) {
 	fmt.Println("OffchainProcessMessageReceived")
 
-	// keyring, err := newKeyringInstance()
-
-	// kz, err := keyring.List()
-
-	// req := feedbackReq{
-	// 	BaseReq: baseReq{
-	// 		From:    kz[0].GetAddress().String(),
-	// 		ChainId: "baseledger",
-	// 	},
-	// 	UserName: "un",
-	// 	Pwd:      "pwd",
-	// }
-
-	// jsonValue, _ := json.Marshal(req)
-
-	// resp, err := http.Post("http://localhost:1317/proxy/feedback", "application/json", bytes.NewBuffer(jsonValue))
-
-	// if err != nil {
-	// 	fmt.Printf("ERROR POSTING %v\n", err)
-	// 	return
-	// }
-
-}
-
-// TODO: change test keyring with other (file?) - new ticket for this
-func newKeyringInstance() (keyring.Keyring, error) {
-	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
-
-	if err != nil {
-		fmt.Printf("error fetching test keyring %v\n", err.Error())
-		return nil, errors.New("error fetching key ring")
+	// TODO: MISSING INFO BELOW added to fields that are not present in offchain process message we would receive from NATS
+	// can we add missing fields to offchain message so we don't need to query keeper here?
+	// if i understood here, when we receive new message via nats we should based on that message add new trustmesh entry,
+	// that entry will be picked up by worked making sure transaction is committed etc
+	trustmeshEntry := &types.TrustmeshEntry{
+		TendermintTransactionId:  offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		OffchainProcessMessageId: offchainProcessMessage.Id,
+		// TODO: define proxy identifier
+		Sender:                               "123",
+		Receiver:                             offchainProcessMessage.ReceiverId,
+		WorkgroupId:                          offchainProcessMessage.Topic,
+		WorkstepType:                         offchainProcessMessage.WorkstepType,
+		BaseledgerTransactionType:            "", // ---> MISSING INFO
+		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		ReferencedBaseledgerTransactionId:    "", // ---> MISSING INFO
+		BusinessObjectType:                   "", // ---> MISSING INFO,
+		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
+		ReferencedProcessMessageId:           offchainProcessMessage.ReferencedOffchainProcessMessageId,
+		TransactionHash:                      "", // ---> MISSING INFO,
+		Type:                                 "", // ---> MISSING INFO
 	}
 
-	return kr, nil
-}
-
-func getBaseledgerTx(id string) {
-
+	if !trustmeshEntry.Create() {
+		fmt.Printf("error when creating new trustmesh entry")
+	}
 }
 
 func findWorkgroupMock(workgroupId string) *workgroupMock {
@@ -215,6 +201,11 @@ func newOffchainProcessMessage(
 func CreateHashFromBusinessObject(bo string) string {
 	hash := md5.Sum([]byte(bo))
 	return hex.EncodeToString(hash[:])
+}
+
+func DeprivatizeBaseledgerTransactionPayload(payload string, workgroupId string) string {
+	workgroup := findWorkgroupMock(workgroupId)
+	return deprivatizePayload(payload, workgroup.PrivatizeKey)
 }
 
 func privatizePayload(payload *types.BaseledgerTransactionPayload, key string) string {

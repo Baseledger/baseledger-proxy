@@ -105,6 +105,9 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId string, hash string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
+		SenderId:                             "123",
+		ReceiverId:                           req.Recipient,
+		Topic:                                req.WorkgroupId,
 		WorkstepType:                         req.WorkstepType,
 		ReferencedOffchainProcessMessageId:   "",
 		BusinessObject:                       req.BusinessObject,

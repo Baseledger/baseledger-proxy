@@ -111,6 +111,9 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 
 func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
+		SenderId:                             "123",
+		ReceiverId:                           req.Recipient,
+		Topic:                                req.WorkgroupId,
 		WorkstepType:                         "Feedback",
 		ReferencedOffchainProcessMessageId:   req.OriginalOffchainProcessMessageId,
 		BusinessObject:                       req.BusinessObject,
