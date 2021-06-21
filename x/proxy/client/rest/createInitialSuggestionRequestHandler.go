@@ -40,7 +40,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		hash := proxy.CreateHashFromBusinessObject(req.BusinessObject)
 		transactionId, _ := uuid.NewV4()
 
-		offchainMsg := createSuggestOffchainMessage(*req, req.BusinessObject, hash)
+		offchainMsg := createSuggestOffchainMessage(*req, transactionId.String(), hash)
 
 		if !offchainMsg.Create() {
 			fmt.Printf("error when creating new offchain msg entry")
@@ -75,18 +75,19 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
 		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId: transactionId.String(),
+			TendermintTransactionId:  transactionId.String(),
+			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
 			Sender:                               "123",
 			Receiver:                             req.Recipient,
 			WorkgroupId:                          req.WorkgroupId,
-			WorkstepType:                         req.WorkstepType,
+			WorkstepType:                         offchainMsg.WorkstepType,
 			BaseledgerTransactionType:            "Suggest",
 			BaseledgerTransactionId:              transactionId.String(),
 			ReferencedBaseledgerTransactionId:    req.ReferencedBaseledgerTransactionId,
 			BusinessObjectType:                   req.BusinessObjectType,
-			BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
-			ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
+			BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
+			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
 			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
 			TransactionHash:                      res.TxHash,
 			Type:                                 "SuggestionSent",

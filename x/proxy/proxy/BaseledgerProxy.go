@@ -62,7 +62,7 @@ func CreateBaseledgerTransactionPayload(
 	payload := &types.BaseledgerTransactionPayload{
 		// TODO proper identifier
 		SenderId:                             "123",
-		TransactionType:                      "SuggestionSent",
+		TransactionType:                      "Suggest",
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
 		ReferencedBaseledgerTransactionId:    synchronizationRequest.ReferencedBaseledgerTransactionId,
@@ -127,6 +127,29 @@ type feedbackReq struct {
 
 func OffchainProcessMessageReceived() {
 	fmt.Println("OffchainProcessMessageReceived")
+
+	// keyring, err := newKeyringInstance()
+
+	// kz, err := keyring.List()
+
+	// req := feedbackReq{
+	// 	BaseReq: baseReq{
+	// 		From:    kz[0].GetAddress().String(),
+	// 		ChainId: "baseledger",
+	// 	},
+	// 	UserName: "un",
+	// 	Pwd:      "pwd",
+	// }
+
+	// jsonValue, _ := json.Marshal(req)
+
+	// resp, err := http.Post("http://localhost:1317/proxy/feedback", "application/json", bytes.NewBuffer(jsonValue))
+
+	// if err != nil {
+	// 	fmt.Printf("ERROR POSTING %v\n", err)
+	// 	return
+	// }
+
 }
 
 // TODO: change test keyring with other (file?) - new ticket for this

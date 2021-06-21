@@ -39,10 +39,9 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 
 		createFeedbackReq := newFeedbackRequest(*req)
 
-		hash := proxy.CreateHashFromBusinessObject(req.BusinessObject)
 		transactionId, _ := uuid.NewV4()
 
-		offchainMsg := createFeedbackOffchainMessage(*req, req.BusinessObject, hash)
+		offchainMsg := createFeedbackOffchainMessage(*req, transactionId.String())
 
 		if !offchainMsg.Create() {
 			fmt.Printf("error when creating new offchain msg entry")
@@ -82,7 +81,8 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 		}
 
 		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId: transactionId.String(),
+			TendermintTransactionId:  transactionId.String(),
+			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
 			Sender:                               "123",
 			Receiver:                             req.Recipient,
@@ -106,18 +106,17 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-
 	}
 }
 
-func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string, hash string) types.OffchainProcessMessage {
+func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		WorkstepType:                         "Feedback",
 		ReferencedOffchainProcessMessageId:   req.OriginalOffchainProcessMessageId,
 		BusinessObject:                       req.BusinessObject,
-		Hash:                                 hash,
+		Hash:                                 req.HashOfObjectToApprove,
 		BaseledgerBusinessObjectId:           "",
-		ReferencedBaseledgerBusinessObjectId: req.OriginalBaseledgerTransactionId,
+		ReferencedBaseledgerBusinessObjectId: req.BaseledgerBusinessObjectIdOfApprovedObject,
 		StatusTextMessage:                    req.FeedbackMessage,
 		BaseledgerTransactionIdOfStoredProof: transactionId,
 	}
