@@ -1,20 +1,17 @@
 package rest
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	baseledgerTypes "github.com/unibrightio/baseledger/x/baseledger/types"
 	"github.com/unibrightio/baseledger/x/proxy/proxy"
 	"github.com/unibrightio/baseledger/x/proxy/types"
 
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	uuid "github.com/kthomas/go.uuid"
+	txutil "github.com/unibrightio/baseledger/x/proxy/txutil"
 )
 
 type createInitialSuggestionRequest struct {
@@ -29,106 +26,10 @@ type createInitialSuggestionRequest struct {
 	ReferencedBaseledgerTransactionId    string       `json:"referenced_baseledger_transaction_id"`
 }
 
-type createSynchronizationFeedbackRequest struct {
-	BaseReq                                    rest.BaseReq `json:"base_req"`
-	WorkgroupId                                string       `json:"workgroup_id"`
-	BusinessObject                             string       `json:"business_object"`
-	BusinessObjectType                         string       `json:"business_object_type"`
-	Recipient                                  string       `json:"recipient"`
-	Approved                                   bool         `json:"approved"`
-	BaseledgerBusinessObjectIdOfApprovedObject string       `json:"baseledger_business_object_id_of_approved_object"`
-	HashOfObjectToApprove                      string       `json:"hash_of_object_to_approve"`
-	OriginalBaseledgerTransactionId            string       `json:"original_baseledger_transaction_id"`
-	OriginalOffchainProcessMessageId           string       `json:"original_offchain_process_message_id"`
-	FeedbackMessage                            string       `json:"feedback_message"`
-}
-
-func createSynchronizationFeedbackHandler(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := parseFeedbackRequest(w, r, clientCtx)
-		clientCtx, err := buildClientCtx(clientCtx, req.BaseReq.From)
-
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		createFeedbackReq := newFeedbackRequest(*req)
-
-		hash := proxy.CreateHashFromBusinessObject(req.BusinessObject)
-		transactionId, _ := uuid.NewV4()
-
-		offchainMsg := createFeedbackOffchainMessage(*req, req.BusinessObject, hash)
-
-		if !offchainMsg.Create() {
-			fmt.Printf("error when creating new offchain msg entry")
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error when creating new offchain msg entry")
-		}
-
-		payload := proxy.CreateBaseledgerTransactionFeedbackPayload(createFeedbackReq, &offchainMsg)
-
-		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(transactionId.String(), clientCtx.GetFromAddress().String(), transactionId.String(), string(payload))
-		if err := msg.ValidateBasic(); err != nil {
-			fmt.Printf("msg validate basic failed %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
-
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		txBytes, err := signTxAndGetTxBytes(*clientCtx, msg)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		res, err := clientCtx.BroadcastTx(txBytes)
-		if err != nil {
-			fmt.Printf("error while broadcasting tx %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
-
-		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
-
-		feedbackMsg := "Approve"
-		if !req.Approved {
-			feedbackMsg = "Reject"
-		}
-
-		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId: transactionId.String(),
-			// TODO: define proxy identifier
-			Sender:                               "123",
-			Receiver:                             req.Recipient,
-			WorkgroupId:                          req.WorkgroupId,
-			WorkstepType:                         offchainMsg.WorkstepType,
-			BaseledgerTransactionType:            feedbackMsg,
-			BaseledgerTransactionId:              transactionId.String(),
-			ReferencedBaseledgerTransactionId:    req.OriginalBaseledgerTransactionId,
-			BusinessObjectType:                   req.BusinessObjectType,
-			BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
-			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
-			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
-			TransactionHash:                      res.TxHash,
-			Type:                                 "FeedbackSent",
-		}
-
-		trustmeshEntry.OffchainProcessMessageId = offchainMsg.Id
-		if !trustmeshEntry.Create() {
-			fmt.Printf("error when creating new trustmesh entry")
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-	}
-}
-
 func createInitialSuggestionRequestHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := parseRequest(w, r, clientCtx)
-		clientCtx, err := buildClientCtx(clientCtx, req.BaseReq.From)
+		clientCtx, err := txutil.BuildClientCtx(clientCtx, req.BaseReq.From)
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -160,7 +61,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		txBytes, err := signTxAndGetTxBytes(*clientCtx, msg)
+		txBytes, err := txutil.SignTxAndGetTxBytes(*clientCtx, msg)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
@@ -216,38 +117,8 @@ func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactio
 	return offchainMessage
 }
 
-func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string, hash string) types.OffchainProcessMessage {
-	offchainMessage := types.OffchainProcessMessage{
-		WorkstepType:                         "Feedback",
-		ReferencedOffchainProcessMessageId:   req.OriginalOffchainProcessMessageId,
-		BusinessObject:                       req.BusinessObject,
-		Hash:                                 hash,
-		BaseledgerBusinessObjectId:           "",
-		ReferencedBaseledgerBusinessObjectId: req.OriginalBaseledgerTransactionId,
-		StatusTextMessage:                    req.FeedbackMessage,
-		BaseledgerTransactionIdOfStoredProof: transactionId,
-	}
-
-	return offchainMessage
-}
-
 func parseRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createInitialSuggestionRequest {
 	var req createInitialSuggestionRequest
-	if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-		return nil
-	}
-
-	baseReq := req.BaseReq.Sanitize()
-	if !baseReq.ValidateBasic(w) {
-		rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-		return nil
-	}
-
-	return &req
-}
-
-func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createSynchronizationFeedbackRequest {
-	var req createSynchronizationFeedbackRequest
 	if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 		return nil
 	}
@@ -271,97 +142,4 @@ func newSynchronizationRequest(req createInitialSuggestionRequest) *types.Synchr
 		BusinessObject:                       req.BusinessObject,
 		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
 	}
-}
-
-func newFeedbackRequest(req createSynchronizationFeedbackRequest) *types.SynchronizationFeedback {
-	return &types.SynchronizationFeedback{
-		WorkgroupId:    req.WorkgroupId,
-		BusinessObject: req.BusinessObject,
-		Recipient:      req.Recipient,
-		Approved:       req.Approved,
-		BaseledgerBusinessObjectIdOfApprovedObject: req.BaseledgerBusinessObjectIdOfApprovedObject,
-		HashOfObjectToApprove:                      req.HashOfObjectToApprove,
-		OriginalBaseledgerTransactionId:            req.OriginalBaseledgerTransactionId,
-		OriginalOffchainProcessMessageId:           req.OriginalOffchainProcessMessageId,
-		FeedbackMessage:                            req.FeedbackMessage,
-	}
-}
-
-func buildClientCtx(clientCtx client.Context, from string) (*client.Context, error) {
-	fromAddress, err := sdk.AccAddressFromBech32(from)
-
-	keyring, err := newKeyringInstance()
-	key, err := keyring.KeyByAddress(fromAddress)
-
-	if err != nil {
-		fmt.Printf("error getting key %v\n", err.Error())
-		return nil, errors.New("")
-	}
-
-	fmt.Printf("key found %v %v\n", key, key.GetName())
-
-	clientCtx = clientCtx.
-		WithKeyring(keyring).
-		WithFromAddress(fromAddress).
-		WithSkipConfirmation(true).
-		WithFromName(key.GetName()).
-		WithBroadcastMode("sync")
-
-	return &clientCtx, nil
-}
-
-// TODO: change test keyring with other (file?) - new ticket for this
-func newKeyringInstance() (keyring.Keyring, error) {
-	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
-
-	if err != nil {
-		fmt.Printf("error fetching test keyring %v\n", err.Error())
-		return nil, errors.New("error fetching key ring")
-	}
-
-	return kr, nil
-}
-
-func signTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg) ([]byte, error) {
-	accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, clientCtx.FromAddress)
-
-	if err != nil {
-		fmt.Printf("error while retrieving acc %v\n", err.Error())
-		return nil, errors.New("sign tx error")
-	}
-	fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
-	txFactory := tx.Factory{}.
-		WithChainID(clientCtx.ChainID).
-		WithGas(100000).
-		WithTxConfig(clientCtx.TxConfig).
-		WithAccountNumber(accNum).
-		WithSequence(accSeq).
-		WithAccountRetriever(clientCtx.AccountRetriever).
-		WithKeybase(clientCtx.Keyring)
-
-	txFactory, err = tx.PrepareFactory(clientCtx, txFactory)
-	if err != nil {
-		fmt.Printf("prepare factory error %v\n", err.Error())
-		return nil, errors.New("sign tx error")
-	}
-
-	transaction, err := tx.BuildUnsignedTx(txFactory, msg)
-	if err != nil {
-		fmt.Printf("build unsigned tx error %v\n", err.Error())
-		return nil, errors.New("sign tx error")
-	}
-
-	err = tx.Sign(txFactory, clientCtx.GetFromName(), transaction, true)
-	if err != nil {
-		fmt.Printf("sign tx error %v\n", err.Error())
-		return nil, errors.New("sign tx error")
-	}
-
-	txBytes, err := clientCtx.TxConfig.TxEncoder()(transaction.GetTx())
-	if err != nil {
-		fmt.Printf("tx encoder %v\n", err.Error())
-		return nil, errors.New("sign tx error")
-	}
-
-	return txBytes, nil
 }
