@@ -15,8 +15,9 @@ type TrustmeshEntry struct {
 	TendermintBlockId                    sql.NullString
 	TendermintTransactionId              string
 	TendermintTransactionTimestamp       sql.NullString
-	Sender                               string
-	Receiver                             string
+	Type                                 string
+	SenderOrgId                          string
+	ReceiverOrgId                        string
 	WorkgroupId                          string
 	WorkstepType                         string
 	BaseledgerTransactionType            string
@@ -29,7 +30,6 @@ type TrustmeshEntry struct {
 	ReferencedProcessMessageId           string
 	TransactionStatus                    string
 	TransactionHash                      string
-	Type                                 string
 }
 
 func (t *TrustmeshEntry) Create() bool {

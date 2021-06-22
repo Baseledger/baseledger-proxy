@@ -43,7 +43,7 @@ func NewBaseledgerProxy() BaseledgerProxy {
 	proxy.config = BaseledgerProxyConfig{"das connection string"}
 
 	proxy.messagingClient = &messaging.NatsMessagingClient{}
-	proxy.messagingClient.Subscribe("local server conn string", "baseledger", receiveOffchainProcessMessage)
+	proxy.messagingClient.Subscribe("local server conn string", "token", "baseledger", receiveOffchainProcessMessage)
 
 	proxy.workgroupClient = &workgroups.PostgresWorkgroupClient{}
 

@@ -105,8 +105,8 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		trustmeshEntry := &types.TrustmeshEntry{
 			TendermintTransactionId: transactionId,
 			// TODO: define proxy identifier
-			Sender:                               "123",
-			Receiver:                             req.Recipient,
+			SenderOrgId:                          "123",
+			ReceiverOrgId:                        req.Recipient,
 			WorkgroupId:                          req.WorkgroupId,
 			WorkstepType:                         req.WorkstepType,
 			BaseledgerTransactionType:            "Suggest",

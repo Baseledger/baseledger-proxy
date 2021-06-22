@@ -15,9 +15,10 @@ type IMessagingClient interface {
 
 	// used to receive messages sent by other participants to our nats server
 	// serverUrl - local server url
+	// token - local server token
 	// topic - listening topic
 	// onMessageReceived - callback function
-	Subscribe(serverUrl string, topic string, onMessageReceived func(string, string))
+	Subscribe(serverUrl string, token string, topic string, onMessageReceived func(string, string))
 }
 
 type NatsMessagingClient struct {
@@ -25,27 +26,29 @@ type NatsMessagingClient struct {
 
 func (client *NatsMessagingClient) SendMessage(message string, recipient string, token string) {
 	// https://docs.nats.io/developing-with-nats/security/token
-	nc, err := nats.Connect(token + "@" + recipient)
+	nc, err := nats.Connect("nats://" + token + "@" + recipient)
 
 	if err != nil {
-		// TODO: Add logging
+		fmt.Printf("Error while trying to connect to Nats: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
 	}
 
 	defer nc.Close()
 
 	// TODO: https://docs.nats.io/developing-with-nats/sending/replyto
-	nc.Publish("TODO: subject", []byte(message))
-}
-
-func (client *NatsMessagingClient) Subscribe(serverUrl string, topic string, onMessageReceived func(string, string)) {
-	// https://docs.nats.io/developing-with-nats/security/token
-	nc, err := nats.Connect(serverUrl)
+	err = nc.Publish("baseledger", []byte(message))
 
 	if err != nil {
-		// TODO: Add logging
+		fmt.Printf("Error while trying to send NATS message: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
 	}
+}
 
-	defer nc.Close()
+func (client *NatsMessagingClient) Subscribe(serverUrl string, token string, topic string, onMessageReceived func(string, string)) {
+	// https://docs.nats.io/developing-with-nats/security/token
+	nc, err := nats.Connect("nats://" + token + "@" + serverUrl)
+
+	if err != nil {
+		fmt.Printf("Error while trying to connect to local Nats: %v", err)
+	}
 
 	nc.Subscribe(topic, func(m *nats.Msg) {
 		fmt.Printf("Received a message: %s\n", string(m.Data))
