@@ -78,8 +78,8 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			TendermintTransactionId:  transactionId.String(),
 			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
-			Sender:                               "123",
-			Receiver:                             req.Recipient,
+			SenderOrgId:                          "123",
+			ReceiverOrgId:                        req.Recipient,
 			WorkgroupId:                          req.WorkgroupId,
 			WorkstepType:                         offchainMsg.WorkstepType,
 			BaseledgerTransactionType:            "Suggest",

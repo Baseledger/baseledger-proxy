@@ -96,6 +96,7 @@ import (
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
 	"github.com/unibrightio/baseledger/x/proxy"
 	proxykeeper "github.com/unibrightio/baseledger/x/proxy/keeper"
+	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
 	"github.com/jinzhu/gorm"
@@ -266,6 +267,19 @@ func performMigrations() {
 	if err != nil && err != migrate.ErrNoChange {
 		fmt.Printf("migrations failed 4: %s", err.Error())
 	}
+}
+
+func subscribeToWorkgroupMessages() {
+	natsServerUrl, _ := viper.Get("NATS_URL").(string)
+	natsToken := "testToken1" // TODO: Read from configuration
+	fmt.Printf("subscribeToWorkgroupMessages natsServerUrl %v", natsServerUrl)
+	messagingClient := &messaging.NatsMessagingClient{}
+	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
+}
+
+func receiveOffchainProcessMessage(sender string, message string) {
+	fmt.Printf("\n sender %v \n", sender)
+	fmt.Printf("\n message %v \n", message)
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -572,6 +586,7 @@ func New(
 
 	initDbIfNotExists()
 	performMigrations()
+	subscribeToWorkgroupMessages()
 
 	cron.StartCron()
 

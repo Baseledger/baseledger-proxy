@@ -1,38 +1,55 @@
 package workgroups
 
 import (
-	uuid "github.com/kthomas/go.uuid"
+	"fmt"
+
+	"github.com/unibrightio/baseledger/dbutil"
+	"github.com/unibrightio/baseledger/x/proxy/types"
 	// gorm
 )
 
 type IWorkgroupClient interface {
-	FindWorkgroup(workgroupId string) *workgroupMock
-	FindRecipientMessagingEndpoint(recipientId string) string
-	FindRecipientMessagingToken(recipientId string) string
+	FindWorkgroup(workgroupId string) *types.Workgroup
+	FindWorkgroupMember(workgroupId string, recipientId string) *types.WorkgroupMember
 }
 
 type PostgresWorkgroupClient struct {
 }
 
-type workgroupMock struct {
-	BaselineWorkgroupID string
-	Description         string
-	PrivatizeKey        string
-}
+func (client *PostgresWorkgroupClient) FindWorkgroup(workgroupId string) *types.Workgroup {
+	db, err := dbutil.InitBaseledgerDBConnection()
 
-func (client *PostgresWorkgroupClient) FindWorkgroup(workgroupId string) *workgroupMock {
-	newUuid, _ := uuid.NewV4()
-	return &workgroupMock{
-		BaselineWorkgroupID: newUuid.String(),
-		Description:         "Mocked workgroup",
-		PrivatizeKey:        "0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314",
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+		return nil
 	}
+
+	var workgroup types.Workgroup
+	dbError := db.First(&workgroup, "id = ?", workgroupId).Error
+
+	if dbError != nil {
+		fmt.Printf("error trying to fetch workgroup with id %s\n", workgroupId)
+		return nil
+	}
+
+	return &workgroup
 }
 
-func (client *PostgresWorkgroupClient) FindRecipientMessagingEndpoint(recipientId string) string {
-	return "nil"
-}
+func (client *PostgresWorkgroupClient) FindWorkgroupMember(workgroupId string, recipientId string) *types.WorkgroupMember {
+	db, err := dbutil.InitBaseledgerDBConnection()
 
-func (client *PostgresWorkgroupClient) FindRecipientMessagingToken(recipientId string) string {
-	return "nil"
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+		return nil
+	}
+
+	var member types.WorkgroupMember
+	dbError := db.First(&member, "workgroup_id = ? AND organization_id = ?", workgroupId, recipientId).Error
+
+	if dbError != nil {
+		fmt.Printf("error trying to fetch workgroup membership with workgroup id %s and organization with id %s\n", recipientId, recipientId)
+		return nil
+	}
+
+	return &member
 }

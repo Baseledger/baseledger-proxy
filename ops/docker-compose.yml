@@ -3,56 +3,49 @@ version: '3.8'
 services:
   postgres:
     image: postgres
-    container_name: postgres
     command: ["postgres", "-c", "log_statement=all"]
     environment:
       - POSTGRES_DB=ub
       - POSTGRES_USER=ub
       - POSTGRES_PASSWORD=ub123
-    hostname:
-      postgres
     volumes:
       - baseledger-db:/var/lib/postgresql/data
     networks:
       - baseledger
+    hostname: postgres-local-node
     ports:
-      - 5432:5432
+      - ${POSTGRES_EXPOSED_PORT}:5432
     restart: always
   nats:
     image: nats
-    container_name: nats
-    environment:
-      - NATS_USER=bla
+    command: ["--auth", "testToken1"]
     hostname:
-      nats
+      nats-local-node
     networks:
       - baseledger
     ports:
-      - 4222:4222 
+      - ${NATS_EXPOSED_PORT}:4222
     restart: always
-  # starport:
-  #     # build: <starport dockerfile>
-  #     image: starport/cli
-  #     command: ["serve"]
-  #     container_name: starport
-  #     volumes:
-  #       - ../:/apps
-  #     working_dir: /apps
-  #     hostname:
-  #       starport
-  #     networks:
-  #       - baseledger
-  #     ports:
-  #       - 1317:1317
-  #       - 26657:26657
-  #     restart: always
+  starport:
+      build:
+        context: ../
+        dockerfile: ops/Dockerfile
+        args:
+          - DB_HOST=postgres-local-node
+          - DB_UB_USER=ub
+          - DB_UB_PWD=ub123
+      image: starport
+      hostname: starport-local-node
+      networks:
+        - baseledger
+      ports:
+        - ${STARPORT_API_PORT}:1317
+        - ${TENDERMINT_NODE_PORT}:26657
+      restart: always
 
 networks:
   baseledger:
     driver: bridge
-    ipam:
-      config:
-      - subnet: 172.40.0.0/24
 
 volumes:
   baseledger-db:
