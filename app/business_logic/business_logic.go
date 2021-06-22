@@ -19,7 +19,7 @@ import (
 // TODO: currently this is saving after result is written to output channel
 // do we save inside worker or after?
 func SetTxStatusToCommitted(txResult types.Result, db *gorm.DB) {
-	result := db.Exec("UPDATE trustmesh_entries SET transaction_status = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
+	result := db.Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
 		txResult.TxInfo.TxHeight,
 		txResult.TxInfo.TxTimestamp,
 		txResult.Job.TrustmeshEntry.TendermintTransactionId)
@@ -38,10 +38,10 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Println("Offchain process msg not found")
 		return
 	}
-	switch txResult.Job.TrustmeshEntry.Type {
+	switch txResult.Job.TrustmeshEntry.EntryType {
 	case "SuggestionSent":
 		fmt.Println("SuggestionSent")
-		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Receiver)
+		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.TransactionHash)
 	case "SuggestionReceived":
 		fmt.Println("SuggestionReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -60,7 +60,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 			return
 		}
 		// TODO: is this ok? comparing proof that is from baseledger transaction with one from offchain message that is referenced by trustmesh entry
-		if baseledgerTransactionPayload.Proof != offchainMessage.Hash {
+		if baseledgerTransactionPayload.Proof != offchainMessage.BaseledgerTransactionIdOfStoredProof {
 			fmt.Println("Hashes don't match")
 			// TODO: what do to here? is return enough?
 			return
@@ -69,7 +69,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	case "FeedbackSent":
 		fmt.Println("FeedbackSent")
-		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.Sender)
+		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.TransactionHash)
 	case "FeedbackReceived":
 		fmt.Println("FeedbackReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -81,7 +81,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
 		// TODO: this should not happen, probably panic is ok to use here?
-		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.Type)
+		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
 }

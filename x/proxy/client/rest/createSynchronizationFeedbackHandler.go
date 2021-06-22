@@ -17,7 +17,6 @@ import (
 type createSynchronizationFeedbackRequest struct {
 	BaseReq                                    rest.BaseReq `json:"base_req"`
 	WorkgroupId                                string       `json:"workgroup_id"`
-	BusinessObject                             string       `json:"business_object"`
 	BusinessObjectType                         string       `json:"business_object_type"`
 	Recipient                                  string       `json:"recipient"`
 	Approved                                   bool         `json:"approved"`
@@ -26,6 +25,7 @@ type createSynchronizationFeedbackRequest struct {
 	OriginalBaseledgerTransactionId            string       `json:"original_baseledger_transaction_id"`
 	OriginalOffchainProcessMessageId           string       `json:"original_offchain_process_message_id"`
 	FeedbackMessage                            string       `json:"feedback_message"`
+	BaseledgerProvenBusinessObjectJson         string       `json:"baseledger_proven_business_object_json"`
 }
 
 func createSynchronizationFeedbackHandler(clientCtx client.Context) http.HandlerFunc {
@@ -40,8 +40,12 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 		createFeedbackReq := newFeedbackRequest(*req)
 
 		transactionId, _ := uuid.NewV4()
+		feedbackMsg := "Approve"
+		if !req.Approved {
+			feedbackMsg = "Reject"
+		}
 
-		offchainMsg := createFeedbackOffchainMessage(*req, transactionId.String())
+		offchainMsg := createFeedbackOffchainMessage(*req, transactionId.String(), feedbackMsg)
 
 		if !offchainMsg.Create() {
 			fmt.Printf("error when creating new offchain msg entry")
@@ -75,17 +79,12 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
-		feedbackMsg := "Approve"
-		if !req.Approved {
-			feedbackMsg = "Reject"
-		}
-
 		trustmeshEntry := &types.TrustmeshEntry{
 			TendermintTransactionId:  transactionId.String(),
 			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
-			Sender:                               "123",
-			Receiver:                             req.Recipient,
+			SenderOrgId:                          "123",
+			ReceiverOrgId:                        req.Recipient,
 			WorkgroupId:                          req.WorkgroupId,
 			WorkstepType:                         offchainMsg.WorkstepType,
 			BaseledgerTransactionType:            feedbackMsg,
@@ -96,7 +95,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
 			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
 			TransactionHash:                      res.TxHash,
-			Type:                                 "FeedbackSent",
+			EntryType:                            "FeedbackSent",
 		}
 
 		trustmeshEntry.OffchainProcessMessageId = offchainMsg.Id
@@ -109,19 +108,24 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 	}
 }
 
-func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string) types.OffchainProcessMessage {
+func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             "123",
 		ReceiverId:                           req.Recipient,
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         "Feedback",
 		ReferencedOffchainProcessMessageId:   req.OriginalOffchainProcessMessageId,
-		BusinessObject:                       req.BusinessObject,
-		Hash:                                 req.HashOfObjectToApprove,
+		BaseledgerSyncTreeJson:               req.BaseledgerProvenBusinessObjectJson,
+		BusinessObjectProof:                  req.HashOfObjectToApprove,
 		BaseledgerBusinessObjectId:           "",
 		ReferencedBaseledgerBusinessObjectId: req.BaseledgerBusinessObjectIdOfApprovedObject,
 		StatusTextMessage:                    req.FeedbackMessage,
 		BaseledgerTransactionIdOfStoredProof: transactionId,
+		TendermintTransactionIdOfStoredProof: transactionId,
+		BusinessObjectType:                   req.BusinessObjectType,
+		BaseledgerTransactionType:            baseledgerTransactionType,
+		ReferencedBaseledgerTransactionId:    req.OriginalBaseledgerTransactionId,
+		EntryType:                            "FeedbackSent",
 	}
 
 	return offchainMessage
@@ -144,14 +148,15 @@ func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx clie
 
 func newFeedbackRequest(req createSynchronizationFeedbackRequest) *types.SynchronizationFeedback {
 	return &types.SynchronizationFeedback{
-		WorkgroupId:    req.WorkgroupId,
-		BusinessObject: req.BusinessObject,
-		Recipient:      req.Recipient,
-		Approved:       req.Approved,
+		WorkgroupId:                        req.WorkgroupId,
+		BaseledgerProvenBusinessObjectJson: req.BaseledgerProvenBusinessObjectJson,
+		Recipient:                          req.Recipient,
+		Approved:                           req.Approved,
 		BaseledgerBusinessObjectIdOfApprovedObject: req.BaseledgerBusinessObjectIdOfApprovedObject,
 		HashOfObjectToApprove:                      req.HashOfObjectToApprove,
 		OriginalBaseledgerTransactionId:            req.OriginalBaseledgerTransactionId,
 		OriginalOffchainProcessMessageId:           req.OriginalOffchainProcessMessageId,
 		FeedbackMessage:                            req.FeedbackMessage,
+		BusinessObjectType:                         req.BusinessObjectType,
 	}
 }

@@ -25,7 +25,7 @@ type workgroupMock struct {
 
 type IBaseledgerProxy interface {
 	CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string)
-	SendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string)
+	SendOffchainProcessMessage(message types.OffchainProcessMessage, txHash string)
 }
 
 type BaseledgerProxy struct {
@@ -65,7 +65,7 @@ func CreateBaseledgerTransactionPayload(
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
 		ReferencedBaseledgerTransactionId:    synchronizationRequest.ReferencedBaseledgerTransactionId,
 		BaseledgerTransactionID:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		Proof:                                offchainProcessMessage.Hash,
+		Proof:                                offchainProcessMessage.BusinessObjectProof,
 		BaseledgerBusinessObjectId:           synchronizationRequest.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 	}
@@ -98,7 +98,7 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
 		ReferencedBaseledgerTransactionId:    synchronizationFeedback.OriginalBaseledgerTransactionId,
 		BaseledgerTransactionID:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		Proof:                                offchainProcessMessage.Hash,
+		Proof:                                offchainProcessMessage.BusinessObjectProof,
 		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
 	}
@@ -112,30 +112,29 @@ func CreateBaseledgerTransactionFeedbackPayload(
 	return enc
 }
 
-func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage) {
+func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage, txHash string) {
 	fmt.Println("OffchainProcessMessageReceived")
-
-	// TODO: MISSING INFO BELOW added to fields that are not present in offchain process message we would receive from NATS
-	// can we add missing fields to offchain message so we don't need to query keeper here?
-	// if i understood here, when we receive new message via nats we should based on that message add new trustmesh entry,
-	// that entry will be picked up by worked making sure transaction is committed etc
+	entryType := "SuggestionReceived"
+	if offchainProcessMessage.EntryType == "FeedbackSent" {
+		entryType = "FeedbackReceived"
+	}
 	trustmeshEntry := &types.TrustmeshEntry{
 		TendermintTransactionId:  offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
 		OffchainProcessMessageId: offchainProcessMessage.Id,
 		// TODO: define proxy identifier
-		Sender:                               "123",
-		Receiver:                             offchainProcessMessage.ReceiverId,
+		SenderOrgId:                          "123",
+		ReceiverOrgId:                        offchainProcessMessage.ReceiverId,
 		WorkgroupId:                          offchainProcessMessage.Topic,
 		WorkstepType:                         offchainProcessMessage.WorkstepType,
-		BaseledgerTransactionType:            "", // ---> MISSING INFO
+		BaseledgerTransactionType:            offchainProcessMessage.BaseledgerTransactionType,
 		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		ReferencedBaseledgerTransactionId:    "", // ---> MISSING INFO
-		BusinessObjectType:                   "", // ---> MISSING INFO,
+		ReferencedBaseledgerTransactionId:    offchainProcessMessage.ReferencedBaseledgerTransactionId,
+		BusinessObjectType:                   offchainProcessMessage.BusinessObjectType,
 		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
 		ReferencedProcessMessageId:           offchainProcessMessage.ReferencedOffchainProcessMessageId,
-		TransactionHash:                      "", // ---> MISSING INFO,
-		Type:                                 "", // ---> MISSING INFO
+		TransactionHash:                      txHash,
+		EntryType:                            entryType,
 	}
 
 	if !trustmeshEntry.Create() {
@@ -153,8 +152,8 @@ func findWorkgroupMock(workgroupId string) *workgroupMock {
 }
 
 // TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
-func SendOffchainProcessMessage(message types.OffchainProcessMessage, recipientId string) {
-	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v\n", message.Id)
+func SendOffchainProcessMessage(message types.OffchainProcessMessage, txHash string) {
+	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
 	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
 	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
 	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)
@@ -165,28 +164,6 @@ func receiveOffchainProcessMessage(sender string, message string) {
 	fmt.Printf("\n message %v \n", message)
 }
 
-func newOffchainProcessMessage(
-	workstepType string,
-	referencedOffchainProcessMessage string,
-	businessObject string,
-	hashOfBusinessObject string,
-	baseledgerBusinessObjectID string,
-	referencedBaseledgerBusinessObjectID string,
-	statusTextMessage string) *types.OffchainProcessMessage {
-	newUuid, _ := uuid.NewV4()
-	return &types.OffchainProcessMessage{
-		Id:                                   newUuid,
-		WorkstepType:                         workstepType,
-		ReferencedOffchainProcessMessageId:   referencedOffchainProcessMessage,
-		Hash:                                 hashOfBusinessObject,
-		BusinessObject:                       businessObject,
-		BaseledgerBusinessObjectId:           baseledgerBusinessObjectID,
-		ReferencedBaseledgerBusinessObjectId: referencedBaseledgerBusinessObjectID,
-		StatusTextMessage:                    statusTextMessage,
-	}
-}
-
-// TODO: currently it assumes it is json string, refactor this
 func CreateHashFromBusinessObject(bo string) string {
 	hash := md5.Sum([]byte(bo))
 	return hex.EncodeToString(hash[:])

@@ -21,7 +21,7 @@ type createInitialSuggestionRequest struct {
 	WorkstepType                         string       `json:"workstep_type"`
 	BusinessObjectType                   string       `json:"business_object_type"`
 	BaseledgerBusinessObjectId           string       `json:"baseledger_business_object_id"`
-	BusinessObject                       string       `json:"business_object"`
+	BusinessObjectJson                   string       `json:"business_object_json"`
 	ReferencedBaseledgerBusinessObjectId string       `json:"referenced_baseledger_business_object_id"`
 	ReferencedBaseledgerTransactionId    string       `json:"referenced_baseledger_transaction_id"`
 }
@@ -37,7 +37,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		createSyncReq := newSynchronizationRequest(*req)
 
-		hash := proxy.CreateHashFromBusinessObject(req.BusinessObject)
+		hash := proxy.CreateHashFromBusinessObject(req.BusinessObjectJson)
 		transactionId, _ := uuid.NewV4()
 
 		offchainMsg := createSuggestOffchainMessage(*req, transactionId.String(), hash)
@@ -90,7 +90,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
 			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
 			TransactionHash:                      res.TxHash,
-			Type:                                 "SuggestionSent",
+			EntryType:                            "SuggestionSent",
 		}
 
 		trustmeshEntry.OffchainProcessMessageId = offchainMsg.Id
@@ -110,12 +110,17 @@ func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactio
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         req.WorkstepType,
 		ReferencedOffchainProcessMessageId:   "",
-		BusinessObject:                       req.BusinessObject,
-		Hash:                                 hash,
+		BaseledgerSyncTreeJson:               req.BusinessObjectJson,
+		BusinessObjectProof:                  hash,
 		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
 		StatusTextMessage:                    req.WorkstepType + " suggested",
 		BaseledgerTransactionIdOfStoredProof: transactionId,
+		TendermintTransactionIdOfStoredProof: transactionId,
+		BusinessObjectType:                   req.BusinessObjectType,
+		BaseledgerTransactionType:            "Suggest",
+		ReferencedBaseledgerTransactionId:    req.ReferencedBaseledgerTransactionId,
+		EntryType:                            "SugggestionSent",
 	}
 
 	return offchainMessage
@@ -143,7 +148,7 @@ func newSynchronizationRequest(req createInitialSuggestionRequest) *types.Synchr
 		WorkstepType:                         req.WorkstepType,
 		BusinessObjectType:                   req.BusinessObjectType,
 		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
-		BusinessObject:                       req.BusinessObject,
+		BusinessObjectJson:                   req.BusinessObjectJson,
 		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
 	}
 }

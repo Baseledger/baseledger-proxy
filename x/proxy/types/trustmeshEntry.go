@@ -16,7 +16,7 @@ type TrustmeshEntry struct {
 	TendermintBlockId                    sql.NullString
 	TendermintTransactionId              string
 	TendermintTransactionTimestamp       sql.NullString
-	Type                                 string
+	EntryType                            string
 	SenderOrgId                          string
 	ReceiverOrgId                        string
 	WorkgroupId                          string
@@ -29,7 +29,7 @@ type TrustmeshEntry struct {
 	ReferencedBaseledgerBusinessObjectId string
 	OffchainProcessMessageId             uuid.UUID
 	ReferencedProcessMessageId           string
-	TransactionStatus                    string
+	CommitmentState                      string
 	TransactionHash                      string
 }
 
@@ -41,7 +41,7 @@ func (t *TrustmeshEntry) Create() bool {
 		return false
 	}
 
-	t.TransactionStatus = defaultTransactionStatus
+	t.CommitmentState = defaultTransactionStatus
 	t.TendermintBlockId = sql.NullString{Valid: false}
 	t.TendermintTransactionTimestamp = sql.NullString{Valid: false}
 	if db.NewRecord(t) {

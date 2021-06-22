@@ -45,7 +45,7 @@ CREATE TABLE public.trustmesh_entries (
     tendermint_transaction_id text,
     tendermint_transaction_timestamp timestamp with time zone,
     
-    type text,
+    entry_type text,
 
     sender_org_id uuid,
     receiver_org_id uuid,
@@ -64,10 +64,42 @@ CREATE TABLE public.trustmesh_entries (
     offchain_process_message_id text,
     referenced_process_message_id text,
 
-    transaction_status text,
+    commitment_state text,
     transaction_hash text
 );
 
 ALTER TABLE public.trustmesh_entries OWNER TO baseledger;
 
-CREATE INDEX idx_transaction_status ON public.trustmesh_entries USING btree (transaction_status);
+CREATE INDEX idx_commitment_state ON public.trustmesh_entries USING btree (commitment_state);
+
+CREATE TABLE public.offchain_process_messages (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    sender_id text,
+	receiver_id text,
+	topic text,
+	referenced_offchain_process_message_id text,
+	baseledger_sync_tree_json text,
+	workstep_type text,
+	business_object_proof text,
+	tendermint_transaction_id_of_stored_proof text,
+	baseledger_transaction_id_of_stored_proof text,
+    baseledger_business_object_id text,
+	referenced_baseledger_business_object_id text,
+	status_text_message text,
+    business_object_type text,
+	baseledger_transaction_type text,
+	referenced_baseledger_transaction_id text,
+	entry_type text
+);
+
+ALTER TABLE public.offchain_process_messages OWNER TO baseledger;
+
+ALTER TABLE ONLY public.offchain_process_messages ADD CONSTRAINT offchain_process_messagess_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.trustmesh_entries ADD CONSTRAINT trustmesh_entries_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.trustmesh_entries
+    ALTER COLUMN offchain_process_message_id TYPE uuid USING (uuid_generate_v4());
+
+ALTER TABLE ONLY public.trustmesh_entries
+    ADD CONSTRAINT trustmesh_entries_offchain_process_message_id_offchain_process_messages_id_foreign FOREIGN KEY (offchain_process_message_id) REFERENCES public.offchain_process_messages(id) ON UPDATE CASCADE ON DELETE CASCADE;

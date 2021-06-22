@@ -25,7 +25,7 @@ func queryTrustmeshes() {
 	}
 
 	var trustmeshEntries []proxytypes.TrustmeshEntry
-	db.Where("transaction_status='UNCOMMITTED'").Find(&trustmeshEntries)
+	db.Where("commitment_state='UNCOMMITTED'").Find(&trustmeshEntries)
 
 	fmt.Printf("found %v trustmesh entries\n", len(trustmeshEntries))
 	var jobs = make(chan types.Job, len(trustmeshEntries))

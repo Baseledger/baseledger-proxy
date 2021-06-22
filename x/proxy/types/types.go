@@ -13,20 +13,23 @@ import (
 type OffchainProcessMessageReferenceType string
 
 type OffchainProcessMessage struct {
-	Id                                 uuid.UUID
-	SenderId                           string
-	ReceiverId                         string
-	Topic                              string
-	ReferencedOffchainProcessMessageId string
-	// todo replace string with proper type?
-	BusinessObject                       string
+	Id                                   uuid.UUID
+	SenderId                             string
+	ReceiverId                           string
+	Topic                                string
+	ReferencedOffchainProcessMessageId   string
+	BaseledgerSyncTreeJson               string
 	WorkstepType                         string
-	Hash                                 string
+	BusinessObjectProof                  string
+	BusinessObjectType                   string
 	TendermintTransactionIdOfStoredProof string
 	BaseledgerTransactionIdOfStoredProof string
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
 	StatusTextMessage                    string
+	BaseledgerTransactionType            string
+	ReferencedBaseledgerTransactionId    string
+	EntryType                            string
 }
 
 // TODO rename after clean up
@@ -36,14 +39,15 @@ type SynchronizationRequest struct {
 	WorkstepType                         string
 	BusinessObjectType                   string
 	BaseledgerBusinessObjectId           string
-	BusinessObject                       string
+	BusinessObjectJson                   string
 	ReferencedBaseledgerBusinessObjectId string
 	ReferencedBaseledgerTransactionId    string
 }
 
 type SynchronizationFeedback struct {
 	WorkgroupId                                string
-	BusinessObject                             string
+	BaseledgerProvenBusinessObjectJson         string
+	BusinessObjectType                         string
 	Recipient                                  string
 	Approved                                   bool
 	BaseledgerBusinessObjectIdOfApprovedObject string
