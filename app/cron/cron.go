@@ -45,6 +45,9 @@ func queryTrustmeshes() {
 			businessprocess.SetTxStatusToCommitted(result, db)
 		}
 	}
+
+	db.Close()
+
 	fmt.Println("query trustmeshes end")
 }
 
