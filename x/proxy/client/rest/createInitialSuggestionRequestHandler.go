@@ -11,7 +11,7 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/types"
 
 	uuid "github.com/kthomas/go.uuid"
-	txutil "github.com/unibrightio/baseledger/x/proxy/txutil"
+	txutil "github.com/unibrightio/baseledger/txutil"
 )
 
 type createInitialSuggestionRequest struct {

@@ -11,10 +11,11 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/types"
 
 	uuid "github.com/kthomas/go.uuid"
-	txutil "github.com/unibrightio/baseledger/x/proxy/txutil"
+	txutil "github.com/unibrightio/baseledger/txutil"
 )
 
-type CreateSynchronizationFeedbackRequest struct {
+// keep in sync with restuitl struct
+type createSynchronizationFeedbackRequest struct {
 	BaseReq                                    rest.BaseReq `json:"base_req"`
 	WorkgroupId                                string       `json:"workgroup_id"`
 	BusinessObjectType                         string       `json:"business_object_type"`
@@ -108,7 +109,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 	}
 }
 
-func createFeedbackOffchainMessage(req CreateSynchronizationFeedbackRequest, transactionId string, baseledgerTransactionType string) types.OffchainProcessMessage {
+func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
@@ -131,8 +132,8 @@ func createFeedbackOffchainMessage(req CreateSynchronizationFeedbackRequest, tra
 	return offchainMessage
 }
 
-func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *CreateSynchronizationFeedbackRequest {
-	var req CreateSynchronizationFeedbackRequest
+func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createSynchronizationFeedbackRequest {
+	var req createSynchronizationFeedbackRequest
 	if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
 		return nil
 	}
@@ -146,7 +147,7 @@ func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx clie
 	return &req
 }
 
-func newFeedbackRequest(req CreateSynchronizationFeedbackRequest) *types.SynchronizationFeedback {
+func newFeedbackRequest(req createSynchronizationFeedbackRequest) *types.SynchronizationFeedback {
 	return &types.SynchronizationFeedback{
 		WorkgroupId:                        uuid.FromStringOrNil(req.WorkgroupId),
 		BaseledgerProvenBusinessObjectJson: req.BaseledgerProvenBusinessObjectJson,
