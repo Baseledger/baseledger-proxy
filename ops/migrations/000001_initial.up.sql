@@ -22,12 +22,18 @@ CREATE TABLE public.organizations (
 
 ALTER TABLE public.organizations OWNER TO baseledger;
 
+INSERT INTO public.organizations (organization_name)
+VALUES ('Org1'), ('Org2');
+
 CREATE TABLE public.workgroups (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     workgroup_name text NOT NULL
 );
 
 ALTER TABLE public.workgroups OWNER TO baseledger;
+
+INSERT INTO public.workgroups (workgroup_name)
+VALUES ('Workgroup1');
 
 CREATE TABLE public.workgroup_members (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -38,6 +44,32 @@ CREATE TABLE public.workgroup_members (
 );
 
 ALTER TABLE public.workgroup_members OWNER TO baseledger;
+
+INSERT INTO public.workgroup_members (workgroup_id, organization_id, organization_endpoint, organization_token)
+WITH
+  w AS (
+    SELECT id 
+    FROM public.workgroups 
+  ),
+  o AS (
+    SELECT id FROM public.organizations
+    WHERE organization_name = 'Org1'
+  )
+  select w.id, o.id, 'localhost:4222', 'testToken1'
+  from w, o;
+
+INSERT INTO public.workgroup_members (workgroup_id, organization_id, organization_endpoint, organization_token)
+WITH
+  w AS (
+    SELECT id 
+    FROM public.workgroups 
+  ),
+  o AS (
+    SELECT id FROM public.organizations
+    WHERE organization_name = 'Org2'
+  )
+  select w.id, o.id, 'localhost:4223', 'testToken1'
+  from w, o;
 
 CREATE TABLE public.trustmesh_entries (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,

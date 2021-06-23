@@ -27,6 +27,8 @@ func (client *PostgresWorkgroupClient) FindWorkgroup(workgroupId string) *types.
 	var workgroup types.Workgroup
 	dbError := db.First(&workgroup, "id = ?", workgroupId).Error
 
+	db.Close()
+
 	if dbError != nil {
 		fmt.Printf("error trying to fetch workgroup with id %s\n", workgroupId)
 		return nil
@@ -45,6 +47,8 @@ func (client *PostgresWorkgroupClient) FindWorkgroupMember(workgroupId string, r
 
 	var member types.WorkgroupMember
 	dbError := db.First(&member, "workgroup_id = ? AND organization_id = ?", workgroupId, recipientId).Error
+
+	db.Close()
 
 	if dbError != nil {
 		fmt.Printf("error trying to fetch workgroup membership with workgroup id %s and organization with id %s\n", recipientId, recipientId)

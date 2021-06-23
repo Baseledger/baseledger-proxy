@@ -42,6 +42,9 @@ func queryTrustmeshes() {
 	for result := range results {
 		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TendermintTransactionId, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
 	}
+
+	db.Close()
+
 	fmt.Println("query trustmeshes end")
 }
 
