@@ -42,12 +42,12 @@ func RejectFeedback(offchainMessage types.OffchainProcessMessage, workgroupId st
 		FeedbackMessage:                    "Rejected because Hashes do not match",
 		Approved:                           false,
 		BaseledgerProvenBusinessObjectJson: offchainMessage.BaseledgerSyncTreeJson,
-		BaseledgerBusinessObjectIdOfApprovedObject: offchainMessage.BaseledgerBusinessObjectId,
+		BaseledgerBusinessObjectIdOfApprovedObject: offchainMessage.BaseledgerBusinessObjectId.String(),
 		WorkgroupId: workgroupId,
 		Recipient:   offchainMessage.SenderId.String(),
 		// TODO: Which proof to send here?
 		HashOfObjectToApprove:            offchainMessage.BusinessObjectProof,
-		OriginalBaseledgerTransactionId:  offchainMessage.BaseledgerTransactionIdOfStoredProof,
+		OriginalBaseledgerTransactionId:  offchainMessage.BaseledgerTransactionIdOfStoredProof.String(),
 		OriginalOffchainProcessMessageId: offchainMessage.Id.String(),
 		BusinessObjectType:               offchainMessage.BusinessObjectType,
 	}

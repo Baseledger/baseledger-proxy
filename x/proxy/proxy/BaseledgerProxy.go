@@ -62,9 +62,9 @@ func CreateBaseledgerTransactionPayload(
 		SenderId:                             "123",
 		TransactionType:                      "Suggest",
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
-		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
+		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
 		ReferencedBaseledgerTransactionId:    synchronizationRequest.ReferencedBaseledgerTransactionId,
-		BaseledgerTransactionID:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof.String(),
 		Proof:                                offchainProcessMessage.BusinessObjectProof,
 		BaseledgerBusinessObjectId:           synchronizationRequest.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
@@ -95,12 +95,12 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		SenderId:                             "123",
 		TransactionType:                      feedbackMsg,
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
-		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId,
+		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
 		ReferencedBaseledgerTransactionId:    synchronizationFeedback.OriginalBaseledgerTransactionId,
-		BaseledgerTransactionID:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof.String(),
 		Proof:                                offchainProcessMessage.BusinessObjectProof,
-		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
+		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId.String(),
+		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId.String(),
 	}
 
 	fmt.Printf("\n payload %v \n", *payload)
@@ -151,7 +151,7 @@ func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
 }
 
 // TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
-func SendOffchainProcessMessage(message types.OffchainProcessMessage, txHash string) {
+func SendOffchainProcessMessage(message types.OffchainProcessMessage, receiver string, txHash string) {
 	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
 	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
 	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)

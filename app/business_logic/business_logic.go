@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/app/types"
 	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/sor"
@@ -17,26 +18,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func SetTxStatusToCommitted(txResult types.Result) {
-	// TODO: should we reuse db connection here, or open new one?
-	db, err := dbutil.InitBaseledgerDBConnection()
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-	}
-	result := db.Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
-		txResult.TxInfo.TxHeight,
-		txResult.TxInfo.TxTimestamp,
-		txResult.Job.TrustmeshEntry.TendermintTransactionId)
-	if result.RowsAffected == 1 {
-		fmt.Printf("Tx %v committed \n", txResult.Job.TrustmeshEntry.TendermintTransactionId)
-	} else {
-		fmt.Printf("Error setting tx status to committed %v\n", result.Error)
-	}
-}
-
 func ExecuteBusinessLogic(txResult types.Result) {
 	// TODO: it looks like we should do this first?
-	SetTxStatusToCommitted(txResult)
+	setTxStatusToCommitted(txResult)
 	// TODO: should we reuse db connection here, or open new one?
 	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
@@ -47,7 +31,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 	switch txResult.Job.TrustmeshEntry.EntryType {
 	case "SuggestionSent":
 		fmt.Println("SuggestionSent")
-		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.TransactionHash)
+		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case "SuggestionReceived":
 		fmt.Println("SuggestionReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -55,16 +39,15 @@ func ExecuteBusinessLogic(txResult types.Result) {
 			// TODO: logging
 			return
 		}
-
 		baseledgerTransactionPayload := proxytypes.BaseledgerTransactionPayload{}
 		deprivitizedPayload := proxy.DeprivatizeBaseledgerTransactionPayload(baseledgerTransaction.Payload, txResult.Job.TrustmeshEntry.WorkgroupId)
 
 		err = json.Unmarshal(([]byte)(deprivitizedPayload), &baseledgerTransactionPayload)
-
 		if err != nil {
 			fmt.Println("Failed to unmarshal baseledger transaction payload")
 			return
 		}
+
 		offchainMessageBusinessObjectProof := proxy.CreateHashFromBusinessObject(offchainMessage.BaseledgerSyncTreeJson)
 		if baseledgerTransactionPayload.Proof == offchainMessage.BusinessObjectProof && baseledgerTransactionPayload.Proof == offchainMessageBusinessObjectProof {
 			fmt.Println("Hashes match, processing feedback")
@@ -75,7 +58,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		restutil.RejectFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
 	case "FeedbackSent":
 		fmt.Println("FeedbackSent")
-		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.TransactionHash)
+		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case "FeedbackReceived":
 		fmt.Println("FeedbackReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -92,7 +75,24 @@ func ExecuteBusinessLogic(txResult types.Result) {
 	}
 }
 
-func getCommittedBaseledgerTransaction(transactionId string) *baseledgertypes.BaseledgerTransaction {
+func setTxStatusToCommitted(txResult types.Result) {
+	// TODO: should we reuse db connection here, or open new one?
+	db, err := dbutil.InitBaseledgerDBConnection()
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+	}
+	result := db.Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
+		txResult.TxInfo.TxHeight,
+		txResult.TxInfo.TxTimestamp,
+		txResult.Job.TrustmeshEntry.TendermintTransactionId)
+	if result.RowsAffected == 1 {
+		fmt.Printf("Tx %v committed \n", txResult.Job.TrustmeshEntry.TendermintTransactionId)
+	} else {
+		fmt.Printf("Error setting tx status to committed %v\n", result.Error)
+	}
+}
+
+func getCommittedBaseledgerTransaction(transactionId uuid.UUID) *baseledgertypes.BaseledgerTransaction {
 	grpcConn, err := grpc.Dial(
 		"127.0.0.1:9090",
 		// The SDK doesn't support any transport security mechanism.
@@ -108,7 +108,7 @@ func getCommittedBaseledgerTransaction(transactionId string) *baseledgertypes.Ba
 
 	queryClient := baseledgertypes.NewQueryClient(grpcConn)
 
-	res, err := queryClient.BaseledgerTransaction(context.Background(), &baseledgertypes.QueryGetBaseledgerTransactionRequest{Id: transactionId})
+	res, err := queryClient.BaseledgerTransaction(context.Background(), &baseledgertypes.QueryGetBaseledgerTransactionRequest{Id: transactionId.String()})
 
 	if err != nil {
 		// TODO: error handling

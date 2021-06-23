@@ -113,15 +113,3 @@ func GetBaseledgerTransactionUUIDBytes(id string) []byte {
 	uuidFromString, _ := uuid.FromString(id)
 	return uuidFromString.Bytes()
 }
-
-// GetBaseledgerTransactionIDBytes returns the byte representation of the ID
-// func GetBaseledgerTransactionIDBytes(id uint64) []byte {
-// 	bz := make([]byte, 8)
-// 	binary.BigEndian.PutUint64(bz, id)
-// 	return bz
-// }
-
-// GetBaseledgerTransactionIDFromBytes returns ID in uint64 format from a byte array
-// func GetBaseledgerTransactionIDFromBytes(bz []byte) uint64 {
-// 	return binary.BigEndian.Uint64(bz)
-// }

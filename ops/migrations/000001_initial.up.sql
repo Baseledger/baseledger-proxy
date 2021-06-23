@@ -42,7 +42,7 @@ ALTER TABLE public.workgroup_members OWNER TO baseledger;
 CREATE TABLE public.trustmesh_entries (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     tendermint_block_id text,
-    tendermint_transaction_id text,
+    tendermint_transaction_id uuid,
     tendermint_transaction_timestamp timestamp with time zone,
     
     entry_type text,
@@ -54,15 +54,15 @@ CREATE TABLE public.trustmesh_entries (
     workstep_type text,
     baseledger_transaction_type text,
 
-    baseledger_transaction_id text,
-    referenced_baseledger_transaction_id text,
+    baseledger_transaction_id uuid,
+    referenced_baseledger_transaction_id uuid,
 
     business_object_type text,
-    baseledger_business_object_id text,
-    referenced_baseledger_business_object_id text,
+    baseledger_business_object_id uuid,
+    referenced_baseledger_business_object_id uuid,
 
-    offchain_process_message_id text,
-    referenced_process_message_id text,
+    offchain_process_message_id uuid,
+    referenced_process_message_id uuid,
 
     commitment_state text,
     transaction_hash text
@@ -74,21 +74,21 @@ CREATE INDEX idx_commitment_state ON public.trustmesh_entries USING btree (commi
 
 CREATE TABLE public.offchain_process_messages (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    sender_id text,
-	receiver_id text,
+    sender_id uuid,
+	receiver_id uuid,
 	topic text,
-	referenced_offchain_process_message_id text,
+	referenced_offchain_process_message_id uuid,
 	baseledger_sync_tree_json text,
 	workstep_type text,
 	business_object_proof text,
-	tendermint_transaction_id_of_stored_proof text,
-	baseledger_transaction_id_of_stored_proof text,
-    baseledger_business_object_id text,
-	referenced_baseledger_business_object_id text,
+	tendermint_transaction_id_of_stored_proof uuid,
+	baseledger_transaction_id_of_stored_proof uuid,
+    baseledger_business_object_id uuid,
+	referenced_baseledger_business_object_id uuid,
 	status_text_message text,
     business_object_type text,
 	baseledger_transaction_type text,
-	referenced_baseledger_transaction_id text,
+	referenced_baseledger_transaction_id uuid,
 	entry_type text
 );
 

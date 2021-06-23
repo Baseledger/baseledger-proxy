@@ -46,7 +46,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 			feedbackMsg = "Reject"
 		}
 
-		offchainMsg := createFeedbackOffchainMessage(*req, transactionId.String(), feedbackMsg)
+		offchainMsg := createFeedbackOffchainMessage(*req, transactionId, feedbackMsg)
 
 		if !offchainMsg.Create() {
 			fmt.Printf("error when creating new offchain msg entry")
@@ -81,7 +81,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
 		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId:  transactionId.String(),
+			TendermintTransactionId:  transactionId,
 			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
 			SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
@@ -89,8 +89,8 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 			WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 			WorkstepType:                         offchainMsg.WorkstepType,
 			BaseledgerTransactionType:            feedbackMsg,
-			BaseledgerTransactionId:              transactionId.String(),
-			ReferencedBaseledgerTransactionId:    req.OriginalBaseledgerTransactionId,
+			BaseledgerTransactionId:              transactionId,
+			ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
 			BusinessObjectType:                   req.BusinessObjectType,
 			BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
 			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
@@ -109,23 +109,23 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 	}
 }
 
-func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string, baseledgerTransactionType string) types.OffchainProcessMessage {
+func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         "Feedback",
-		ReferencedOffchainProcessMessageId:   req.OriginalOffchainProcessMessageId,
+		ReferencedOffchainProcessMessageId:   uuid.FromStringOrNil(req.OriginalOffchainProcessMessageId),
 		BaseledgerSyncTreeJson:               req.BaseledgerProvenBusinessObjectJson,
 		BusinessObjectProof:                  req.HashOfObjectToApprove,
-		BaseledgerBusinessObjectId:           "",
-		ReferencedBaseledgerBusinessObjectId: req.BaseledgerBusinessObjectIdOfApprovedObject,
+		BaseledgerBusinessObjectId:           uuid.FromStringOrNil(""),
+		ReferencedBaseledgerBusinessObjectId: uuid.FromStringOrNil(req.BaseledgerBusinessObjectIdOfApprovedObject),
 		StatusTextMessage:                    req.FeedbackMessage,
 		BaseledgerTransactionIdOfStoredProof: transactionId,
 		TendermintTransactionIdOfStoredProof: transactionId,
 		BusinessObjectType:                   req.BusinessObjectType,
 		BaseledgerTransactionType:            baseledgerTransactionType,
-		ReferencedBaseledgerTransactionId:    req.OriginalBaseledgerTransactionId,
+		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
 		EntryType:                            "FeedbackSent",
 	}
 

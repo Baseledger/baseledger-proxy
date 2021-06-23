@@ -17,18 +17,18 @@ type OffchainProcessMessage struct {
 	SenderId                             uuid.UUID
 	ReceiverId                           uuid.UUID
 	Topic                                string
-	ReferencedOffchainProcessMessageId   string
+	ReferencedOffchainProcessMessageId   uuid.UUID
 	BaseledgerSyncTreeJson               string
 	WorkstepType                         string
 	BusinessObjectProof                  string
 	BusinessObjectType                   string
-	TendermintTransactionIdOfStoredProof string
-	BaseledgerTransactionIdOfStoredProof string
-	BaseledgerBusinessObjectId           string
-	ReferencedBaseledgerBusinessObjectId string
+	TendermintTransactionIdOfStoredProof uuid.UUID
+	BaseledgerTransactionIdOfStoredProof uuid.UUID
+	BaseledgerBusinessObjectId           uuid.UUID
+	ReferencedBaseledgerBusinessObjectId uuid.UUID
 	StatusTextMessage                    string
 	BaseledgerTransactionType            string
-	ReferencedBaseledgerTransactionId    string
+	ReferencedBaseledgerTransactionId    uuid.UUID
 	EntryType                            string
 }
 
@@ -63,7 +63,7 @@ type BaseledgerTransactionPayload struct {
 	OffchainMessageId                    string
 	ReferencedOffchainMessageId          string
 	ReferencedBaseledgerTransactionId    string
-	BaseledgerTransactionID              string
+	BaseledgerTransactionId              string
 	Proof                                string
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string

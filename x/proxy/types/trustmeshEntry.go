@@ -14,7 +14,7 @@ const defaultTransactionStatus = "UNCOMMITTED"
 
 type TrustmeshEntry struct {
 	TendermintBlockId                    sql.NullString
-	TendermintTransactionId              string
+	TendermintTransactionId              uuid.UUID
 	TendermintTransactionTimestamp       sql.NullString
 	EntryType                            string
 	SenderOrgId                          uuid.UUID
@@ -22,13 +22,13 @@ type TrustmeshEntry struct {
 	WorkgroupId                          uuid.UUID
 	WorkstepType                         string
 	BaseledgerTransactionType            string
-	BaseledgerTransactionId              string
-	ReferencedBaseledgerTransactionId    string
+	BaseledgerTransactionId              uuid.UUID
+	ReferencedBaseledgerTransactionId    uuid.UUID
 	BusinessObjectType                   string
-	BaseledgerBusinessObjectId           string
-	ReferencedBaseledgerBusinessObjectId string
+	BaseledgerBusinessObjectId           uuid.UUID
+	ReferencedBaseledgerBusinessObjectId uuid.UUID
 	OffchainProcessMessageId             uuid.UUID
-	ReferencedProcessMessageId           string
+	ReferencedProcessMessageId           uuid.UUID
 	CommitmentState                      string
 	TransactionHash                      string
 }
