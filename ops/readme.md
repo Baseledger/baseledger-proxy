@@ -23,6 +23,6 @@ export POSTGRES_EXPOSED_PORT=5433
 export NATS_EXPOSED_PORT=4223
 export STARPORT_API_PORT=1318
 export TENDERMINT_NODE_PORT=26658
-docker-compose -p first_node up
+docker-compose -p second_node up
 
 TODO https://tutorials.cosmos.network/nameservice/tutorial/20-build-run.html
