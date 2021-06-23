@@ -1,16 +1,21 @@
 package businesslogic
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 
+	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/unibrightio/baseledger/app/types"
 	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/sor"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
+	proxyrest "github.com/unibrightio/baseledger/x/proxy/client/rest"
 	"github.com/unibrightio/baseledger/x/proxy/proxy"
+	txutil "github.com/unibrightio/baseledger/x/proxy/txutil"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
 	"google.golang.org/grpc"
@@ -34,6 +39,8 @@ func SetTxStatusToCommitted(txResult types.Result) {
 }
 
 func ExecuteBusinessLogic(txResult types.Result) {
+	// TODO: it looks like we should do this first?
+	SetTxStatusToCommitted(txResult)
 	// TODO: should we reuse db connection here, or open new one?
 	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
@@ -45,6 +52,8 @@ func ExecuteBusinessLogic(txResult types.Result) {
 	case "SuggestionSent":
 		fmt.Println("SuggestionSent")
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.TransactionHash)
+		fmt.Printf("HERE LOOOOL")
+		proxy.OffchainProcessMessageReceived(*offchainMessage, txResult.Job.TrustmeshEntry.TransactionHash)
 	case "SuggestionReceived":
 		fmt.Println("SuggestionReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -67,7 +76,42 @@ func ExecuteBusinessLogic(txResult types.Result) {
 			baseledgerTransactionPayload.Proof != offchainMessageBusinessObjectProof ||
 			offchainMessage.BaseledgerTransactionIdOfStoredProof != offchainMessageBusinessObjectProof {
 			fmt.Println("Hashes don't match")
-			// TODO: send reject feedback request to proxy/feedback?
+			// TODO: move this to separate util package
+			kr, err := txutil.NewKeyringInstance()
+			if err != nil {
+				panic("Keyring not found")
+			}
+
+			addressList, _ := kr.List()
+			// issue is here, fix it
+			fromAddress := addressList[0].GetAddress().String()
+
+			feedback := proxyrest.CreateSynchronizationFeedbackRequest{
+				BaseReq: rest.BaseReq{
+					From:    fromAddress,
+					ChainID: "baseledger",
+				},
+				FeedbackMessage:                    "Rejected because Hashes do not match",
+				Approved:                           false,
+				BaseledgerProvenBusinessObjectJson: offchainMessage.BaseledgerSyncTreeJson,
+				BaseledgerBusinessObjectIdOfApprovedObject: offchainMessage.BaseledgerBusinessObjectId,
+				WorkgroupId: txResult.Job.TrustmeshEntry.WorkgroupId.String(),
+				Recipient:   offchainMessage.SenderId.String(),
+				// TODO: Which proof to send here?
+				HashOfObjectToApprove:            baseledgerTransactionPayload.Proof,
+				OriginalBaseledgerTransactionId:  offchainMessage.BaseledgerTransactionIdOfStoredProof,
+				OriginalOffchainProcessMessageId: offchainMessage.Id.String(),
+				BusinessObjectType:               offchainMessage.BusinessObjectType,
+			}
+
+			jsonValue, _ := json.Marshal(feedback)
+
+			_, err = http.Post("http://localhost:1317/proxy/feedback", "application/json", bytes.NewBuffer(jsonValue))
+
+			if err != nil {
+				fmt.Printf("error while sending feedback request %v\n", err.Error())
+			}
+
 			return
 		}
 
@@ -89,7 +133,6 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
-	SetTxStatusToCommitted(txResult)
 }
 
 func getCommittedBaseledgerTransaction(transactionId string) *baseledgertypes.BaseledgerTransaction {
