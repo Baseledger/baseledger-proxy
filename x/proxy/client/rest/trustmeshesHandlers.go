@@ -31,6 +31,8 @@ func listTrustmeshEntriesHandler(clientCtx client.Context) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
+		db.Close()
+
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(res)
 		w.WriteHeader(http.StatusOK)
