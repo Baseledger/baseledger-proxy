@@ -17,9 +17,9 @@ type TrustmeshEntry struct {
 	TendermintTransactionId              string
 	TendermintTransactionTimestamp       sql.NullString
 	EntryType                            string
-	SenderOrgId                          string
-	ReceiverOrgId                        string
-	WorkgroupId                          string
+	SenderOrgId                          uuid.UUID
+	ReceiverOrgId                        uuid.UUID
+	WorkgroupId                          uuid.UUID
 	WorkstepType                         string
 	BaseledgerTransactionType            string
 	BaseledgerTransactionId              string

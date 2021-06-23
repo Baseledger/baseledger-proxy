@@ -41,9 +41,6 @@ func queryTrustmeshes() {
 
 	for result := range results {
 		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TendermintTransactionId, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
-		if result.TxInfo.TxHeight != "" && result.TxInfo.TxTimestamp != "" {
-			businesslogic.SetTxStatusToCommitted(result, db)
-		}
 	}
 	fmt.Println("query trustmeshes end")
 }

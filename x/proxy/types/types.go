@@ -14,8 +14,8 @@ type OffchainProcessMessageReferenceType string
 
 type OffchainProcessMessage struct {
 	Id                                   uuid.UUID
-	SenderId                             string
-	ReceiverId                           string
+	SenderId                             uuid.UUID
+	ReceiverId                           uuid.UUID
 	Topic                                string
 	ReferencedOffchainProcessMessageId   string
 	BaseledgerSyncTreeJson               string
@@ -34,7 +34,7 @@ type OffchainProcessMessage struct {
 
 // TODO rename after clean up
 type SynchronizationRequest struct {
-	WorkgroupId                          string
+	WorkgroupId                          uuid.UUID
 	Recipient                            string
 	WorkstepType                         string
 	BusinessObjectType                   string
@@ -45,7 +45,7 @@ type SynchronizationRequest struct {
 }
 
 type SynchronizationFeedback struct {
-	WorkgroupId                                string
+	WorkgroupId                                uuid.UUID
 	BaseledgerProvenBusinessObjectJson         string
 	BusinessObjectType                         string
 	Recipient                                  string

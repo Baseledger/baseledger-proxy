@@ -83,9 +83,9 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 			TendermintTransactionId:  transactionId.String(),
 			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
-			SenderOrgId:                          "123",
-			ReceiverOrgId:                        req.Recipient,
-			WorkgroupId:                          req.WorkgroupId,
+			SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+			ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
+			WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 			WorkstepType:                         offchainMsg.WorkstepType,
 			BaseledgerTransactionType:            feedbackMsg,
 			BaseledgerTransactionId:              transactionId.String(),
@@ -110,8 +110,8 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 
 func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId string, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
-		SenderId:                             "123",
-		ReceiverId:                           req.Recipient,
+		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         "Feedback",
 		ReferencedOffchainProcessMessageId:   req.OriginalOffchainProcessMessageId,
@@ -148,7 +148,7 @@ func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx clie
 
 func newFeedbackRequest(req createSynchronizationFeedbackRequest) *types.SynchronizationFeedback {
 	return &types.SynchronizationFeedback{
-		WorkgroupId:                        req.WorkgroupId,
+		WorkgroupId:                        uuid.FromStringOrNil(req.WorkgroupId),
 		BaseledgerProvenBusinessObjectJson: req.BaseledgerProvenBusinessObjectJson,
 		Recipient:                          req.Recipient,
 		Approved:                           req.Approved,

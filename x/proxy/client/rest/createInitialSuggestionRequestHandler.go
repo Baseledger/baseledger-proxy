@@ -78,9 +78,9 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			TendermintTransactionId:  transactionId.String(),
 			OffchainProcessMessageId: offchainMsg.Id,
 			// TODO: define proxy identifier
-			SenderOrgId:                          "123",
-			ReceiverOrgId:                        req.Recipient,
-			WorkgroupId:                          req.WorkgroupId,
+			SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+			ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
+			WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 			WorkstepType:                         offchainMsg.WorkstepType,
 			BaseledgerTransactionType:            "Suggest",
 			BaseledgerTransactionId:              transactionId.String(),
@@ -105,8 +105,9 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId string, hash string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
-		SenderId:                             "123",
-		ReceiverId:                           req.Recipient,
+		// TODO: define proxy identifier
+		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         req.WorkstepType,
 		ReferencedOffchainProcessMessageId:   "",
@@ -143,7 +144,7 @@ func parseRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Conte
 
 func newSynchronizationRequest(req createInitialSuggestionRequest) *types.SynchronizationRequest {
 	return &types.SynchronizationRequest{
-		WorkgroupId:                          req.WorkgroupId,
+		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 		Recipient:                            req.Recipient,
 		WorkstepType:                         req.WorkstepType,
 		BusinessObjectType:                   req.BusinessObjectType,

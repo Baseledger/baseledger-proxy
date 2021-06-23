@@ -7,18 +7,21 @@ import (
 	"fmt"
 
 	"github.com/unibrightio/baseledger/app/types"
+	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/sor"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
 	"github.com/unibrightio/baseledger/x/proxy/proxy"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
-	"github.com/jinzhu/gorm"
 	"google.golang.org/grpc"
 )
 
-// TODO: currently this is saving after result is written to output channel
-// do we save inside worker or after?
-func SetTxStatusToCommitted(txResult types.Result, db *gorm.DB) {
+func SetTxStatusToCommitted(txResult types.Result) {
+	// TODO: should we reuse db connection here, or open new one?
+	db, err := dbutil.InitBaseledgerDBConnection()
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+	}
 	result := db.Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
 		txResult.TxInfo.TxHeight,
 		txResult.TxInfo.TxTimestamp,
@@ -34,7 +37,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 	// TODO: should we reuse db connection here, or open new one?
 	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
-		// TODO: what do to here? is return enough?
+		// TODO: logging
 		fmt.Println("Offchain process msg not found")
 		return
 	}
@@ -46,7 +49,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Println("SuggestionReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
-			// TODO: what do to here? is return enough?
+			// TODO: logging
 			return
 		}
 
@@ -59,10 +62,12 @@ func ExecuteBusinessLogic(txResult types.Result) {
 			fmt.Println("Failed to unmarshal baseledger transaction payload")
 			return
 		}
-		// TODO: is this ok? comparing proof that is from baseledger transaction with one from offchain message that is referenced by trustmesh entry
-		if baseledgerTransactionPayload.Proof != offchainMessage.BaseledgerTransactionIdOfStoredProof {
+		offchainMessageBusinessObjectProof := proxy.CreateHashFromBusinessObject(offchainMessage.BusinessObjectProof)
+		if baseledgerTransactionPayload.Proof != offchainMessage.BaseledgerTransactionIdOfStoredProof ||
+			baseledgerTransactionPayload.Proof != offchainMessageBusinessObjectProof ||
+			offchainMessage.BaseledgerTransactionIdOfStoredProof != offchainMessageBusinessObjectProof {
 			fmt.Println("Hashes don't match")
-			// TODO: what do to here? is return enough?
+			// TODO: send reject feedback request to proxy/feedback?
 			return
 		}
 
@@ -74,7 +79,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Println("FeedbackReceived")
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
-			// TODO: what do to here? is return enough?
+			// TODO: logging
 			return
 		}
 
@@ -84,6 +89,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
+	SetTxStatusToCommitted(txResult)
 }
 
 func getCommittedBaseledgerTransaction(transactionId string) *baseledgertypes.BaseledgerTransaction {

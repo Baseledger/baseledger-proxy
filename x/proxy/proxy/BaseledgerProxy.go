@@ -18,7 +18,7 @@ import (
 )
 
 type workgroupMock struct {
-	BaselineWorkgroupID string
+	BaselineWorkgroupID uuid.UUID
 	Description         string
 	PrivatizeKey        string
 }
@@ -122,9 +122,9 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 		TendermintTransactionId:  offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
 		OffchainProcessMessageId: offchainProcessMessage.Id,
 		// TODO: define proxy identifier
-		SenderOrgId:                          "123",
+		SenderOrgId:                          offchainProcessMessage.SenderId,
 		ReceiverOrgId:                        offchainProcessMessage.ReceiverId,
-		WorkgroupId:                          offchainProcessMessage.Topic,
+		WorkgroupId:                          uuid.FromStringOrNil(offchainProcessMessage.Topic),
 		WorkstepType:                         offchainProcessMessage.WorkstepType,
 		BaseledgerTransactionType:            offchainProcessMessage.BaseledgerTransactionType,
 		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
@@ -142,10 +142,9 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 	}
 }
 
-func findWorkgroupMock(workgroupId string) *workgroupMock {
-	newUuid, _ := uuid.NewV4()
+func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
 	return &workgroupMock{
-		BaselineWorkgroupID: newUuid.String(),
+		BaselineWorkgroupID: workgroupId,
 		Description:         "Mocked workgroup",
 		PrivatizeKey:        "0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314",
 	}
@@ -169,7 +168,7 @@ func CreateHashFromBusinessObject(bo string) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func DeprivatizeBaseledgerTransactionPayload(payload string, workgroupId string) string {
+func DeprivatizeBaseledgerTransactionPayload(payload string, workgroupId uuid.UUID) string {
 	workgroup := findWorkgroupMock(workgroupId)
 	return deprivatizePayload(payload, workgroup.PrivatizeKey)
 }
