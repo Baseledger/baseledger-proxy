@@ -18,7 +18,7 @@ services:
     restart: always
   nats:
     image: nats
-    command: ["--auth", "testToken1"]
+    command: ["--auth", "testToken1", "-DV"]
     hostname:
       nats-local-node
     networks:
