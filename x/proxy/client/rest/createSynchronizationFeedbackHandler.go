@@ -38,6 +38,13 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
+		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(*clientCtx, clientCtx.FromAddress)
+
+		if err != nil {
+			fmt.Printf("error while retrieving acc %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error while retrieving acc")
+		}
+
 		createFeedbackReq := newFeedbackRequest(*req)
 
 		transactionId, _ := uuid.NewV4()
@@ -67,7 +74,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}
 
-		txBytes, err := txutil.SignTxAndGetTxBytes(*clientCtx, msg)
+		txBytes, err := txutil.SignTxAndGetTxBytes(*clientCtx, msg, accNum, accSeq)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 		}

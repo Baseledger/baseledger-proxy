@@ -45,13 +45,7 @@ func NewKeyringInstance() (keyring.Keyring, error) {
 	return kr, nil
 }
 
-func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg) ([]byte, error) {
-	accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(clientCtx, clientCtx.FromAddress)
-
-	if err != nil {
-		fmt.Printf("error while retrieving acc %v\n", err.Error())
-		return nil, errors.New("sign tx error")
-	}
+func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, accSeq uint64) ([]byte, error) {
 	fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
 	txFactory := tx.Factory{}.
 		WithChainID(clientCtx.ChainID).
@@ -62,7 +56,7 @@ func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg) ([]byte, error) 
 		WithAccountRetriever(clientCtx.AccountRetriever).
 		WithKeybase(clientCtx.Keyring)
 
-	txFactory, err = tx.PrepareFactory(clientCtx, txFactory)
+	txFactory, err := tx.PrepareFactory(clientCtx, txFactory)
 	if err != nil {
 		fmt.Printf("prepare factory error %v\n", err.Error())
 		return nil, errors.New("sign tx error")
