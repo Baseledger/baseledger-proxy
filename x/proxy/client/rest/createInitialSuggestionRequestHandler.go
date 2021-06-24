@@ -99,6 +99,8 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			return
 		}
 
+		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
+
 		trustmeshEntry := &types.TrustmeshEntry{
 			TendermintTransactionId:  transactionId,
 			OffchainProcessMessageId: offchainMsg.Id,
@@ -140,7 +142,6 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		// if code is missmatch, parse log and try again
 		fmt.Printf("ACCOUNT SEQUENCE MISSMATCH %v\n", res.RawLog)
-		_, accSeq, _ = clientCtx.AccountRetriever.GetAccountNumberSequence(*clientCtx, clientCtx.FromAddress)
 
 		nextSequence, ok := parseNextSequence(accSeq, res.RawLog)
 
@@ -165,7 +166,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			return
 		}
 
-		// do not try again if another missmatch occurs
+		// do not try again if another missmatch (or any other error) occurs
 		if res.Code != 0 {
 			fmt.Printf("error while broadcasting tx 4 %v\n", res.Code)
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, errors.New(res.RawLog).Error())
@@ -173,6 +174,8 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		}
 
 		fmt.Printf("TRANSACTION REBROADCASTED WITH RESULT %v\n", res)
+
+		// make sure to overwrite transaction hash with new one
 		trustmeshEntry.TransactionHash = res.TxHash
 		if !trustmeshEntry.Create() {
 			fmt.Printf("error when creating new trustmesh entry")

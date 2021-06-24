@@ -19,6 +19,9 @@ import (
 )
 
 func ExecuteBusinessLogic(txResult types.Result) {
+	if txResult.TxInfo.TxHeight == "" || txResult.TxInfo.TxTimestamp == "" {
+		return
+	}
 	// TODO: it looks like we should do this first?
 	setTxStatusToCommitted(txResult)
 	// TODO: should we reuse db connection here, or open new one?
@@ -76,9 +79,6 @@ func ExecuteBusinessLogic(txResult types.Result) {
 }
 
 func setTxStatusToCommitted(txResult types.Result) {
-	if txResult.TxInfo.TxHeight == "" || txResult.TxInfo.TxTimestamp == "" {
-		return
-	}
 	// TODO: should we reuse db connection here, or open new one?
 	db, err := dbutil.InitBaseledgerDBConnection()
 	if err != nil {
