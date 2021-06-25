@@ -1,11 +1,9 @@
 package rest
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -86,20 +84,13 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			return
 		}
 
-		txBytes, err := txutil.SignTxAndGetTxBytes(*clientCtx, msg, accNum, accSeq)
+		txHash, err := txutil.BroadcastAndGetTxHash(*clientCtx, msg, accNum, accSeq, false)
+
 		if err != nil {
+			fmt.Printf("broadcasting failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-
-		res, err := clientCtx.BroadcastTx(txBytes)
-		if err != nil {
-			fmt.Printf("error while broadcasting tx %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
 
 		trustmeshEntry := &types.TrustmeshEntry{
 			TendermintTransactionId:  transactionId,
@@ -116,67 +107,10 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
 			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
 			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
-			TransactionHash:                      res.TxHash,
+			TransactionHash:                      *txHash,
 			EntryType:                            "SuggestionSent",
 		}
 
-		// if broadcast was successful, save new trustmesh entry
-		if res.Code == 0 {
-			if !trustmeshEntry.Create() {
-				fmt.Printf("error when creating new trustmesh entry")
-				rest.WriteErrorResponse(w, http.StatusInternalServerError, errors.New(res.RawLog).Error())
-				return
-			}
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		// if code is not 0 and is not missmatch, don't handle it and return
-		if res.Code != errCodeMismatch {
-			fmt.Printf("error while broadcasting tx 1 %v\n", res)
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, errors.New(res.RawLog).Error())
-			return
-		}
-
-		// if code is missmatch, parse log and try again
-		fmt.Printf("ACCOUNT SEQUENCE MISSMATCH %v\n", res.RawLog)
-
-		nextSequence, ok := parseNextSequence(accSeq, res.RawLog)
-
-		if !ok {
-			fmt.Printf("error while broadcasting tx 2 %v\n", res.Code)
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, errors.New(res.RawLog).Error())
-			return
-		}
-
-		fmt.Printf("RETRYING WITH SEQUENCE %v\n", nextSequence)
-
-		txBytes, err = txutil.SignTxAndGetTxBytes(*clientCtx, msg, accNum, nextSequence)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		res, err = clientCtx.BroadcastTx(txBytes)
-		if err != nil {
-			fmt.Printf("error while broadcasting tx 3 %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		// do not try again if another missmatch (or any other error) occurs
-		if res.Code != 0 {
-			fmt.Printf("error while broadcasting tx 4 %v\n", res.Code)
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, errors.New(res.RawLog).Error())
-			return
-		}
-
-		fmt.Printf("TRANSACTION REBROADCASTED WITH RESULT %v\n", res)
-
-		// make sure to overwrite transaction hash with new one
-		trustmeshEntry.TransactionHash = res.TxHash
 		if !trustmeshEntry.Create() {
 			fmt.Printf("error when creating new trustmesh entry")
 		}
@@ -185,35 +119,6 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-}
-
-func parseNextSequence(current uint64, message string) (uint64, bool) {
-	// "account sequence mismatch, expected 25, got 27: incorrect account sequence"
-	matches := recoverRegexp.FindStringSubmatch(message)
-
-	if len(matches) != 3 {
-		return 0, false
-	}
-
-	if len(matches[1]) == 0 || len(matches[2]) == 0 {
-		return 0, false
-	}
-
-	expected, err := strconv.ParseUint(matches[1], 10, 64)
-	if err != nil || expected == 0 {
-		return 0, false
-	}
-
-	received, err := strconv.ParseUint(matches[2], 10, 64)
-	if err != nil || received == 0 {
-		return 0, false
-	}
-
-	if received != current {
-		return expected, true
-	}
-
-	return expected, true
 }
 
 func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId uuid.UUID, hash string) types.OffchainProcessMessage {

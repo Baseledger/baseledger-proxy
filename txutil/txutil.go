@@ -3,11 +3,23 @@ package txutil
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
+const (
+	errCodeMismatch = 32
+)
+
+var (
+	// errors are of the form:
+	// "account sequence mismatch, expected 25, got 27: incorrect account sequence"
+	recoverRegexp = regexp.MustCompile(`^account sequence mismatch, expected (\d+), got (\d+):`)
 )
 
 func BuildClientCtx(clientCtx client.Context, from string) (*client.Context, error) {
@@ -81,4 +93,78 @@ func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, a
 	}
 
 	return txBytes, nil
+}
+
+func BroadcastAndGetTxHash(clientCtx client.Context, msg sdk.Msg, accNum uint64, accSeq uint64, retried bool) (*string, error) {
+	txBytes, err := SignTxAndGetTxBytes(clientCtx, msg, accNum, accSeq)
+	if err != nil {
+		return nil, err
+	}
+	res, err := clientCtx.BroadcastTx(txBytes)
+	if err != nil {
+		fmt.Printf("error while broadcasting tx %v\n", err.Error())
+		return nil, err
+	}
+
+	// if broadcast was successful, return txHash
+	if res.Code == 0 {
+		logMsg := "BROADCASTED"
+		if retried {
+			logMsg = "REBROADCASTED"
+		}
+		fmt.Printf("TRANSACTION %v WITH RESULT %v\n", logMsg, res)
+		return &res.TxHash, nil
+	}
+
+	// if code is not 0 and is not missmatch, don't handle it and return
+	if res.Code != errCodeMismatch {
+		return nil, err
+	}
+
+	// if code is missmatch and it is retrying, don't handle it and return
+	if retried {
+		return nil, errors.New("broadcast failed after retrying")
+	}
+
+	// if code is missmatch first time, parse log and try again
+	fmt.Printf("ACCOUNT SEQUENCE MISSMATCH %v\n", res.RawLog)
+
+	nextSequence, ok := parseNextSequence(accSeq, res.RawLog)
+
+	if !ok {
+		return nil, errors.New("broadcast failed when parsing sequence")
+	}
+
+	fmt.Printf("RETRYING WITH SEQUENCE %v\n", nextSequence)
+
+	return BroadcastAndGetTxHash(clientCtx, msg, accNum, nextSequence, true)
+}
+
+func parseNextSequence(current uint64, message string) (uint64, bool) {
+	// "account sequence mismatch, expected 25, got 27: incorrect account sequence"
+	matches := recoverRegexp.FindStringSubmatch(message)
+
+	if len(matches) != 3 {
+		return 0, false
+	}
+
+	if len(matches[1]) == 0 || len(matches[2]) == 0 {
+		return 0, false
+	}
+
+	expected, err := strconv.ParseUint(matches[1], 10, 64)
+	if err != nil || expected == 0 {
+		return 0, false
+	}
+
+	received, err := strconv.ParseUint(matches[2], 10, 64)
+	if err != nil || received == 0 {
+		return 0, false
+	}
+
+	if received != current {
+		return expected, true
+	}
+
+	return expected, true
 }
