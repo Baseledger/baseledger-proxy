@@ -79,12 +79,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 }
 
 func setTxStatusToCommitted(txResult types.Result) {
-	// TODO: should we reuse db connection here, or open new one?
-	db, err := dbutil.InitBaseledgerDBConnection()
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-	}
-	result := db.Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
+	result := dbutil.Db.GetConn().Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
 		txResult.TxInfo.TxHeight,
 		txResult.TxInfo.TxTimestamp,
 		txResult.Job.TrustmeshEntry.TendermintTransactionId)

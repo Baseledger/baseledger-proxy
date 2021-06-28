@@ -18,14 +18,9 @@ import (
 
 func queryTrustmeshes() {
 	fmt.Println("query trustmeshes start")
-	db, err := dbutil.InitBaseledgerDBConnection()
-
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-	}
 
 	var trustmeshEntries []proxytypes.TrustmeshEntry
-	db.Where("commitment_state='UNCOMMITTED'").Find(&trustmeshEntries)
+	dbutil.Db.GetConn().Where("commitment_state='UNCOMMITTED'").Find(&trustmeshEntries)
 
 	fmt.Printf("found %v trustmesh entries\n", len(trustmeshEntries))
 	var jobs = make(chan types.Job, len(trustmeshEntries))
@@ -40,10 +35,8 @@ func queryTrustmeshes() {
 	close(jobs)
 
 	for result := range results {
-		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TendermintTransactionId, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
+		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TransactionHash, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
 	}
-
-	db.Close()
 
 	fmt.Println("query trustmeshes end")
 }

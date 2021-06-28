@@ -1,7 +1,7 @@
 package app
 
 import (
-	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/nats-io/nats.go"
 	"github.com/spf13/cast"
 	"github.com/tendermint/spm/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -85,6 +86,7 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	appparams "github.com/unibrightio/baseledger/app/params"
+	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/docs"
 
 	"github.com/unibrightio/baseledger/app/cron"
@@ -99,13 +101,11 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
-	"github.com/golang-migrate/migrate"
-	"github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
 
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
 )
 
@@ -183,92 +183,6 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
 }
 
-func initDbIfNotExists() {
-	dbHost, _ := viper.Get("DB_HOST").(string)
-	dbSuperUser, _ := viper.Get("DB_UB_USER").(string)
-	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
-	dbDefaultName, _ := viper.Get("DB_UB_NAME").(string)
-	sslMode, _ := viper.Get("DB_SSLMODE").(string)
-	dbUser, _ := viper.Get("DB_BASELEDGER_USER").(string)
-	dbName, _ := viper.Get("DB_BASELEDGER_NAME").(string)
-
-	args := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s sslmode=%s",
-		dbHost,
-		dbSuperUser,
-		dbPwd,
-		dbDefaultName,
-		sslMode,
-	)
-	db, err := gorm.Open("postgres", args)
-
-	if err != nil {
-		fmt.Printf("db connection failed %v\n", err.Error())
-		panic(err)
-	}
-
-	fmt.Printf("db connection successful")
-
-	exists := db.Exec(fmt.Sprintf("select 1 from pg_roles where rolname='%s'", dbUser))
-
-	if exists.RowsAffected == 1 {
-		fmt.Printf("row already exits")
-		return
-	}
-
-	result := db.Exec(fmt.Sprintf("create user %s with superuser password '%s'", dbUser, dbPwd))
-
-	if result.Error != nil {
-		fmt.Printf("failed to create user %v\n", result.Error)
-		panic(result.Error)
-	}
-
-	result = db.Exec(fmt.Sprintf("create database %s owner %s", dbName, dbUser))
-
-	if result.Error != nil {
-		fmt.Printf("failed to create baseledger db %v\n", result.Error)
-		panic(result.Error)
-	}
-}
-
-func performMigrations() {
-	dbHost, _ := viper.Get("DB_HOST").(string)
-	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
-	sslMode, _ := viper.Get("DB_SSLMODE").(string)
-	dbUser, _ := viper.Get("DB_BASELEDGER_USER").(string)
-	dbName, _ := viper.Get("DB_BASELEDGER_NAME").(string)
-
-	dsn := fmt.Sprintf("postgres://%s/%s?user=%s&password=%s&sslmode=%s",
-		dbHost,
-		dbName,
-		dbUser,
-		dbPwd,
-		sslMode,
-	)
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		fmt.Printf("migrations failed 1: %s", err.Error())
-		panic(err)
-	}
-
-	driver, err := postgres.WithInstance(db, &postgres.Config{})
-	if err != nil {
-		fmt.Printf("migrations failed 2: %s", err.Error())
-		panic(err)
-	}
-
-	m, err := migrate.NewWithDatabaseInstance("file://./ops/migrations", dbName, driver)
-	if err != nil {
-		fmt.Printf("migrations failed 3: %s", err.Error())
-		panic(err)
-	}
-
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		fmt.Printf("migrations failed 4: %s", err.Error())
-	}
-}
-
 func subscribeToWorkgroupMessages() {
 	natsServerUrl, _ := viper.Get("NATS_URL").(string)
 	natsToken := "testToken1" // TODO: Read from configuration
@@ -277,9 +191,42 @@ func subscribeToWorkgroupMessages() {
 	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
 }
 
-func receiveOffchainProcessMessage(sender string, message string) {
-	fmt.Printf("\n sender %v \n", sender)
-	fmt.Printf("\n message %v \n", message)
+func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
+	// TODO: should we move this parsing to nats client and just get struct in this callback?
+	var natsMessage proxytypes.NatsMessage
+	err := json.Unmarshal(natsMsg.Data, &natsMessage)
+	if err != nil {
+		fmt.Printf("Error parsing nats message %v\n", err)
+	}
+
+	fmt.Printf("message received %v\n", natsMessage)
+	entryType := "SuggestionReceived"
+	if natsMessage.ProcessMessage.EntryType == "FeedbackSent" {
+		entryType = "FeedbackReceived"
+	}
+	trustmeshEntry := &proxytypes.TrustmeshEntry{
+		TendermintTransactionId:  natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		OffchainProcessMessageId: natsMessage.ProcessMessage.Id,
+		// TODO: define proxy identifier
+		SenderOrgId:                          natsMessage.ProcessMessage.SenderId,
+		ReceiverOrgId:                        natsMessage.ProcessMessage.ReceiverId,
+		WorkgroupId:                          uuid.FromStringOrNil(natsMessage.ProcessMessage.Topic),
+		WorkstepType:                         natsMessage.ProcessMessage.WorkstepType,
+		BaseledgerTransactionType:            natsMessage.ProcessMessage.BaseledgerTransactionType,
+		BaseledgerTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		ReferencedBaseledgerTransactionId:    natsMessage.ProcessMessage.ReferencedBaseledgerTransactionId,
+		BusinessObjectType:                   natsMessage.ProcessMessage.BusinessObjectType,
+		BaseledgerBusinessObjectId:           natsMessage.ProcessMessage.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: natsMessage.ProcessMessage.ReferencedBaseledgerBusinessObjectId,
+		ReferencedProcessMessageId:           natsMessage.ProcessMessage.ReferencedOffchainProcessMessageId,
+		TransactionHash:                      natsMessage.TxHash,
+		EntryType:                            entryType,
+	}
+
+	if !trustmeshEntry.Create() {
+		fmt.Printf("error when creating new trustmesh entry")
+	}
+
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -584,8 +531,10 @@ func New(
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 
-	initDbIfNotExists()
-	performMigrations()
+	dbutil.InitDbIfNotExists()
+	dbutil.PerformMigrations()
+	dbutil.InitConnection()
+
 	subscribeToWorkgroupMessages()
 
 	cron.StartCron()

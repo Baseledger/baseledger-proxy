@@ -43,7 +43,7 @@ func NewBaseledgerProxy() BaseledgerProxy {
 	proxy.config = BaseledgerProxyConfig{"das connection string"}
 
 	proxy.messagingClient = &messaging.NatsMessagingClient{}
-	proxy.messagingClient.Subscribe("local server conn string", "token", "baseledger", receiveOffchainProcessMessage)
+	// proxy.messagingClient.Subscribe("local server conn string", "token", "baseledger", receiveOffchainProcessMessage)
 
 	proxy.workgroupClient = &workgroups.PostgresWorkgroupClient{}
 
@@ -153,15 +153,16 @@ func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
 // TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
 func SendOffchainProcessMessage(message types.OffchainProcessMessage, receiver string, txHash string) {
 	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
+	// marshal natsMessage to byte array
 	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
 	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
 	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)
 }
 
-func receiveOffchainProcessMessage(sender string, message string) {
-	fmt.Printf("\n sender %v \n", sender)
-	fmt.Printf("\n message %v \n", message)
-}
+// func receiveOffchainProcessMessage(sender string, message string) {
+// 	fmt.Printf("\n sender %v \n", sender)
+// 	fmt.Printf("\n message %v \n", message)
+// }
 
 func CreateHashFromBusinessObject(bo string) string {
 	hash := md5.Sum([]byte(bo))

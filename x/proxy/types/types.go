@@ -32,6 +32,11 @@ type OffchainProcessMessage struct {
 	EntryType                            string
 }
 
+type NatsMessage struct {
+	ProcessMessage OffchainProcessMessage
+	TxHash         string
+}
+
 // TODO rename after clean up
 type SynchronizationRequest struct {
 	WorkgroupId                          uuid.UUID
@@ -70,13 +75,7 @@ type BaseledgerTransactionPayload struct {
 }
 
 func (o *OffchainProcessMessage) Create() bool {
-	db, err := dbutil.InitBaseledgerDBConnection()
-
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-		return false
-	}
-
+	db := dbutil.Db.GetConn()
 	if db.NewRecord(o) {
 		result := db.Create(&o)
 		rowsAffected := result.RowsAffected
@@ -92,13 +91,7 @@ func (o *OffchainProcessMessage) Create() bool {
 }
 
 func GetOffchainMsgById(id uuid.UUID) (msg *OffchainProcessMessage, err error) {
-	db, err := dbutil.InitBaseledgerDBConnection()
-
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-		return nil, err
-	}
-
+	db := dbutil.Db.GetConn()
 	var offchainMsg OffchainProcessMessage
 	res := db.First(&offchainMsg, "id = ?", id.String())
 
