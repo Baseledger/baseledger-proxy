@@ -85,6 +85,7 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	appparams "github.com/unibrightio/baseledger/app/params"
+	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/docs"
 
 	"github.com/unibrightio/baseledger/app/cron"
@@ -207,7 +208,7 @@ func initDbIfNotExists() {
 		panic(err)
 	}
 
-	fmt.Printf("db connection successful")
+	fmt.Printf("admin db connection successful")
 
 	exists := db.Exec(fmt.Sprintf("select 1 from pg_roles where rolname='%s'", dbUser))
 
@@ -229,6 +230,8 @@ func initDbIfNotExists() {
 		fmt.Printf("failed to create baseledger db %v\n", result.Error)
 		panic(result.Error)
 	}
+
+	db.DB().Close() // Close admin connection TODO: Move whole section above to dbutil
 }
 
 func performMigrations() {
@@ -586,6 +589,8 @@ func New(
 
 	initDbIfNotExists()
 	performMigrations()
+
+	dbutil.InitConnection()
 	subscribeToWorkgroupMessages()
 
 	cron.StartCron()

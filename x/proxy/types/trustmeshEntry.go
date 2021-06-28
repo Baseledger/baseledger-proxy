@@ -10,7 +10,7 @@ import (
 	"github.com/unibrightio/baseledger/dbutil"
 )
 
-const defaultTransactionStatus = "UNCOMMITTED"
+const defaultCommitmentState = "UNCOMMITTED"
 
 type TrustmeshEntry struct {
 	TendermintBlockId                    sql.NullString
@@ -34,18 +34,11 @@ type TrustmeshEntry struct {
 }
 
 func (t *TrustmeshEntry) Create() bool {
-	db, err := dbutil.InitBaseledgerDBConnection()
-
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-		return false
-	}
-
-	t.CommitmentState = defaultTransactionStatus
+	t.CommitmentState = defaultCommitmentState
 	t.TendermintBlockId = sql.NullString{Valid: false}
 	t.TendermintTransactionTimestamp = sql.NullString{Valid: false}
-	if db.NewRecord(t) {
-		result := db.Create(&t)
+	if dbutil.Db.GetConn().NewRecord(t) {
+		result := dbutil.Db.GetConn().Create(&t)
 		rowsAffected := result.RowsAffected
 		errors := result.GetErrors()
 		if len(errors) > 0 {
