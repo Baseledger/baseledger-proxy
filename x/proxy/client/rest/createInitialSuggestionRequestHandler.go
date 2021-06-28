@@ -3,7 +3,6 @@ package rest
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -13,16 +12,6 @@ import (
 
 	uuid "github.com/kthomas/go.uuid"
 	txutil "github.com/unibrightio/baseledger/txutil"
-)
-
-const (
-	errCodeMismatch = 32
-)
-
-var (
-	// errors are of the form:
-	// "account sequence mismatch, expected 25, got 27: incorrect account sequence"
-	recoverRegexp = regexp.MustCompile(`^account sequence mismatch, expected (\d+), got (\d+):`)
 )
 
 type createInitialSuggestionRequest struct {
