@@ -7,7 +7,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-func InitBaseledgerDBConnection() (db *gorm.DB, err error) {
+type dbInstance struct {
+	db *gorm.DB
+}
+
+var Db dbInstance
+
+func InitConnection() {
+	fmt.Println("init app db connection")
+
 	dbHost, _ := viper.Get("DB_HOST").(string)
 	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
 	sslMode, _ := viper.Get("DB_SSLMODE").(string)
@@ -23,5 +31,18 @@ func InitBaseledgerDBConnection() (db *gorm.DB, err error) {
 		sslMode,
 	)
 
-	return gorm.Open("postgres", args)
+	db, err := gorm.Open("postgres", args)
+
+	if err != nil {
+		fmt.Printf("error when connecting to db %v\n", err)
+		panic(err)
+	}
+
+	fmt.Println("app db connection successful")
+
+	Db = dbInstance{db: db}
+}
+
+func (instance *dbInstance) GetConn() *gorm.DB {
+	return instance.db
 }

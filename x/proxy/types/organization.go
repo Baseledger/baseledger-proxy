@@ -14,15 +14,8 @@ type Organization struct {
 }
 
 func (t *Organization) Create() bool {
-	db, err := dbutil.InitBaseledgerDBConnection()
-
-	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
-		return false
-	}
-
-	if db.NewRecord(t) {
-		result := db.Create(&t)
+	if dbutil.Db.GetConn().NewRecord(t) {
+		result := dbutil.Db.GetConn().Create(&t)
 		rowsAffected := result.RowsAffected
 		errors := result.GetErrors()
 		if len(errors) > 0 {
