@@ -55,7 +55,7 @@ WITH
     SELECT id FROM public.organizations
     WHERE organization_name = 'Org1'
   )
-  select w.id, o.id, 'localhost:4222', 'testToken1'
+  select w.id, o.id, 'host.docker.internal:4222', 'testToken1'
   from w, o;
 
 INSERT INTO public.workgroup_members (workgroup_id, organization_id, organization_endpoint, organization_token)
@@ -68,7 +68,7 @@ WITH
     SELECT id FROM public.organizations
     WHERE organization_name = 'Org2'
   )
-  select w.id, o.id, 'localhost:4223', 'testToken1'
+  select w.id, o.id, 'host.docker.internal:4223', 'testToken1'
   from w, o;
 
 CREATE TABLE public.trustmesh_entries (

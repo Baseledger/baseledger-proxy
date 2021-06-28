@@ -41,6 +41,8 @@ services:
       ports:
         - ${STARPORT_API_PORT}:1317
         - ${TENDERMINT_NODE_PORT}:26657
+      extra_hosts:
+          - "host.docker.internal:host-gateway" # enable targeting host machine with host.docker.internal
       restart: always
 
 networks:

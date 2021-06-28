@@ -12,8 +12,8 @@ type WorkgroupMember struct {
 	Id                   uuid.UUID
 	WorkgroupId          string
 	OrganizationId       string
-	OrganizationEndpoint string // localhost:4223
-	OrganizationToken    string // testToken1
+	OrganizationEndpoint string
+	OrganizationToken    string
 }
 
 func (t *WorkgroupMember) Create() bool {
