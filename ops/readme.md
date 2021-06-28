@@ -28,6 +28,12 @@ sudo -E docker-compose -p second_node up
 
 TODO https://tutorials.cosmos.network/nameservice/tutorial/20-build-run.html
 
-Removing docker node (for rebuilding due to new codebase)
+1. Removing docker node:
 sudo -E docker-compose -p first_node down
 sudo -E docker-compose -p second_node down
+
+2. Cleanup to start with a fresh code changes for starport:
+docker rmi startport
+
+3. Cleanup to start with fresh database:
+docker volume prune
