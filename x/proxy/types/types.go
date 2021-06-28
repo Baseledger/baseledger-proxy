@@ -32,6 +32,11 @@ type OffchainProcessMessage struct {
 	EntryType                            string
 }
 
+type NatsMessage struct {
+	ProcessMessage OffchainProcessMessage
+	TxHash         string
+}
+
 // TODO rename after clean up
 type SynchronizationRequest struct {
 	WorkgroupId                          uuid.UUID

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/nats-io/nats.go"
 	"github.com/spf13/cast"
 	"github.com/tendermint/spm/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -103,6 +105,7 @@ import (
 
 	_ "github.com/golang-migrate/migrate/source/file"
 
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
 )
 
@@ -188,9 +191,42 @@ func subscribeToWorkgroupMessages() {
 	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
 }
 
-func receiveOffchainProcessMessage(sender string, message string) {
-	fmt.Printf("\n sender %v \n", sender)
-	fmt.Printf("\n message %v \n", message)
+func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
+	// TODO: should we move this parsing to nats client and just get struct in this callback?
+	var natsMessage proxytypes.NatsMessage
+	err := json.Unmarshal(natsMsg.Data, &natsMessage)
+	if err != nil {
+		fmt.Printf("Error parsing nats message %v\n", err)
+	}
+
+	fmt.Printf("message received %v\n", natsMessage)
+	entryType := "SuggestionReceived"
+	if natsMessage.ProcessMessage.EntryType == "FeedbackSent" {
+		entryType = "FeedbackReceived"
+	}
+	trustmeshEntry := &proxytypes.TrustmeshEntry{
+		TendermintTransactionId:  natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		OffchainProcessMessageId: natsMessage.ProcessMessage.Id,
+		// TODO: define proxy identifier
+		SenderOrgId:                          natsMessage.ProcessMessage.SenderId,
+		ReceiverOrgId:                        natsMessage.ProcessMessage.ReceiverId,
+		WorkgroupId:                          uuid.FromStringOrNil(natsMessage.ProcessMessage.Topic),
+		WorkstepType:                         natsMessage.ProcessMessage.WorkstepType,
+		BaseledgerTransactionType:            natsMessage.ProcessMessage.BaseledgerTransactionType,
+		BaseledgerTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		ReferencedBaseledgerTransactionId:    natsMessage.ProcessMessage.ReferencedBaseledgerTransactionId,
+		BusinessObjectType:                   natsMessage.ProcessMessage.BusinessObjectType,
+		BaseledgerBusinessObjectId:           natsMessage.ProcessMessage.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: natsMessage.ProcessMessage.ReferencedBaseledgerBusinessObjectId,
+		ReferencedProcessMessageId:           natsMessage.ProcessMessage.ReferencedOffchainProcessMessageId,
+		TransactionHash:                      natsMessage.TxHash,
+		EntryType:                            entryType,
+	}
+
+	if !trustmeshEntry.Create() {
+		fmt.Printf("error when creating new trustmesh entry")
+	}
+
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
