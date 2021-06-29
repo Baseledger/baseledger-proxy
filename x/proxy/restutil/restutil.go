@@ -59,6 +59,11 @@ func RejectFeedback(offchainMessage types.OffchainProcessMessage, workgroupId st
 		return
 	}
 
+	// TODO: BAS-33
+	// TODO: discuss within the team broadcasting of transactions (should this be done by SoR external calls only?)
+	// security - here we need to pull out from keyring and solve everything automatically
+	// discuss additional security of external triggering of tx broadcast
+	// think about implications of this approach and discuss
 	_, err = http.Post("http://localhost:1317/proxy/feedback", "application/json", bytes.NewBuffer(jsonValue))
 
 	if err != nil {

@@ -101,6 +101,7 @@ func InitDbIfNotExists() {
 	db.DB().Close() // Close admin connection
 }
 
+// TODO: check if we can reuse db connection from method above
 func PerformMigrations() {
 	dbHost, _ := viper.Get("DB_HOST").(string)
 	dbPwd, _ := viper.Get("DB_UB_PWD").(string)

@@ -107,6 +107,7 @@ import (
 
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
+	common "github.com/unibrightio/baseledger/common"
 )
 
 const Name = "baseledger"
@@ -200,14 +201,13 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	}
 
 	fmt.Printf("message received %v\n", natsMessage)
-	entryType := "SuggestionReceived"
-	if natsMessage.ProcessMessage.EntryType == "FeedbackSent" {
-		entryType = "FeedbackReceived"
+	entryType := common.SuggestionReceivedTrustmeshEntryType
+	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
+		entryType = common.FeedbackReceivedTrustmeshEntryType
 	}
 	trustmeshEntry := &proxytypes.TrustmeshEntry{
-		TendermintTransactionId:  natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		OffchainProcessMessageId: natsMessage.ProcessMessage.Id,
-		// TODO: define proxy identifier
+		TendermintTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		OffchainProcessMessageId:             natsMessage.ProcessMessage.Id,
 		SenderOrgId:                          natsMessage.ProcessMessage.SenderId,
 		ReceiverOrgId:                        natsMessage.ProcessMessage.ReceiverId,
 		WorkgroupId:                          uuid.FromStringOrNil(natsMessage.ProcessMessage.Topic),

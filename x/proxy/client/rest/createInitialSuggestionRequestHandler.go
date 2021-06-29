@@ -11,6 +11,7 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/types"
 
 	uuid "github.com/kthomas/go.uuid"
+	common "github.com/unibrightio/baseledger/common"
 	txutil "github.com/unibrightio/baseledger/txutil"
 )
 
@@ -81,24 +82,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 			return
 		}
 
-		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId:  transactionId,
-			OffchainProcessMessageId: offchainMsg.Id,
-			// TODO: define proxy identifier
-			SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
-			ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
-			WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
-			WorkstepType:                         offchainMsg.WorkstepType,
-			BaseledgerTransactionType:            "Suggest",
-			BaseledgerTransactionId:              transactionId,
-			ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
-			BusinessObjectType:                   req.BusinessObjectType,
-			BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
-			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
-			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
-			TransactionHash:                      *txHash,
-			EntryType:                            "SuggestionSent",
-		}
+		trustmeshEntry := createSuggestionSentTrustmeshEntry(*req, transactionId, offchainMsg, *txHash)
 
 		if !trustmeshEntry.Create() {
 			fmt.Printf("error when creating new trustmesh entry")
@@ -128,10 +112,31 @@ func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactio
 		BusinessObjectType:                   req.BusinessObjectType,
 		BaseledgerTransactionType:            "Suggest",
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
-		EntryType:                            "SugggestionSent",
+		EntryType:                            common.SuggestionSentTrustmeshEntryType,
 	}
 
 	return offchainMessage
+}
+
+func createSuggestionSentTrustmeshEntry(req createInitialSuggestionRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, txHash string) *types.TrustmeshEntry {
+	return &types.TrustmeshEntry{
+		TendermintTransactionId:  transactionId,
+		OffchainProcessMessageId: offchainMsg.Id,
+		// TODO: define proxy identifier, BAS-33
+		SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
+		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
+		WorkstepType:                         offchainMsg.WorkstepType,
+		BaseledgerTransactionType:            "Suggest",
+		BaseledgerTransactionId:              transactionId,
+		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
+		BusinessObjectType:                   req.BusinessObjectType,
+		BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
+		ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
+		TransactionHash:                      txHash,
+		EntryType:                            common.SuggestionSentTrustmeshEntryType,
+	}
 }
 
 func parseRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createInitialSuggestionRequest {

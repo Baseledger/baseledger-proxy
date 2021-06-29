@@ -14,7 +14,9 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	"github.com/unibrightio/baseledger/x/proxy/types"
 	"github.com/unibrightio/baseledger/x/proxy/workgroups"
+
 	// "github.com/cosmos/cosmos-sdk/client/tx"
+	common "github.com/unibrightio/baseledger/common"
 )
 
 type workgroupMock struct {
@@ -58,7 +60,7 @@ func CreateBaseledgerTransactionPayload(
 	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
 
 	payload := &types.BaseledgerTransactionPayload{
-		// TODO proper identifier
+		// TODO proper identifier BAS-33
 		SenderId:                             "123",
 		TransactionType:                      "Suggest",
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
@@ -91,7 +93,7 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		feedbackMsg = "Reject"
 	}
 	payload := &types.BaseledgerTransactionPayload{
-		// TODO proper identifier
+		// TODO proper identifier BAS-33
 		SenderId:                             "123",
 		TransactionType:                      feedbackMsg,
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
@@ -114,14 +116,13 @@ func CreateBaseledgerTransactionFeedbackPayload(
 
 func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage, txHash string) {
 	fmt.Println("OffchainProcessMessageReceived")
-	entryType := "SuggestionReceived"
-	if offchainProcessMessage.EntryType == "FeedbackSent" {
-		entryType = "FeedbackReceived"
+	entryType := common.SuggestionReceivedTrustmeshEntryType
+	if offchainProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
+		entryType = common.FeedbackReceivedTrustmeshEntryType
 	}
 	trustmeshEntry := &types.TrustmeshEntry{
-		TendermintTransactionId:  offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		OffchainProcessMessageId: offchainProcessMessage.Id,
-		// TODO: define proxy identifier
+		TendermintTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
+		OffchainProcessMessageId:             offchainProcessMessage.Id,
 		SenderOrgId:                          offchainProcessMessage.SenderId,
 		ReceiverOrgId:                        offchainProcessMessage.ReceiverId,
 		WorkgroupId:                          uuid.FromStringOrNil(offchainProcessMessage.Topic),
@@ -142,6 +143,7 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 	}
 }
 
+// TODO: skos remove this and read from db
 func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
 	return &workgroupMock{
 		BaselineWorkgroupID: workgroupId,

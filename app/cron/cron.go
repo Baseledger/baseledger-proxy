@@ -13,6 +13,7 @@ import (
 	"github.com/unibrightio/baseledger/app/types"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
+	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
 )
 
@@ -20,7 +21,7 @@ func queryTrustmeshes() {
 	fmt.Println("query trustmeshes start")
 
 	var trustmeshEntries []proxytypes.TrustmeshEntry
-	dbutil.Db.GetConn().Where("commitment_state='UNCOMMITTED'").Find(&trustmeshEntries)
+	dbutil.Db.GetConn().Where("commitment_state=?", common.UncommittedCommitmentState).Find(&trustmeshEntries)
 
 	fmt.Printf("found %v trustmesh entries\n", len(trustmeshEntries))
 	var jobs = make(chan types.Job, len(trustmeshEntries))
@@ -43,6 +44,7 @@ func queryTrustmeshes() {
 
 func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 	// fetching tx details
+	// TODO: BAS-33
 	str := "http://localhost:26657/tx?hash=0x" + txHash
 	httpRes, err := http.Get(str)
 	if err != nil {
@@ -64,6 +66,7 @@ func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 		return &types.TxInfo{}, errors.New("error decoding tx")
 	}
 	// query for block at specific height to find timestamp
+	// TODO: BAS-33
 	str = "http://localhost:26657/block?height" + committedTx.TxResult.Height
 	httpRes, err = http.Get(str)
 	if err != nil {
