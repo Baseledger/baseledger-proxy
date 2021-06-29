@@ -37,6 +37,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
 		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(*clientCtx, clientCtx.FromAddress)
