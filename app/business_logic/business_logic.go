@@ -8,20 +8,21 @@ import (
 
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/app/types"
+	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/sor"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
 	"github.com/unibrightio/baseledger/x/proxy/proxy"
 	restutil "github.com/unibrightio/baseledger/x/proxy/restutil"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
-
 	"google.golang.org/grpc"
 )
 
 func ExecuteBusinessLogic(txResult types.Result) {
-	// TODO: it looks like we should do this first?
-	setTxStatusToCommitted(txResult)
-	// TODO: should we reuse db connection here, or open new one?
+	if txResult.TxInfo.TxHeight == "" || txResult.TxInfo.TxTimestamp == "" {
+		return
+	}
+	fmt.Printf("Execute business logic for result %v\n", txResult)
 	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
 		// TODO: logging
@@ -29,11 +30,12 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		return
 	}
 	switch txResult.Job.TrustmeshEntry.EntryType {
-	case "SuggestionSent":
-		fmt.Println("SuggestionSent")
+	case common.SuggestionSentTrustmeshEntryType:
+		fmt.Println(common.SuggestionSentTrustmeshEntryType)
+		// TODO: Ognjen, use msg client
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
-	case "SuggestionReceived":
-		fmt.Println("SuggestionReceived")
+	case common.SuggestionReceivedTrustmeshEntryType:
+		fmt.Println(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
 			// TODO: logging
@@ -56,11 +58,12 @@ func ExecuteBusinessLogic(txResult types.Result) {
 		}
 		fmt.Println("Hashes don't match")
 		restutil.RejectFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
-	case "FeedbackSent":
-		fmt.Println("FeedbackSent")
+	case common.FeedbackSentTrustmeshEntryType:
+		fmt.Println(common.FeedbackSentTrustmeshEntryType)
+		// TODO: Ognjen, use msg client
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
-	case "FeedbackReceived":
-		fmt.Println("FeedbackReceived")
+	case common.FeedbackReceivedTrustmeshEntryType:
+		fmt.Println(common.FeedbackReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
 			// TODO: logging
@@ -69,14 +72,15 @@ func ExecuteBusinessLogic(txResult types.Result) {
 
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
-		// TODO: this should not happen, probably panic is ok to use here?
 		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
+	setTxStatusToCommitted(txResult)
 }
 
 func setTxStatusToCommitted(txResult types.Result) {
-	result := dbutil.Db.GetConn().Exec("UPDATE trustmesh_entries SET commitment_state = 'COMMITTED', tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
+	result := dbutil.Db.GetConn().Exec("UPDATE trustmesh_entries SET commitment_state = ?, tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
+		common.CommittedCommitmentState,
 		txResult.TxInfo.TxHeight,
 		txResult.TxInfo.TxTimestamp,
 		txResult.Job.TrustmeshEntry.TendermintTransactionId)
@@ -88,6 +92,7 @@ func setTxStatusToCommitted(txResult types.Result) {
 }
 
 func getCommittedBaseledgerTransaction(transactionId uuid.UUID) *baseledgertypes.BaseledgerTransaction {
+	// TODO: BAS-33
 	grpcConn, err := grpc.Dial(
 		"127.0.0.1:9090",
 		// The SDK doesn't support any transport security mechanism.

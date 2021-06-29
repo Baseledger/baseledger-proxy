@@ -7,10 +7,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
 	uuid "github.com/kthomas/go.uuid"
+	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
 )
-
-const defaultCommitmentState = "UNCOMMITTED"
 
 type TrustmeshEntry struct {
 	TendermintBlockId                    sql.NullString
@@ -34,7 +33,7 @@ type TrustmeshEntry struct {
 }
 
 func (t *TrustmeshEntry) Create() bool {
-	t.CommitmentState = defaultCommitmentState
+	t.CommitmentState = common.UncommittedCommitmentState
 	t.TendermintBlockId = sql.NullString{Valid: false}
 	t.TendermintTransactionTimestamp = sql.NullString{Valid: false}
 	if dbutil.Db.GetConn().NewRecord(t) {

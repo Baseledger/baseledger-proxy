@@ -11,6 +11,7 @@ import (
 	"github.com/unibrightio/baseledger/x/proxy/types"
 
 	uuid "github.com/kthomas/go.uuid"
+	common "github.com/unibrightio/baseledger/common"
 	txutil "github.com/unibrightio/baseledger/txutil"
 )
 
@@ -79,25 +80,7 @@ func createSynchronizationFeedbackHandler(clientCtx client.Context) http.Handler
 		}
 
 		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
-
-		trustmeshEntry := &types.TrustmeshEntry{
-			TendermintTransactionId:  transactionId,
-			OffchainProcessMessageId: offchainMsg.Id,
-			// TODO: define proxy identifier
-			SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
-			ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
-			WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
-			WorkstepType:                         offchainMsg.WorkstepType,
-			BaseledgerTransactionType:            feedbackMsg,
-			BaseledgerTransactionId:              transactionId,
-			ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
-			BusinessObjectType:                   req.BusinessObjectType,
-			BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
-			ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
-			ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
-			TransactionHash:                      res.TxHash,
-			EntryType:                            "FeedbackSent",
-		}
+		trustmeshEntry := createFeedbackSentTrustmeshEntry(*req, transactionId, offchainMsg, feedbackMsg, res.TxHash)
 
 		trustmeshEntry.OffchainProcessMessageId = offchainMsg.Id
 		if !trustmeshEntry.Create() {
@@ -126,10 +109,33 @@ func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, tra
 		BusinessObjectType:                   req.BusinessObjectType,
 		BaseledgerTransactionType:            baseledgerTransactionType,
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
-		EntryType:                            "FeedbackSent",
+		EntryType:                            common.FeedbackSentTrustmeshEntryType,
 	}
 
 	return offchainMessage
+}
+
+func createFeedbackSentTrustmeshEntry(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, feedbackMsg string, txHash string) *types.TrustmeshEntry {
+	trustmeshEntry := &types.TrustmeshEntry{
+		TendermintTransactionId:  transactionId,
+		OffchainProcessMessageId: offchainMsg.Id,
+		// TODO: define proxy identifier, BAS-33
+		SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
+		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
+		WorkstepType:                         offchainMsg.WorkstepType,
+		BaseledgerTransactionType:            feedbackMsg,
+		BaseledgerTransactionId:              transactionId,
+		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
+		BusinessObjectType:                   req.BusinessObjectType,
+		BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
+		ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
+		TransactionHash:                      txHash,
+		EntryType:                            common.FeedbackSentTrustmeshEntryType,
+	}
+
+	return trustmeshEntry
 }
 
 func parseFeedbackRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *createSynchronizationFeedbackRequest {
