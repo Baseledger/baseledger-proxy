@@ -15,15 +15,16 @@ import (
 
 	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
+	"github.com/unibrightio/baseledger/logger"
 )
 
 func queryTrustmeshes() {
-	fmt.Println("query trustmeshes start")
+	logger.Info("query trustmesh start")
 
 	var trustmeshEntries []proxytypes.TrustmeshEntry
 	dbutil.Db.GetConn().Where("commitment_state=?", common.UncommittedCommitmentState).Find(&trustmeshEntries)
 
-	fmt.Printf("found %v trustmesh entries\n", len(trustmeshEntries))
+	logger.Infof("found %v trustmesh entries\n", len(trustmeshEntries))
 	var jobs = make(chan types.Job, len(trustmeshEntries))
 	var results = make(chan types.Result, len(trustmeshEntries))
 	createWorkerPool(1, jobs, results)
@@ -39,7 +40,7 @@ func queryTrustmeshes() {
 		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TransactionHash, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
 	}
 
-	fmt.Println("query trustmeshes end")
+	logger.Info("query trustmesh end")
 }
 
 func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {

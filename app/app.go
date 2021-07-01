@@ -108,6 +108,7 @@ import (
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
 	common "github.com/unibrightio/baseledger/common"
+	baseledgerLogger "github.com/unibrightio/baseledger/logger"
 )
 
 const Name = "baseledger"
@@ -538,6 +539,7 @@ func New(
 	subscribeToWorkgroupMessages()
 
 	cron.StartCron()
+	baseledgerLogger.SetupLogger()
 
 	return app
 }
