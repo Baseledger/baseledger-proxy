@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/rs/zerolog"
@@ -13,7 +12,6 @@ import (
 // JSON_LOGS should be part of docker compose and we can move this to init and use os.GetEnv()
 func SetupLogger() {
 	jsonLogs := viper.GetBool("JSON_LOGS")
-	fmt.Printf("INITIALIZING LOGGER %v\n", jsonLogs)
 	if !jsonLogs {
 		log.Logger = log.Logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}

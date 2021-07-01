@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/app/types"
 	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
+	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/sor"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
 	"github.com/unibrightio/baseledger/x/proxy/proxy"
@@ -22,20 +22,20 @@ func ExecuteBusinessLogic(txResult types.Result) {
 	if txResult.TxInfo.TxHeight == "" || txResult.TxInfo.TxTimestamp == "" {
 		return
 	}
-	fmt.Printf("Execute business logic for result %v\n", txResult)
+	logger.Infof("Execute business logic for result %v\n", txResult)
 	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
 		// TODO: logging
-		fmt.Println("Offchain process msg not found")
+		logger.Error("Offchain process msg not found")
 		return
 	}
 	switch txResult.Job.TrustmeshEntry.EntryType {
 	case common.SuggestionSentTrustmeshEntryType:
-		fmt.Println(common.SuggestionSentTrustmeshEntryType)
+		logger.Info(common.SuggestionSentTrustmeshEntryType)
 		// TODO: Ognjen, use msg client
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case common.SuggestionReceivedTrustmeshEntryType:
-		fmt.Println(common.SuggestionReceivedTrustmeshEntryType)
+		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
 			// TODO: logging
@@ -46,24 +46,24 @@ func ExecuteBusinessLogic(txResult types.Result) {
 
 		err = json.Unmarshal(([]byte)(deprivitizedPayload), &baseledgerTransactionPayload)
 		if err != nil {
-			fmt.Println("Failed to unmarshal baseledger transaction payload")
+			logger.Error("Failed to unmarshal baseledger transaction payload")
 			return
 		}
 
 		offchainMessageBusinessObjectProof := proxy.CreateHashFromBusinessObject(offchainMessage.BaseledgerSyncTreeJson)
 		if baseledgerTransactionPayload.Proof == offchainMessage.BusinessObjectProof && baseledgerTransactionPayload.Proof == offchainMessageBusinessObjectProof {
-			fmt.Println("Hashes match, processing feedback")
+			logger.Info("Hashes match, processing feedback")
 			sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 			return
 		}
-		fmt.Println("Hashes don't match")
+		logger.Warn("Hashes don't match")
 		restutil.RejectFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
 	case common.FeedbackSentTrustmeshEntryType:
-		fmt.Println(common.FeedbackSentTrustmeshEntryType)
+		logger.Info(common.FeedbackSentTrustmeshEntryType)
 		// TODO: Ognjen, use msg client
 		proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case common.FeedbackReceivedTrustmeshEntryType:
-		fmt.Println(common.FeedbackReceivedTrustmeshEntryType)
+		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
 			// TODO: logging
@@ -72,7 +72,7 @@ func ExecuteBusinessLogic(txResult types.Result) {
 
 		sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
-		fmt.Printf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
+		logger.Errorf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
 	setTxStatusToCommitted(txResult)
@@ -85,9 +85,9 @@ func setTxStatusToCommitted(txResult types.Result) {
 		txResult.TxInfo.TxTimestamp,
 		txResult.Job.TrustmeshEntry.TendermintTransactionId)
 	if result.RowsAffected == 1 {
-		fmt.Printf("Tx %v committed \n", txResult.Job.TrustmeshEntry.TendermintTransactionId)
+		logger.Infof("Tx %v committed \n", txResult.Job.TrustmeshEntry.TendermintTransactionId)
 	} else {
-		fmt.Printf("Error setting tx status to committed %v\n", result.Error)
+		logger.Errorf("Error setting tx status to committed %v\n", result.Error)
 	}
 }
 
@@ -102,7 +102,7 @@ func getCommittedBaseledgerTransaction(transactionId uuid.UUID) *baseledgertypes
 
 	if err != nil {
 		// TODO: error handling
-		fmt.Printf("grpc conn failed %v\n", err.Error())
+		logger.Errorf("grpc conn failed %v\n", err.Error())
 		return nil
 	}
 
@@ -112,10 +112,10 @@ func getCommittedBaseledgerTransaction(transactionId uuid.UUID) *baseledgertypes
 
 	if err != nil {
 		// TODO: error handling
-		fmt.Printf("grpc query failed %v\n", err.Error())
+		logger.Errorf("grpc query failed %v\n", err.Error())
 		return nil
 	}
 
-	fmt.Printf("found baseledger transaction %v\n", res.BaseledgerTransaction)
+	logger.Infof("found baseledger transaction %v\n", res.BaseledgerTransaction)
 	return res.BaseledgerTransaction
 }

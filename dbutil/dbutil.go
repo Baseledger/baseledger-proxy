@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
+	"github.com/unibrightio/baseledger/logger"
 )
 
 type dbInstance struct {
@@ -18,7 +19,7 @@ type dbInstance struct {
 var Db dbInstance
 
 func InitConnection() {
-	fmt.Println("init app db connection")
+	logger.Info("init app db connection")
 
 	dbHost, _ := viper.Get("DB_HOST").(string)
 	dbPwd, _ := viper.Get("DB_UB_PWD").(string)
@@ -38,11 +39,11 @@ func InitConnection() {
 	db, err := gorm.Open("postgres", args)
 
 	if err != nil {
-		fmt.Printf("error when connecting to db %v\n", err)
+		logger.Errorf("error when connecting to db %v\n", err)
 		panic(err)
 	}
 
-	fmt.Println("app db connection successful")
+	logger.Info("app db connection successful")
 
 	Db = dbInstance{db: db}
 }
@@ -71,30 +72,30 @@ func InitDbIfNotExists() {
 	db, err := gorm.Open("postgres", args)
 
 	if err != nil {
-		fmt.Printf("db connection failed %v\n", err.Error())
+		logger.Errorf("db connection failed %v\n", err.Error())
 		panic(err)
 	}
 
-	fmt.Printf("admin db connection successful")
+	logger.Info("admin db connection successful")
 
 	exists := db.Exec(fmt.Sprintf("select 1 from pg_roles where rolname='%s'", dbUser))
 
 	if exists.RowsAffected == 1 {
-		fmt.Printf("row already exits")
+		logger.Errorf("row already exits")
 		return
 	}
 
 	result := db.Exec(fmt.Sprintf("create user %s with superuser password '%s'", dbUser, dbPwd))
 
 	if result.Error != nil {
-		fmt.Printf("failed to create user %v\n", result.Error)
+		logger.Errorf("failed to create user %v\n", result.Error)
 		panic(result.Error)
 	}
 
 	result = db.Exec(fmt.Sprintf("create database %s owner %s", dbName, dbUser))
 
 	if result.Error != nil {
-		fmt.Printf("failed to create baseledger db %v\n", result.Error)
+		logger.Errorf("failed to create baseledger db %v\n", result.Error)
 		panic(result.Error)
 	}
 
@@ -118,24 +119,24 @@ func PerformMigrations() {
 	)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		fmt.Printf("migrations failed 1: %s", err.Error())
+		logger.Errorf("migrations failed 1: %s", err.Error())
 		panic(err)
 	}
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		fmt.Printf("migrations failed 2: %s", err.Error())
+		logger.Errorf("migrations failed 2: %s", err.Error())
 		panic(err)
 	}
 
 	m, err := migrate.NewWithDatabaseInstance("file://./ops/migrations", dbName, driver)
 	if err != nil {
-		fmt.Printf("migrations failed 3: %s", err.Error())
+		logger.Errorf("migrations failed 3: %s", err.Error())
 		panic(err)
 	}
 
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		fmt.Printf("migrations failed 4: %s", err.Error())
+		logger.Errorf("migrations failed 4: %s", err.Error())
 	}
 }
