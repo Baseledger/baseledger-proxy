@@ -34,6 +34,15 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(*clientCtx, clientCtx.FromAddress)
+
+		if err != nil {
+			fmt.Printf("error while retrieving acc %v\n", err.Error())
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error while retrieving acc")
+			return
 		}
 
 		createSyncReq := newSynchronizationRequest(*req)
@@ -46,6 +55,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		if !offchainMsg.Create() {
 			fmt.Printf("error when creating new offchain msg entry")
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error when creating new offchain msg entry")
+			return
 		}
 
 		payload := proxy.CreateBaseledgerTransactionPayload(createSyncReq, &offchainMsg)
@@ -54,35 +64,33 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		if err := msg.ValidateBasic(); err != nil {
 			fmt.Printf("msg validate basic failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
 		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
-		txBytes, err := txutil.SignTxAndGetTxBytes(*clientCtx, msg)
+		txHash, err := txutil.BroadcastAndGetTxHash(*clientCtx, msg, accNum, accSeq, false)
+
 		if err != nil {
+			fmt.Printf("broadcasting failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
 		}
 
-		res, err := clientCtx.BroadcastTx(txBytes)
-		if err != nil {
-			fmt.Printf("error while broadcasting tx %v\n", err.Error())
-			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
-		}
+		trustmeshEntry := createSuggestionSentTrustmeshEntry(*req, transactionId, offchainMsg, *txHash)
 
-		fmt.Printf("TRANSACTION BROADCASTED WITH RESULT %v\n", res)
-		trustmeshEntry := createSuggestionSentTrustmeshEntry(*req, transactionId, offchainMsg, res.TxHash)
-
-		trustmeshEntry.OffchainProcessMessageId = offchainMsg.Id
 		if !trustmeshEntry.Create() {
 			fmt.Printf("error when creating new trustmesh entry")
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		return
 	}
 }
 
