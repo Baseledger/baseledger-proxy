@@ -1,9 +1,8 @@
 package messaging
 
 import (
-	"fmt"
-
 	"github.com/nats-io/nats.go"
+	"github.com/unibrightio/baseledger/logger"
 )
 
 type IMessagingClient interface {
@@ -29,7 +28,8 @@ func (client *NatsMessagingClient) SendMessage(message []byte, recipient string,
 	nc, err := nats.Connect("nats://" + token + "@" + recipient)
 
 	if err != nil {
-		fmt.Printf("Error while trying to connect to Nats: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
+		logger.Errorf("Error while trying to connect to Nats: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
+		return
 	}
 
 	defer nc.Close()
@@ -38,7 +38,7 @@ func (client *NatsMessagingClient) SendMessage(message []byte, recipient string,
 	err = nc.Publish("baseledger", message)
 
 	if err != nil {
-		fmt.Printf("Error while trying to send NATS message: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
+		logger.Errorf("Error while trying to send NATS message: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
 	}
 }
 
@@ -47,7 +47,8 @@ func (client *NatsMessagingClient) Subscribe(serverUrl string, token string, top
 	nc, err := nats.Connect("nats://" + token + "@" + serverUrl)
 
 	if err != nil {
-		fmt.Printf("Error while trying to connect to local Nats: %v", err)
+		logger.Errorf("Error while trying to connect to local Nats: %v", err)
+		return
 	}
 
 	nc.Subscribe(topic, func(m *nats.Msg) {

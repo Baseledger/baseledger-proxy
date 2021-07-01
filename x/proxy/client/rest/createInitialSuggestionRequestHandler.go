@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -12,6 +11,7 @@ import (
 
 	uuid "github.com/kthomas/go.uuid"
 	common "github.com/unibrightio/baseledger/common"
+	"github.com/unibrightio/baseledger/logger"
 	txutil "github.com/unibrightio/baseledger/txutil"
 )
 
@@ -40,7 +40,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		accNum, accSeq, err := clientCtx.AccountRetriever.GetAccountNumberSequence(*clientCtx, clientCtx.FromAddress)
 
 		if err != nil {
-			fmt.Printf("error while retrieving acc %v\n", err.Error())
+			logger.Errorf("error while retrieving acc %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error while retrieving acc")
 			return
 		}
@@ -53,7 +53,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		offchainMsg := createSuggestOffchainMessage(*req, transactionId, hash)
 
 		if !offchainMsg.Create() {
-			fmt.Printf("error when creating new offchain msg entry")
+			logger.Errorf("error when creating new offchain msg entry")
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error when creating new offchain msg entry")
 			return
 		}
@@ -62,12 +62,12 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 
 		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(transactionId.String(), clientCtx.GetFromAddress().String(), transactionId.String(), string(payload))
 		if err := msg.ValidateBasic(); err != nil {
-			fmt.Printf("msg validate basic failed %v\n", err.Error())
+			logger.Errorf("msg validate basic failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		fmt.Printf("msg with encrypted payload to be broadcasted %s\n", msg)
+		logger.Infof("msg with encrypted payload to be broadcasted %s\n", msg)
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -77,7 +77,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		txHash, err := txutil.BroadcastAndGetTxHash(*clientCtx, msg, accNum, accSeq, false)
 
 		if err != nil {
-			fmt.Printf("broadcasting failed %v\n", err.Error())
+			logger.Errorf("broadcasting failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -85,7 +85,7 @@ func createInitialSuggestionRequestHandler(clientCtx client.Context) http.Handle
 		trustmeshEntry := createSuggestionSentTrustmeshEntry(*req, transactionId, offchainMsg, *txHash)
 
 		if !trustmeshEntry.Create() {
-			fmt.Printf("error when creating new trustmesh entry")
+			logger.Errorf("error when creating new trustmesh entry")
 		}
 
 		w.Header().Set("Content-Type", "application/json")

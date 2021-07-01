@@ -1,9 +1,8 @@
 package workgroups
 
 import (
-	"fmt"
-
 	"github.com/unibrightio/baseledger/dbutil"
+	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/x/proxy/types"
 	// gorm
 )
@@ -21,7 +20,7 @@ func (client *PostgresWorkgroupClient) FindWorkgroup(workgroupId string) *types.
 	dbError := dbutil.Db.GetConn().First(&workgroup, "id = ?", workgroupId).Error
 
 	if dbError != nil {
-		fmt.Printf("error trying to fetch workgroup with id %s\n", workgroupId)
+		logger.Errorf("error trying to fetch workgroup with id %s\n", workgroupId)
 		return nil
 	}
 
@@ -33,7 +32,7 @@ func (client *PostgresWorkgroupClient) FindWorkgroupMember(workgroupId string, r
 	dbError := dbutil.Db.GetConn().First(&member, "workgroup_id = ? AND organization_id = ?", workgroupId, recipientId).Error
 
 	if dbError != nil {
-		fmt.Printf("error trying to fetch workgroup membership with workgroup id %s and organization with id %s\n", recipientId, recipientId)
+		logger.Errorf("error trying to fetch workgroup membership with workgroup id %s and organization with id %s\n", recipientId, recipientId)
 		return nil
 	}
 

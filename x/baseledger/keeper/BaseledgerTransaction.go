@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -54,7 +53,6 @@ func (k Keeper) AppendBaseledgerTransaction(
 	appendedValue := k.cdc.MustMarshalBinaryBare(&BaseledgerTransaction)
 	store.Set(GetBaseledgerTransactionUUIDBytes(BaseledgerTransaction.Id), appendedValue)
 
-	fmt.Printf("KEEPER %v %v\n", BaseledgerTransaction.Id, GetBaseledgerTransactionUUIDBytes(BaseledgerTransaction.Id))
 	// Update BaseledgerTransaction count
 	k.SetBaseledgerTransactionCount(ctx, count+1)
 

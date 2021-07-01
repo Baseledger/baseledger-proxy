@@ -1,13 +1,13 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
+	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/x/proxy/messaging"
 	"github.com/unibrightio/baseledger/x/proxy/workgroups"
 )
@@ -21,14 +21,14 @@ type sendOffchainMessageRequest struct {
 
 func sendOffchainMessageHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("sendOffchainMessageHandler initiated\n")
+		logger.Infof("sendOffchainMessageHandler initiated\n")
 
-		fmt.Printf("trying to parse request\n")
+		logger.Infof("trying to parse request\n")
 		req := parseMessageRequest(w, r, clientCtx)
-		fmt.Printf("Request parsed succesfully %s %s\n", req.WorkgroupId, req.RecipientId)
+		logger.Infof("Request parsed succesfully %s %s\n", req.WorkgroupId, req.RecipientId)
 
 		workgroupClient := &workgroups.PostgresWorkgroupClient{}
-		fmt.Printf("trying to find workgroup member\n")
+		logger.Infof("trying to find workgroup member\n")
 		workgroupMembership := workgroupClient.FindWorkgroupMember(req.WorkgroupId, req.RecipientId)
 
 		if workgroupMembership == nil {
@@ -36,7 +36,7 @@ func sendOffchainMessageHandler(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		fmt.Printf("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+		logger.Infof("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
 		messagingClient := &messaging.NatsMessagingClient{}
 		messagingClient.SendMessage([]byte(req.Payload), workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
 

@@ -22,7 +22,7 @@ func Info(msg string) {
 }
 
 func Infof(msg string, v ...interface{}) {
-	log.Logger.Info().Str("project", "BASELEDGER").Msgf(msg, v)
+	log.Logger.Info().Str("project", "BASELEDGER").Msgf(msg, v...)
 }
 
 func Warn(msg string) {
@@ -30,7 +30,7 @@ func Warn(msg string) {
 }
 
 func Warnf(msg string, v ...interface{}) {
-	log.Logger.Warn().Str("project", "BASELEDGER").Msgf(msg, v)
+	log.Logger.Warn().Str("project", "BASELEDGER").Msgf(msg, v...)
 }
 
 func Error(msg string) {
@@ -38,7 +38,7 @@ func Error(msg string) {
 }
 
 func Errorf(msg string, v ...interface{}) {
-	log.Logger.Error().Str("project", "BASELEDGER").Msgf(msg, v)
+	log.Logger.Error().Str("project", "BASELEDGER").Msgf(msg, v...)
 }
 
 func Debug(msg string) {
@@ -46,5 +46,5 @@ func Debug(msg string) {
 }
 
 func Debugf(msg string, v ...interface{}) {
-	log.Logger.Debug().Str("project", "BASELEDGER").Msgf(msg, v)
+	log.Logger.Debug().Str("project", "BASELEDGER").Msgf(msg, v...)
 }

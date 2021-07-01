@@ -17,6 +17,7 @@ import (
 
 	// "github.com/cosmos/cosmos-sdk/client/tx"
 	common "github.com/unibrightio/baseledger/common"
+	"github.com/unibrightio/baseledger/logger"
 )
 
 type workgroupMock struct {
@@ -72,11 +73,11 @@ func CreateBaseledgerTransactionPayload(
 		ReferencedBaseledgerBusinessObjectId: synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
 	}
 
-	fmt.Printf("\n payload %v \n", *payload)
+	logger.Infof("\n payload %v \n", *payload)
 	enc := privatizePayload(payload, workgroup.PrivatizeKey)
-	fmt.Printf("enc %s\n\n", enc)
+	logger.Infof("enc %s\n\n", enc)
 	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
-	fmt.Printf("dec %s\n", dec)
+	logger.Infof("dec %s\n", dec)
 
 	return enc
 }
@@ -105,17 +106,17 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId.String(),
 	}
 
-	fmt.Printf("\n payload %v \n", *payload)
+	logger.Infof("\n payload %v \n", *payload)
 	enc := privatizePayload(payload, workgroup.PrivatizeKey)
-	fmt.Printf("enc %s\n\n", enc)
+	logger.Infof("enc %s\n\n", enc)
 	dec := deprivatizePayload(enc, workgroup.PrivatizeKey)
-	fmt.Printf("dec %s\n", dec)
+	logger.Infof("dec %s\n", dec)
 
 	return enc
 }
 
 func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage, txHash string) {
-	fmt.Println("OffchainProcessMessageReceived")
+	logger.Info("OffchainProcessMessageReceived")
 	entryType := common.SuggestionReceivedTrustmeshEntryType
 	if offchainProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType
@@ -139,7 +140,7 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 	}
 
 	if !trustmeshEntry.Create() {
-		fmt.Printf("error when creating new trustmesh entry")
+		logger.Error("error when creating new trustmesh entry")
 	}
 }
 
@@ -154,7 +155,7 @@ func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
 
 // TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
 func SendOffchainProcessMessage(message types.OffchainProcessMessage, receiver string, txHash string) {
-	fmt.Printf("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
+	logger.Infof("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
 	// marshal natsMessage to byte array
 	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
 	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
@@ -178,7 +179,6 @@ func DeprivatizeBaseledgerTransactionPayload(payload string, workgroupId uuid.UU
 
 func privatizePayload(payload *types.BaseledgerTransactionPayload, key string) string {
 	payloadJson, _ := json.Marshal(payload)
-	fmt.Println("json", string(payloadJson))
 	return encrypt(string(payloadJson), key)
 }
 
