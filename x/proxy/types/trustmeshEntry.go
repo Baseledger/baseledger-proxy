@@ -6,34 +6,34 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
+	uuid "github.com/kthomas/go.uuid"
+	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
 )
 
-const defaultTransactionStatus = "UNCOMMITTED"
-
 type TrustmeshEntry struct {
 	TendermintBlockId                    sql.NullString
-	TendermintTransactionId              string
+	TendermintTransactionId              uuid.UUID
 	TendermintTransactionTimestamp       sql.NullString
-	Type                                 string
-	SenderOrgId                          string
-	ReceiverOrgId                        string
-	WorkgroupId                          string
+	EntryType                            string
+	SenderOrgId                          uuid.UUID
+	ReceiverOrgId                        uuid.UUID
+	WorkgroupId                          uuid.UUID
 	WorkstepType                         string
 	BaseledgerTransactionType            string
-	BaseledgerTransactionId              string
-	ReferencedBaseledgerTransactionId    string
+	BaseledgerTransactionId              uuid.UUID
+	ReferencedBaseledgerTransactionId    uuid.UUID
 	BusinessObjectType                   string
-	BaseledgerBusinessObjectId           string
-	ReferencedBaseledgerBusinessObjectId string
-	OffchainProcessMessageId             string
-	ReferencedProcessMessageId           string
-	TransactionStatus                    string
+	BaseledgerBusinessObjectId           uuid.UUID
+	ReferencedBaseledgerBusinessObjectId uuid.UUID
+	OffchainProcessMessageId             uuid.UUID
+	ReferencedProcessMessageId           uuid.UUID
+	CommitmentState                      string
 	TransactionHash                      string
 }
 
 func (t *TrustmeshEntry) Create() bool {
-	t.TransactionStatus = defaultTransactionStatus
+	t.CommitmentState = common.UncommittedCommitmentState
 	t.TendermintBlockId = sql.NullString{Valid: false}
 	t.TendermintTransactionTimestamp = sql.NullString{Valid: false}
 	if dbutil.Db.GetConn().NewRecord(t) {

@@ -11,20 +11,20 @@ type IMessagingClient interface {
 	// message - message payload
 	// recipient - address of the recipient (i.e. NATS server url) taken from workgroup
 	// token - token used to authenticate (i.e. NATS server token) taken from the workgroup
-	SendMessage(message string, recipient string, token string)
+	SendMessage(message []byte, recipient string, token string)
 
 	// used to receive messages sent by other participants to our nats server
 	// serverUrl - local server url
 	// token - local server token
 	// topic - listening topic
 	// onMessageReceived - callback function
-	Subscribe(serverUrl string, token string, topic string, onMessageReceived func(string, string))
+	Subscribe(serverUrl string, token string, topic string, onMessageReceived func(string, *nats.Msg))
 }
 
 type NatsMessagingClient struct {
 }
 
-func (client *NatsMessagingClient) SendMessage(message string, recipient string, token string) {
+func (client *NatsMessagingClient) SendMessage(message []byte, recipient string, token string) {
 	// https://docs.nats.io/developing-with-nats/security/token
 	nc, err := nats.Connect("nats://" + token + "@" + recipient)
 
@@ -35,14 +35,14 @@ func (client *NatsMessagingClient) SendMessage(message string, recipient string,
 	defer nc.Close()
 
 	// TODO: https://docs.nats.io/developing-with-nats/sending/replyto
-	err = nc.Publish("baseledger", []byte(message))
+	err = nc.Publish("baseledger", message)
 
 	if err != nil {
 		fmt.Printf("Error while trying to send NATS message: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)
 	}
 }
 
-func (client *NatsMessagingClient) Subscribe(serverUrl string, token string, topic string, onMessageReceived func(string, string)) {
+func (client *NatsMessagingClient) Subscribe(serverUrl string, token string, topic string, onMessageReceived func(string, *nats.Msg)) {
 	// https://docs.nats.io/developing-with-nats/security/token
 	nc, err := nats.Connect("nats://" + token + "@" + serverUrl)
 
@@ -51,7 +51,6 @@ func (client *NatsMessagingClient) Subscribe(serverUrl string, token string, top
 	}
 
 	nc.Subscribe(topic, func(m *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-		onMessageReceived(string("TODO: m.Sender"), string(m.Data))
+		onMessageReceived(string("TODO: m.Sender"), m)
 	})
 }

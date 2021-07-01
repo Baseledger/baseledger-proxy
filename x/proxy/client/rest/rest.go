@@ -27,5 +27,5 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
 	r.HandleFunc("/proxy/suggestion", createInitialSuggestionRequestHandler(clientCtx)).Methods("POST")
-	r.HandleFunc("/proxy/test_keeper/{id}", testKeeperByKey(clientCtx)).Methods("GET")
+	r.HandleFunc("/proxy/feedback", createSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
 }

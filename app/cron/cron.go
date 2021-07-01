@@ -9,10 +9,11 @@ import (
 
 	"github.com/go-co-op/gocron"
 
-	businessprocess "github.com/unibrightio/baseledger/app/business_process"
+	businesslogic "github.com/unibrightio/baseledger/app/business_logic"
 	"github.com/unibrightio/baseledger/app/types"
 	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
+	common "github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/dbutil"
 )
 
@@ -20,7 +21,7 @@ func queryTrustmeshes() {
 	fmt.Println("query trustmeshes start")
 
 	var trustmeshEntries []proxytypes.TrustmeshEntry
-	dbutil.Db.GetConn().Where("transaction_status='UNCOMMITTED'").Find(&trustmeshEntries)
+	dbutil.Db.GetConn().Where("commitment_state=?", common.UncommittedCommitmentState).Find(&trustmeshEntries)
 
 	fmt.Printf("found %v trustmesh entries\n", len(trustmeshEntries))
 	var jobs = make(chan types.Job, len(trustmeshEntries))
@@ -29,16 +30,13 @@ func queryTrustmeshes() {
 
 	for _, trustmeshEntry := range trustmeshEntries {
 		fmt.Printf("creating job for %v\n", trustmeshEntry.TransactionHash)
-		job := types.Job{TxHash: trustmeshEntry.TransactionHash}
+		job := types.Job{TrustmeshEntry: trustmeshEntry}
 		jobs <- job
 	}
 	close(jobs)
 
 	for result := range results {
-		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TxHash, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
-		if result.TxInfo.TxHeight != "" && result.TxInfo.TxTimestamp != "" {
-			businessprocess.SetTxStatusToCommitted(result, dbutil.Db.GetConn())
-		}
+		fmt.Printf("Tx hash %v, height %v, timestamp %v\n", result.Job.TrustmeshEntry.TransactionHash, result.TxInfo.TxHeight, result.TxInfo.TxTimestamp)
 	}
 
 	fmt.Println("query trustmeshes end")
@@ -46,6 +44,7 @@ func queryTrustmeshes() {
 
 func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 	// fetching tx details
+	// TODO: BAS-33
 	str := "http://localhost:26657/tx?hash=0x" + txHash
 	httpRes, err := http.Get(str)
 	if err != nil {
@@ -67,6 +66,7 @@ func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 		return &types.TxInfo{}, errors.New("error decoding tx")
 	}
 	// query for block at specific height to find timestamp
+	// TODO: BAS-33
 	str = "http://localhost:26657/block?height" + committedTx.TxResult.Height
 	httpRes, err = http.Get(str)
 	if err != nil {
@@ -90,14 +90,15 @@ func getTxInfo(txHash string) (txInfo *types.TxInfo, err error) {
 func worker(jobs chan types.Job, results chan types.Result) {
 	defer close(results)
 	for job := range jobs {
-		txInfo, err := getTxInfo(job.TxHash)
+		txInfo, err := getTxInfo(job.TrustmeshEntry.TransactionHash)
 		if err != nil {
 			// here it would be http error
 			// it seems that we can just let it go through result channel
 			fmt.Printf("result error %v\n", err)
 		}
-		fmt.Printf("result tx %v\n", txInfo)
+		fmt.Printf("result tx %v transaction type %v\n", txInfo, job.TrustmeshEntry.BaseledgerTransactionType)
 		output := types.Result{Job: job, TxInfo: *txInfo}
+		businesslogic.ExecuteBusinessLogic(output)
 		results <- output
 	}
 }

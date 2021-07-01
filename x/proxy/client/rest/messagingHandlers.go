@@ -38,7 +38,7 @@ func sendOffchainMessageHandler(clientCtx client.Context) http.HandlerFunc {
 
 		fmt.Printf("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
 		messagingClient := &messaging.NatsMessagingClient{}
-		messagingClient.SendMessage(req.Payload, workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+		messagingClient.SendMessage([]byte(req.Payload), workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
 
 		w.WriteHeader(http.StatusOK)
 	}
