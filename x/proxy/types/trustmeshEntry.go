@@ -2,6 +2,7 @@ package types
 
 import (
 	"database/sql"
+	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
@@ -30,6 +31,13 @@ type TrustmeshEntry struct {
 	ReferencedProcessMessageId           uuid.UUID
 	CommitmentState                      string
 	TransactionHash                      string
+	TrustmeshId                          uuid.UUID
+}
+
+type Trustmesh struct {
+	Id        uuid.UUID
+	CreatedAt time.Time
+	Entries   []TrustmeshEntry
 }
 
 func (t *TrustmeshEntry) Create() bool {

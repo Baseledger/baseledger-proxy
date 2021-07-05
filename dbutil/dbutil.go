@@ -3,6 +3,7 @@ package dbutil
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
@@ -139,4 +140,24 @@ func PerformMigrations() {
 	if err != nil && err != migrate.ErrNoChange {
 		logger.Errorf("migrations failed 4: %s", err.Error())
 	}
+}
+
+func Paginate(db *gorm.DB, model interface{}, pageNum, pageSize string) (query *gorm.DB, totalResults *uint64) {
+	page := int64(1)
+	rpp := int64(5)
+
+	if pageNum != "" {
+		if _page, err := strconv.ParseInt(pageNum, 10, 64); err == nil {
+			page = _page
+		}
+	}
+
+	if pageSize != "" {
+		if _rpp, err := strconv.ParseInt(pageSize, 10, 64); err == nil {
+			rpp = _rpp
+		}
+	}
+	db.Model(model).Count(&totalResults)
+	query = db.Limit(rpp).Offset((page - 1) * rpp)
+	return query, totalResults
 }
