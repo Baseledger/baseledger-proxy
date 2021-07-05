@@ -46,6 +46,7 @@ func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 		for i := 0; i < len(trustmeshes); i++ {
 			db.Where("trustmesh_id = ?", trustmeshes[i].Id).Find(&trustmeshEntries)
 			trustmeshes[i].Entries = trustmeshEntries[:]
+			processTrustmesh(&trustmeshes[i])
 		}
 
 		res, err := json.Marshal(trustmeshes)
@@ -59,5 +60,56 @@ func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 		w.Header().Set("x-total-results-count", fmt.Sprintf("%d", *totalResults))
 		w.Write(res)
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func processTrustmesh(trustmesh *types.Trustmesh) {
+	if len(trustmesh.Entries) == 0 {
+		return
+	}
+
+	startTime := trustmesh.Entries[0].TendermintTransactionTimestamp
+	endTime := trustmesh.Entries[0].TendermintTransactionTimestamp
+	senders := ""
+	receivers := ""
+	businessObjectTypes := ""
+	finalized := false
+	containsRejection := false
+
+	for _, entry := range trustmesh.Entries {
+		if entry.TendermintTransactionTimestamp.Time.Before(startTime.Time) {
+			startTime = entry.TendermintTransactionTimestamp
+		}
+
+		if entry.TendermintTransactionTimestamp.Time.After(endTime.Time) {
+			endTime = entry.TendermintTransactionTimestamp
+		}
+
+		senders = senders + getSeparator(senders) + entry.SenderOrgId.String()
+		receivers = receivers + getSeparator(receivers) + entry.ReceiverOrgId.String()
+		businessObjectTypes = businessObjectTypes + getSeparator(businessObjectTypes) + entry.BusinessObjectType
+
+		if entry.WorkstepType == "Final" && !finalized {
+			finalized = true
+		}
+
+		if entry.BaseledgerTransactionType == "Reject" && !containsRejection {
+			containsRejection = true
+		}
+	}
+
+	trustmesh.StartTime = startTime.Time
+	trustmesh.EndTime = endTime.Time
+	trustmesh.Participants = senders + ", " + receivers
+	trustmesh.BusinessObjectTypes = businessObjectTypes
+	trustmesh.Finalized = finalized
+	trustmesh.ContainsRejections = containsRejection
+}
+
+func getSeparator(str string) string {
+	if str == "" {
+		return ""
+	} else {
+		return ", "
 	}
 }
