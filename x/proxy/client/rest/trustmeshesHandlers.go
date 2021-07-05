@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -64,10 +65,6 @@ func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 func processTrustmesh(trustmesh *types.Trustmesh) {
-	if len(trustmesh.Entries) == 0 {
-		return
-	}
-
 	startTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	endTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	senders := ""
@@ -77,13 +74,8 @@ func processTrustmesh(trustmesh *types.Trustmesh) {
 	containsRejection := false
 
 	for _, entry := range trustmesh.Entries {
-		if entry.TendermintTransactionTimestamp.Time.Before(startTime.Time) {
-			startTime = entry.TendermintTransactionTimestamp
-		}
-
-		if entry.TendermintTransactionTimestamp.Time.After(endTime.Time) {
-			endTime = entry.TendermintTransactionTimestamp
-		}
+		startTime = getBeforeTime(startTime, entry.TendermintTransactionTimestamp)
+		endTime = getAfterTime(endTime, entry.TendermintTransactionTimestamp)
 
 		senders = senders + getSeparator(senders) + entry.SenderOrgId.String()
 		receivers = receivers + getSeparator(receivers) + entry.ReceiverOrgId.String()
@@ -112,4 +104,36 @@ func getSeparator(str string) string {
 	} else {
 		return ", "
 	}
+}
+
+func getBeforeTime(first sql.NullTime, second sql.NullTime) sql.NullTime {
+	if !first.Valid {
+		return second
+	}
+
+	if !second.Valid {
+		return first
+	}
+
+	if first.Time.Before(second.Time) {
+		return first
+	}
+
+	return second
+}
+
+func getAfterTime(first sql.NullTime, second sql.NullTime) sql.NullTime {
+	if !first.Valid {
+		return second
+	}
+
+	if !second.Valid {
+		return first
+	}
+
+	if first.Time.Before(second.Time) {
+		return second
+	}
+
+	return first
 }

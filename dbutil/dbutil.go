@@ -13,6 +13,8 @@ import (
 	"github.com/unibrightio/baseledger/logger"
 )
 
+const defaultResultsPerPage = 5
+
 type dbInstance struct {
 	db *gorm.DB
 }
@@ -144,7 +146,7 @@ func PerformMigrations() {
 
 func Paginate(db *gorm.DB, model interface{}, pageNum, pageSize string) (query *gorm.DB, totalResults *uint64) {
 	page := int64(1)
-	rpp := int64(5)
+	rpp := int64(defaultResultsPerPage)
 
 	if pageNum != "" {
 		if _page, err := strconv.ParseInt(pageNum, 10, 64); err == nil {
