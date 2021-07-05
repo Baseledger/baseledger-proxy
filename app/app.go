@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -108,6 +107,7 @@ import (
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
 	common "github.com/unibrightio/baseledger/common"
+	baseledgerLogger "github.com/unibrightio/baseledger/logger"
 )
 
 const Name = "baseledger"
@@ -187,7 +187,7 @@ func init() {
 func subscribeToWorkgroupMessages() {
 	natsServerUrl, _ := viper.Get("NATS_URL").(string)
 	natsToken := "testToken1" // TODO: Read from configuration
-	fmt.Printf("subscribeToWorkgroupMessages natsServerUrl %v", natsServerUrl)
+	baseledgerLogger.Infof("subscribeToWorkgroupMessages natsServerUrl %v", natsServerUrl)
 	messagingClient := &messaging.NatsMessagingClient{}
 	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
 }
@@ -197,10 +197,10 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	var natsMessage proxytypes.NatsMessage
 	err := json.Unmarshal(natsMsg.Data, &natsMessage)
 	if err != nil {
-		fmt.Printf("Error parsing nats message %v\n", err)
+		baseledgerLogger.Errorf("Error parsing nats message %v\n", err)
 	}
 
-	fmt.Printf("message received %v\n", natsMessage)
+	baseledgerLogger.Infof("message received %v\n", natsMessage)
 	entryType := common.SuggestionReceivedTrustmeshEntryType
 	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType
@@ -224,7 +224,7 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	}
 
 	if !trustmeshEntry.Create() {
-		fmt.Printf("error when creating new trustmesh entry")
+		baseledgerLogger.Errorf("error when creating new trustmesh entry")
 	}
 
 }
@@ -530,6 +530,7 @@ func New(
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
+	baseledgerLogger.SetupLogger()
 
 	dbutil.InitDbIfNotExists()
 	dbutil.PerformMigrations()

@@ -17,6 +17,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kthomas/go.uuid v1.2.1-0.20190324131420-28d1fa77e9a4
 	github.com/nats-io/nats.go v1.11.0
+	github.com/rs/zerolog v1.23.0
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5

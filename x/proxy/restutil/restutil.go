@@ -3,9 +3,9 @@ package restutil
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
+	"github.com/unibrightio/baseledger/logger"
 	txutil "github.com/unibrightio/baseledger/txutil"
 	types "github.com/unibrightio/baseledger/x/proxy/types"
 )
@@ -55,7 +55,7 @@ func RejectFeedback(offchainMessage types.OffchainProcessMessage, workgroupId st
 	jsonValue, err := json.Marshal(feedback)
 
 	if err != nil {
-		fmt.Println("Error marshaling json feedback")
+		logger.Error("Error marshaling json feedback")
 		return
 	}
 
@@ -67,7 +67,7 @@ func RejectFeedback(offchainMessage types.OffchainProcessMessage, workgroupId st
 	_, err = http.Post("http://localhost:1317/proxy/feedback", "application/json", bytes.NewBuffer(jsonValue))
 
 	if err != nil {
-		fmt.Printf("error while sending feedback request %v\n", err.Error())
+		logger.Errorf("error while sending feedback request %v\n", err.Error())
 	}
 }
 

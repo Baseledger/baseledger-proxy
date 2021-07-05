@@ -2,7 +2,6 @@ package txutil
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/unibrightio/baseledger/logger"
 )
 
 const (
@@ -29,11 +29,11 @@ func BuildClientCtx(clientCtx client.Context, from string) (*client.Context, err
 	key, err := keyring.KeyByAddress(fromAddress)
 
 	if err != nil {
-		fmt.Printf("error getting key %v\n", err.Error())
+		logger.Errorf("error getting key %v\n", err.Error())
 		return nil, errors.New("")
 	}
 
-	fmt.Printf("key found %v %v\n", key, key.GetName())
+	logger.Infof("key found %v %v\n", key, key.GetName())
 
 	clientCtx = clientCtx.
 		WithKeyring(keyring).
@@ -50,7 +50,7 @@ func NewKeyringInstance() (keyring.Keyring, error) {
 	kr, err := keyring.New("baseledger", "test", "~/.baseledger", nil)
 
 	if err != nil {
-		fmt.Printf("error fetching test keyring %v\n", err.Error())
+		logger.Errorf("error fetching test keyring %v\n", err.Error())
 		return nil, errors.New("error fetching key ring")
 	}
 
@@ -58,7 +58,7 @@ func NewKeyringInstance() (keyring.Keyring, error) {
 }
 
 func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, accSeq uint64) ([]byte, error) {
-	fmt.Printf("retrieved account %v %v\n", accNum, accSeq)
+	logger.Infof("retrieved account %v %v\n", accNum, accSeq)
 	txFactory := tx.Factory{}.
 		WithChainID(clientCtx.ChainID).
 		WithGas(100000).
@@ -70,25 +70,25 @@ func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, a
 
 	txFactory, err := tx.PrepareFactory(clientCtx, txFactory)
 	if err != nil {
-		fmt.Printf("prepare factory error %v\n", err.Error())
+		logger.Errorf("prepare factory error %v\n", err.Error())
 		return nil, errors.New("sign tx error")
 	}
 
 	transaction, err := tx.BuildUnsignedTx(txFactory, msg)
 	if err != nil {
-		fmt.Printf("build unsigned tx error %v\n", err.Error())
+		logger.Errorf("build unsigned tx error %v\n", err.Error())
 		return nil, errors.New("sign tx error")
 	}
 
 	err = tx.Sign(txFactory, clientCtx.GetFromName(), transaction, true)
 	if err != nil {
-		fmt.Printf("sign tx error %v\n", err.Error())
+		logger.Errorf("sign tx error %v\n", err.Error())
 		return nil, errors.New("sign tx error")
 	}
 
 	txBytes, err := clientCtx.TxConfig.TxEncoder()(transaction.GetTx())
 	if err != nil {
-		fmt.Printf("tx encoder %v\n", err.Error())
+		logger.Errorf("tx encoder %v\n", err.Error())
 		return nil, errors.New("sign tx error")
 	}
 
@@ -102,7 +102,7 @@ func BroadcastAndGetTxHash(clientCtx client.Context, msg sdk.Msg, accNum uint64,
 	}
 	res, err := clientCtx.BroadcastTx(txBytes)
 	if err != nil {
-		fmt.Printf("error while broadcasting tx %v\n", err.Error())
+		logger.Errorf("error while broadcasting tx %v\n", err.Error())
 		return nil, err
 	}
 
@@ -112,7 +112,7 @@ func BroadcastAndGetTxHash(clientCtx client.Context, msg sdk.Msg, accNum uint64,
 		if retried {
 			logMsg = "REBROADCASTED"
 		}
-		fmt.Printf("TRANSACTION %v WITH RESULT %v\n", logMsg, res)
+		logger.Infof("TRANSACTION %v WITH RESULT %v\n", logMsg, res)
 		return &res.TxHash, nil
 	}
 
@@ -127,7 +127,7 @@ func BroadcastAndGetTxHash(clientCtx client.Context, msg sdk.Msg, accNum uint64,
 	}
 
 	// if code is missmatch first time, parse log and try again
-	fmt.Printf("ACCOUNT SEQUENCE MISSMATCH %v\n", res.RawLog)
+	logger.Infof("ACCOUNT SEQUENCE MISSMATCH %v\n", res.RawLog)
 
 	nextSequence, ok := parseNextSequence(accSeq, res.RawLog)
 
@@ -135,7 +135,7 @@ func BroadcastAndGetTxHash(clientCtx client.Context, msg sdk.Msg, accNum uint64,
 		return nil, errors.New("broadcast failed when parsing sequence")
 	}
 
-	fmt.Printf("RETRYING WITH SEQUENCE %v\n", nextSequence)
+	logger.Infof("RETRYING WITH SEQUENCE %v\n", nextSequence)
 
 	return BroadcastAndGetTxHash(clientCtx, msg, accNum, nextSequence, true)
 }

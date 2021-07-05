@@ -1,12 +1,11 @@
 package types
 
 import (
-	"fmt"
-
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/baseledger/dbutil"
+	"github.com/unibrightio/baseledger/logger"
 )
 
 //Put here our Types needed for the proxy elements?
@@ -81,7 +80,7 @@ func (o *OffchainProcessMessage) Create() bool {
 		rowsAffected := result.RowsAffected
 		errors := result.GetErrors()
 		if len(errors) > 0 {
-			fmt.Printf("errors while creating new offchain process msg entry %v\n", errors)
+			logger.Errorf("errors while creating new offchain process msg entry %v\n", errors)
 			return false
 		}
 		return rowsAffected > 0
@@ -96,7 +95,7 @@ func GetOffchainMsgById(id uuid.UUID) (msg *OffchainProcessMessage, err error) {
 	res := db.First(&offchainMsg, "id = ?", id.String())
 
 	if res.Error != nil {
-		fmt.Printf("error when getting offchain msg from db %v\n", err)
+		logger.Errorf("error when getting offchain msg from db %v\n", err)
 		return nil, res.Error
 	}
 
