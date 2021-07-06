@@ -3,6 +3,7 @@ package dbutil
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/jinzhu/gorm"
@@ -144,22 +145,26 @@ func PerformMigrations() {
 	}
 }
 
-func Paginate(db *gorm.DB, model interface{}, pageNum, pageSize string) (query *gorm.DB, totalResults *uint64) {
-	page := int64(1)
-	rpp := int64(defaultResultsPerPage)
+func Paginate(db *gorm.DB, model interface{}, request *http.Request, w http.ResponseWriter) (query *gorm.DB) {
+	pageNum := int64(1)
+	pageSize := int64(defaultResultsPerPage)
+	queryParams := request.URL.Query()
 
-	if pageNum != "" {
-		if _page, err := strconv.ParseInt(pageNum, 10, 64); err == nil {
-			page = _page
+	if queryParams.Get("pageNum") != "" {
+		if _page, err := strconv.ParseInt(queryParams.Get("pageNum"), 10, 64); err == nil {
+			pageNum = _page
 		}
 	}
 
-	if pageSize != "" {
-		if _rpp, err := strconv.ParseInt(pageSize, 10, 64); err == nil {
-			rpp = _rpp
+	if queryParams.Get("pageSize") != "" {
+		if _rpp, err := strconv.ParseInt(queryParams.Get("pageSize"), 10, 64); err == nil {
+			pageSize = _rpp
 		}
 	}
+
+	totalResults := 0
 	db.Model(model).Count(&totalResults)
-	query = db.Limit(rpp).Offset((page - 1) * rpp)
-	return query, totalResults
+	w.Header().Set("x-total-results-count", fmt.Sprintf("%d", totalResults))
+
+	return db.Limit(pageSize).Offset((pageNum - 1) * pageSize)
 }

@@ -3,7 +3,6 @@ package rest
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -35,14 +34,11 @@ func listTrustmeshEntriesHandler(clientCtx client.Context) http.HandlerFunc {
 
 func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		queryParams := r.URL.Query()
-
 		var trustmeshes []types.Trustmesh
 		entries := dbutil.Db.GetConn().Order("trustmeshes.created_at ASC")
-		db, totalResults := dbutil.Paginate(entries, &types.Trustmesh{}, queryParams.Get("pageNum"), queryParams.Get("pageSize"))
-		db.Find(&trustmeshes)
+		dbutil.Paginate(entries, &types.Trustmesh{}, r, w).Find(&trustmeshes)
 
-		db = dbutil.Db.GetConn()
+		db := dbutil.Db.GetConn()
 		var trustmeshEntries []types.TrustmeshEntry
 		for i := 0; i < len(trustmeshes); i++ {
 			db.Where("trustmesh_id = ?", trustmeshes[i].Id).Find(&trustmeshEntries)
@@ -58,7 +54,6 @@ func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("x-total-results-count", fmt.Sprintf("%d", *totalResults))
 		w.Write(res)
 		w.WriteHeader(http.StatusOK)
 	}
