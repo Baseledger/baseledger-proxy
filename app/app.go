@@ -205,13 +205,6 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType
 	}
-
-	// TODO: These have to be some kind of embeded resources
-	m, err := migrate.NewWithDatabaseInstance("file://./ops/migrations", dbName, driver)
-	if err != nil {
-		fmt.Printf("migrations failed 3: %s", err.Error())
-		panic(err)
-	}
 	
 	trustmeshEntry := &proxytypes.TrustmeshEntry{
 		TendermintTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,

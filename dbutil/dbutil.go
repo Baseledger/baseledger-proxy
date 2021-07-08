@@ -129,6 +129,7 @@ func PerformMigrations() {
 		panic(err)
 	}
 
+	// TODO: These have to be some kind of embeded resources
 	m, err := migrate.NewWithDatabaseInstance("file://./ops/migrations", dbName, driver)
 	if err != nil {
 		logger.Errorf("migrations failed 3: %s", err.Error())
