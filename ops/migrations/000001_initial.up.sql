@@ -146,23 +146,23 @@ ALTER TABLE ONLY public.trustmesh_entries
   ADD CONSTRAINT trustmesh_entries_offchain_process_message_id_offchain_process_messages_id_foreign FOREIGN KEY (offchain_process_message_id) REFERENCES public.offchain_process_messages(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE OR REPLACE FUNCTION set_trustmesh_entry_group()
-   RETURNS trigger AS
- $$
- DECLARE new_trustmesh_id uuid;
- BEGIN
- 	IF NEW.referenced_baseledger_transaction_id = uuid_nil() THEN
- 		INSERT INTO trustmeshes VALUES (DEFAULT, DEFAULT) RETURNING id INTO new_trustmesh_id;
-	ELSE 
-		SELECT trustmesh_id INTO new_trustmesh_id FROM trustmesh_entries WHERE baseledger_transaction_id = NEW.referenced_baseledger_transaction_id;
-	END IF;
-	NEW.trustmesh_id := new_trustmesh_id;
- RETURN NEW;
- END;
- $$
- LANGUAGE plpgsql;
+  RETURNS trigger AS
+  $$
+    DECLARE new_trustmesh_id uuid;
+    BEGIN
+      IF NEW.referenced_baseledger_transaction_id = uuid_nil() THEN
+        INSERT INTO trustmeshes VALUES (DEFAULT, DEFAULT) RETURNING id INTO new_trustmesh_id;
+      ELSE 
+        SELECT trustmesh_id INTO new_trustmesh_id FROM trustmesh_entries WHERE baseledger_transaction_id = NEW.referenced_baseledger_transaction_id;
+      END IF;
+      NEW.trustmesh_id := new_trustmesh_id;
+      RETURN NEW;
+    END;
+  $$
+LANGUAGE plpgsql;
 
- CREATE TRIGGER trustmesh_entry_insert_trigger
-   BEFORE INSERT
-   ON trustmesh_entries
-   FOR EACH ROW
-   EXECUTE PROCEDURE set_trustmesh_entry_group();
+CREATE TRIGGER trustmesh_entry_insert_trigger
+  BEFORE INSERT
+  ON trustmesh_entries
+  FOR EACH ROW
+  EXECUTE PROCEDURE set_trustmesh_entry_group();
