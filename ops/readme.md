@@ -3,37 +3,26 @@ Linux requirements Docker: BuildKit (https://docs.docker.com/develop/develop-ima
 COMPOSE_DOCKER_CLI_BUILD=1
 DOCKER_BUILDKIT=1
 
+# Running the full blockchain
 
+1. Navigate to repo root/ops folder
+2. Run ./run_blockchain.sh (WSL )or sudo sh run_blockchain.sh (Non root user on Linux)
 
-First node Windows:
-SET POSTGRES_EXPOSED_PORT=5432& SET NATS_EXPOSED_PORT=4222& SET STARPORT_API_PORT=1317& SET TENDERMINT_NODE_PORT=26657
-docker-compose -p first_node up
+# Cleanup
 
+1. Navigate to repo root/ops folder
+2. Run ./clear_blockchain.sh (WSL )or sudo sh clear_blockchain.sh (Non root user on Linux)
 
-First node Linux: 
-export POSTGRES_EXPOSED_PORT=5432 && export NATS_EXPOSED_PORT=4222 && export STARPORT_API_PORT=1317 && export TENDERMINT_NODE_PORT=26657
-export COMPOSE_DOCKER_CLI_BUILD=1 && export DOCKER_BUILDKIT=1
-sudo -E docker-compose -p first_node up
+# Running a single node locally for development purposes
+Windows:
+1. SET POSTGRES_EXPOSED_PORT=5432& SET NATS_EXPOSED_PORT=4222& SET STARPORT_API_PORT=1317& SET TENDERMINT_NODE_PORT=26657
+2. Navigate to repo root/ops folder
+3. docker-compose -p first_node up
+4. starport serve --verbose
 
-
-Second node Windows:
-SET POSTGRES_EXPOSED_PORT=5433& SET NATS_EXPOSED_PORT=4223& SET STARPORT_API_PORT=1318& SET TENDERMINT_NODE_PORT=26658
-export POSTGRES_EXPOSED_PORT=5433& export NATS_EXPOSED_PORT=4223& export STARPORT_API_PORT=1318& export TENDERMINT_NODE_PORT=26658
-docker-compose -p second_node up
-
-Second node Linux:
-export POSTGRES_EXPOSED_PORT=5433  && export NATS_EXPOSED_PORT=4223  && export STARPORT_API_PORT=1318  && export TENDERMINT_NODE_PORT=26658
-export COMPOSE_DOCKER_CLI_BUILD=1 && export DOCKER_BUILDKIT=1
-sudo -E docker-compose -p second_node up
-
-TODO https://tutorials.cosmos.network/nameservice/tutorial/20-build-run.html
-
-1. Removing docker node:
-sudo -E docker-compose -p first_node down
-sudo -E docker-compose -p second_node down
-
-2. Cleanup to start with a fresh code changes for starport:
-docker rmi startport
-
-3. Cleanup to start with fresh database:
-docker volume prune
+Linux: 
+1. export POSTGRES_EXPOSED_PORT=5432 && export NATS_EXPOSED_PORT=4222 && export STARPORT_API_PORT=1317 && export TENDERMINT_NODE_PORT=26657
+2. Navigate to repo root/ops folder
+3. export COMPOSE_DOCKER_CLI_BUILD=1 && export DOCKER_BUILDKIT=1
+4. sudo -E docker-compose -p first_node up
+5. starport serve --verbose
