@@ -11,10 +11,8 @@ docker-compose -p second_node up -d
 
 
 # If needed, waiting mechanism
-./await_tcp.sh -h localhost -p 26657
-./await_tcp.sh -h localhost -p 26658
-./await_tcp.sh -h localhost -p 1317
-./await_tcp.sh -h localhost -p 1318
+# ./await_tcp.sh -h localhost -p 1317
+# ./await_tcp.sh -h localhost -p 1318
 
 # Initialize first node
 docker exec first_node_starport_1 baseledgerd init node1 --chain-id baseledger
