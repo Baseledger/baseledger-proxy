@@ -62,6 +62,10 @@ internal_host_ip=$(docker exec first_node_starport_1 getent hosts host.docker.in
 docker exec first_node_starport_1 sed -i 's/persistent_peers = ".*/persistent_peers = "'${node2_id}'@'${internal_host_ip}':26658"/' ~/.baseledger/config/config.toml
 docker exec second_node_starport_1 sed -i 's/persistent_peers = ""/persistent_peers = "'${node1_id}'@'${internal_host_ip}':26657"/' ~/.baseledger/config/config.toml
 
+# this enables rest api, it is only enable = false entry, maybe we can make it a bit more precise?
+docker exec first_node_starport_1 sed -i 's/enable = false/enable = true/' ~/.baseledger/config/app.toml
+docker exec second_node_starport_1 sed -i 's/enable = false/enable = true/' ~/.baseledger/config/app.toml
+
 # this allows connecting peers not in the address book
 docker exec first_node_starport_1 sed -i 's/addr_book_strict = true/addr_book_strict = false/' ~/.baseledger/config/config.toml
 docker exec second_node_starport_1 sed -i 's/addr_book_strict = true/addr_book_strict = false/' ~/.baseledger/config/config.toml
