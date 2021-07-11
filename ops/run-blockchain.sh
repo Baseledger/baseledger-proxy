@@ -2,11 +2,11 @@
 export COMPOSE_DOCKER_CLI_BUILD=1 && export DOCKER_BUILDKIT=1
 
 # Sets up environment for first node and runs it
-export POSTGRES_EXPOSED_PORT=5432 && export NATS_EXPOSED_PORT=4222 && export STARPORT_API_PORT=1317 && export TENDERMINT_NODE_PORT=26657
+export POSTGRES_EXPOSED_PORT=5432 && export NATS_EXPOSED_PORT=4222 && export STARPORT_API_PORT=1317 && export TENDERMINT_NODE_GRPC_PORT=26657 && export TENDERMINT_NODE_PORT=26659
 docker-compose -p first_node up -d
 
 # Sets up environment for second node and runs it
-export POSTGRES_EXPOSED_PORT=5433  && export NATS_EXPOSED_PORT=4223  && export STARPORT_API_PORT=1318  && export TENDERMINT_NODE_PORT=26658
+export POSTGRES_EXPOSED_PORT=5433  && export NATS_EXPOSED_PORT=4223  && export STARPORT_API_PORT=1318  && export TENDERMINT_NODE_GRPC_PORT=26658 && export TENDERMINT_NODE_PORT=26660
 docker-compose -p second_node up -d
 
 
@@ -59,8 +59,8 @@ node2_id=$(docker exec second_node_starport_1 baseledgerd tendermint show-node-i
 internal_host_ip=$(docker exec first_node_starport_1 getent hosts host.docker.internal | awk '{print $1}')
 
 # this adds peers to each other
-docker exec first_node_starport_1 sed -i 's/persistent_peers = ".*/persistent_peers = "'${node2_id}'@'${internal_host_ip}':26658"/' ~/.baseledger/config/config.toml
-docker exec second_node_starport_1 sed -i 's/persistent_peers = ""/persistent_peers = "'${node1_id}'@'${internal_host_ip}':26657"/' ~/.baseledger/config/config.toml
+docker exec first_node_starport_1 sed -i 's/persistent_peers = ".*/persistent_peers = "'${node2_id}'@'${internal_host_ip}':26660"/' ~/.baseledger/config/config.toml
+docker exec second_node_starport_1 sed -i 's/persistent_peers = ""/persistent_peers = "'${node1_id}'@'${internal_host_ip}':26659"/' ~/.baseledger/config/config.toml
 
 # this enables grpc
 docker exec first_node_starport_1 sed -i 's@laddr = "tcp://127.0.0.1:26657"@laddr = "tcp://0.0.0.0:26657"@' ~/.baseledger/config/config.toml
