@@ -3,6 +3,8 @@ package dbutil
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
@@ -11,6 +13,8 @@ import (
 	"github.com/golang-migrate/migrate/database/postgres"
 	"github.com/unibrightio/baseledger/logger"
 )
+
+const defaultResultsPerPage = 5
 
 type dbInstance struct {
 	db *gorm.DB
@@ -140,4 +144,28 @@ func PerformMigrations() {
 	if err != nil && err != migrate.ErrNoChange {
 		logger.Errorf("migrations failed 4: %s", err.Error())
 	}
+}
+
+func Paginate(db *gorm.DB, model interface{}, request *http.Request, w http.ResponseWriter) (query *gorm.DB) {
+	pageNum := int64(1)
+	pageSize := int64(defaultResultsPerPage)
+	queryParams := request.URL.Query()
+
+	if queryParams.Get("pageNum") != "" {
+		if _page, err := strconv.ParseInt(queryParams.Get("pageNum"), 10, 64); err == nil {
+			pageNum = _page
+		}
+	}
+
+	if queryParams.Get("pageSize") != "" {
+		if _rpp, err := strconv.ParseInt(queryParams.Get("pageSize"), 10, 64); err == nil {
+			pageSize = _rpp
+		}
+	}
+
+	totalResults := 0
+	db.Model(model).Count(&totalResults)
+	w.Header().Set("x-total-results-count", fmt.Sprintf("%d", totalResults))
+
+	return db.Limit(pageSize).Offset((pageNum - 1) * pageSize)
 }
