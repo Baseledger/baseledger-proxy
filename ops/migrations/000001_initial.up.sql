@@ -153,7 +153,7 @@ CREATE OR REPLACE FUNCTION set_trustmesh_entry_group()
       IF NEW.referenced_baseledger_transaction_id = uuid_nil() THEN
         INSERT INTO trustmeshes VALUES (DEFAULT, DEFAULT) RETURNING id INTO new_trustmesh_id;
       ELSE 
-        SELECT trustmesh_id INTO new_trustmesh_id FROM trustmesh_entries WHERE baseledger_transaction_id = NEW.referenced_baseledger_transaction_id;
+        SELECT trustmesh_id INTO new_trustmesh_id FROM trustmesh_entries WHERE baseledger_transaction_id = NEW.referenced_baseledger_transaction_id LIMIT 1;
       END IF;
       NEW.trustmesh_id := new_trustmesh_id;
       RETURN NEW;

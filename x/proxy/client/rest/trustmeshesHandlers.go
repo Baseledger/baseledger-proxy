@@ -36,13 +36,10 @@ func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var trustmeshes []types.Trustmesh
 		entries := dbutil.Db.GetConn().Order("trustmeshes.created_at ASC")
-		dbutil.Paginate(entries, &types.Trustmesh{}, r, w).Find(&trustmeshes)
+		// preload seems good enough for now, revisit if it turns out to be performance bottleneck
+		dbutil.Paginate(entries, &types.Trustmesh{}, r, w).Preload("Entries").Find(&trustmeshes)
 
-		db := dbutil.Db.GetConn()
-		var trustmeshEntries []types.TrustmeshEntry
 		for i := 0; i < len(trustmeshes); i++ {
-			db.Where("trustmesh_id = ?", trustmeshes[i].Id).Find(&trustmeshEntries)
-			trustmeshes[i].Entries = trustmeshEntries[:]
 			processTrustmesh(&trustmeshes[i])
 		}
 
@@ -60,6 +57,9 @@ func listTrustmeshesHandler(clientCtx client.Context) http.HandlerFunc {
 }
 
 func processTrustmesh(trustmesh *types.Trustmesh) {
+	if len(trustmesh.Entries) == 0 {
+		return
+	}
 	startTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	endTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	senders := ""
