@@ -30,4 +30,5 @@ func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
 	r.HandleFunc("/proxy/suggestion", createInitialSuggestionRequestHandler(clientCtx)).Methods("POST")
 	r.HandleFunc("/proxy/feedback", createSynchronizationFeedbackHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/proxy/signAndBroadcast", signAndBroadcastTransactionHandler(clientCtx)).Methods("POST")
 }
