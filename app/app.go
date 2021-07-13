@@ -85,10 +85,7 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	appparams "github.com/unibrightio/baseledger/app/params"
-	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/docs"
-
-	"github.com/unibrightio/baseledger/app/cron"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -205,7 +202,7 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType
 	}
-	
+
 	trustmeshEntry := &proxytypes.TrustmeshEntry{
 		TendermintTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
 		OffchainProcessMessageId:             natsMessage.ProcessMessage.Id,
@@ -533,13 +530,13 @@ func New(
 	viper.SetConfigFile(".env")
 	baseledgerLogger.SetupLogger()
 
-	dbutil.InitDbIfNotExists()
-	dbutil.PerformMigrations()
-	dbutil.InitConnection()
+	// dbutil.InitDbIfNotExists()
+	// dbutil.PerformMigrations()
+	// dbutil.InitConnection()
 
 	subscribeToWorkgroupMessages()
 
-	cron.StartCron()
+	// cron.StartCron()
 
 	return app
 }
