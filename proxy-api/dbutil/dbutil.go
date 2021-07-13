@@ -3,9 +3,9 @@ package dbutil
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 
@@ -147,26 +147,37 @@ func PerformMigrations() {
 	}
 }
 
-func Paginate(db *gorm.DB, model interface{}, request *http.Request, w http.ResponseWriter) (query *gorm.DB) {
-	pageNum := int64(1)
-	pageSize := int64(defaultResultsPerPage)
-	queryParams := request.URL.Query()
+// Paginate the current request given the page number and results per page;
+// returns the modified SQL query and adds x-total-results-count header to
+// the response
+func Paginate(c *gin.Context, db *gorm.DB, model interface{}) *gorm.DB {
+	page := int64(1)
+	rpp := int64(defaultResultsPerPage)
 
-	if queryParams.Get("pageNum") != "" {
-		if _page, err := strconv.ParseInt(queryParams.Get("pageNum"), 10, 64); err == nil {
-			pageNum = _page
+	if c.Query("page") != "" {
+		if _page, err := strconv.ParseInt(c.Query("page"), 10, 64); err == nil {
+			page = _page
 		}
 	}
 
-	if queryParams.Get("pageSize") != "" {
-		if _rpp, err := strconv.ParseInt(queryParams.Get("pageSize"), 10, 64); err == nil {
-			pageSize = _rpp
+	if c.Query("rpp") != "" {
+		if _rpp, err := strconv.ParseInt(c.Query("rpp"), 10, 64); err == nil {
+			rpp = _rpp
 		}
 	}
 
-	totalResults := 0
+	query, totalResults := paginate(db, model, page, rpp)
+	if totalResults != nil {
+		c.Header("x-total-results-count", fmt.Sprintf("%d", *totalResults))
+	}
+
+	return query
+}
+
+// Paginate the given query given the page number and results per page;
+// returns the update query and total results
+func paginate(db *gorm.DB, model interface{}, page, rpp int64) (query *gorm.DB, totalResults *uint64) {
 	db.Model(model).Count(&totalResults)
-	w.Header().Set("x-total-results-count", fmt.Sprintf("%d", totalResults))
-
-	return db.Limit(pageSize).Offset((pageNum - 1) * pageSize)
+	query = db.Limit(rpp).Offset((page - 1) * rpp)
+	return query, totalResults
 }
