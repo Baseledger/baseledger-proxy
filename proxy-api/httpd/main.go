@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"github.com/unibrightio/proxy-api/cron"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/httpd/handler"
 	"github.com/unibrightio/proxy-api/logger"
@@ -14,6 +15,7 @@ func main() {
 	setupViper()
 	logger.SetupLogger()
 	setupDb()
+	cron.StartCron()
 
 	r := gin.Default()
 	r.GET("/ping", handler.PingGet())
