@@ -3,6 +3,8 @@ package businesslogic
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net/http"
 
 	uuid "github.com/kthomas/go.uuid"
 	common "github.com/unibrightio/proxy-api/common"
@@ -31,7 +33,6 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
-			// TODO: logging
 			return
 		}
 		baseledgerTransactionPayload := proxytypes.BaseledgerTransactionPayload{}
@@ -58,11 +59,10 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		// proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
-		// baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
-		// if baseledgerTransaction == nil {
-		// 	// TODO: logging
-		// 	return
-		// }
+		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
+		if baseledgerTransaction == nil {
+			return
+		}
 
 		// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
@@ -85,6 +85,24 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 	}
 }
 
-func getCommittedBaseledgerTransaction(id uuid.UUID) interface{} {
-	return nil
+// TODO: this needs to be tested, just building ok for now
+func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransaction {
+	resp, err := http.Get("http://localhost:1317/proxy/committedTx/" + id.String())
+
+	if err != nil {
+		logger.Errorf("error while fetching committed baseledger transaction %v\n", err.Error())
+		return nil
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	var transaction proxytypes.BaseledgerTransaction
+	err = json.Unmarshal(body, &transaction)
+
+	if err != nil {
+		logger.Errorf("error while unmarshalling fetched committed baseledger transaction %v\n", err.Error())
+		return nil
+	}
+
+	logger.Infof("get committed baseleger transaction", transaction)
+	return &transaction
 }

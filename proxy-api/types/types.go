@@ -102,4 +102,12 @@ func GetOffchainMsgById(id uuid.UUID) (msg *OffchainProcessMessage, err error) {
 	return &offchainMsg, nil
 }
 
+// TODO: We need this because of response from 1317 (?)
+type BaseledgerTransaction struct {
+	Creator                 string
+	Id                      string
+	BaseledgerTransactionId string
+	Payload                 string
+}
+
 // all other types for hasing, privacy, off-chain messaging
