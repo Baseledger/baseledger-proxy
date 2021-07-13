@@ -10,6 +10,7 @@ import (
 	common "github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
+	"github.com/unibrightio/proxy-api/proxyutil"
 	proxytypes "github.com/unibrightio/proxy-api/types"
 )
 
@@ -28,7 +29,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	case common.SuggestionSentTrustmeshEntryType:
 		logger.Info(common.SuggestionSentTrustmeshEntryType)
 		// TODO: Ognjen, use msg client
-		// proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
+		proxyutil.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -36,16 +37,14 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 		baseledgerTransactionPayload := proxytypes.BaseledgerTransactionPayload{}
-		// deprivitizedPayload := proxy.DeprivatizeBaseledgerTransactionPayload(baseledgerTransaction.Payload, txResult.Job.TrustmeshEntry.WorkgroupId)
-		deprivitizedPayload := ""
+		deprivitizedPayload := proxyutil.DeprivatizeBaseledgerTransactionPayload(baseledgerTransaction.Payload, txResult.Job.TrustmeshEntry.WorkgroupId)
 		err = json.Unmarshal(([]byte)(deprivitizedPayload), &baseledgerTransactionPayload)
 		if err != nil {
 			logger.Error("Failed to unmarshal baseledger transaction payload")
 			return
 		}
 
-		// offchainMessageBusinessObjectProof := proxy.CreateHashFromBusinessObject(offchainMessage.BaseledgerSyncTreeJson)
-		offchainMessageBusinessObjectProof := ""
+		offchainMessageBusinessObjectProof := proxyutil.CreateHashFromBusinessObject(offchainMessage.BaseledgerSyncTreeJson)
 		if baseledgerTransactionPayload.Proof == offchainMessage.BusinessObjectProof && baseledgerTransactionPayload.Proof == offchainMessageBusinessObjectProof {
 			logger.Info("Hashes match, processing feedback")
 			// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
@@ -56,7 +55,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	case common.FeedbackSentTrustmeshEntryType:
 		logger.Info(common.FeedbackSentTrustmeshEntryType)
 		// TODO: Ognjen, use msg client
-		// proxy.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
+		proxyutil.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)

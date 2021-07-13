@@ -85,6 +85,7 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	appparams "github.com/unibrightio/baseledger/app/params"
+	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/docs"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -530,9 +531,9 @@ func New(
 	viper.SetConfigFile(".env")
 	baseledgerLogger.SetupLogger()
 
-	// dbutil.InitDbIfNotExists()
-	// dbutil.PerformMigrations()
-	// dbutil.InitConnection()
+	dbutil.InitDbIfNotExists()
+	dbutil.PerformMigrations()
+	dbutil.InitConnection()
 
 	subscribeToWorkgroupMessages()
 
