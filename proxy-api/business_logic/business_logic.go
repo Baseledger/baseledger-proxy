@@ -94,6 +94,11 @@ func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTrans
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logger.Errorf("error while reading committed baseledger transaction response %v\n", err.Error())
+		return nil
+	}
+
 	var transaction proxytypes.BaseledgerTransaction
 	err = json.Unmarshal(body, &transaction)
 

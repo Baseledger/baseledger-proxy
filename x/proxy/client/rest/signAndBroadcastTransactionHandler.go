@@ -59,6 +59,7 @@ func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFu
 		logger.Infof("broadcasted tx hash %v\n", *txHash)
 
 		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(*txHash))
 		w.WriteHeader(http.StatusOK)
 		return
 	}
