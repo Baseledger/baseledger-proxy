@@ -27,12 +27,6 @@ type createInitialSuggestionRequest struct {
 	ReferencedBaseledgerTransactionId    string           `json:"referenced_baseledger_transaction_id"`
 }
 
-type signAndBroadcastPayload struct {
-	BaseReq       restutil.BaseReq `json:"base_req"`
-	TransactionId string           `json:"transaction_id"`
-	Payload       string           `json:"payload"`
-}
-
 func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		buf, err := c.GetRawData()
@@ -63,7 +57,7 @@ func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 
 		payload := proxyutil.CreateBaseledgerTransactionPayload(syncReq, &offchainMsg)
 
-		signAndBroadcastPayload := signAndBroadcastPayload{
+		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			BaseReq:       req.BaseReq,
 			TransactionId: transactionId.String(),
 			Payload:       payload,
@@ -100,7 +94,7 @@ func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 			return
 		}
 
-		restutil.Render(nil, 200, c)
+		restutil.Render(transactionHash, 200, c)
 	}
 }
 

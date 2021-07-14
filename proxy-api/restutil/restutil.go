@@ -14,6 +14,12 @@ type BaseReq struct {
 	ChainID string `json:"chain_id"`
 }
 
+type SignAndBroadcastPayload struct {
+	BaseReq       BaseReq `json:"base_req"`
+	TransactionId string  `json:"transaction_id"`
+	Payload       string  `json:"payload"`
+}
+
 // Render an object and status using the given gin context
 func Render(obj interface{}, status int, c *gin.Context) {
 	c.Header("content-type", defaultResponseContentType)
