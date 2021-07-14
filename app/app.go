@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/nats-io/nats.go"
 	"github.com/spf13/cast"
 	"github.com/tendermint/spm/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -85,7 +83,6 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	appparams "github.com/unibrightio/baseledger/app/params"
-	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/docs"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -93,18 +90,12 @@ import (
 	"github.com/unibrightio/baseledger/x/baseledger"
 	baseledgerkeeper "github.com/unibrightio/baseledger/x/baseledger/keeper"
 	baseledgertypes "github.com/unibrightio/baseledger/x/baseledger/types"
-	"github.com/unibrightio/baseledger/x/proxy"
-	proxykeeper "github.com/unibrightio/baseledger/x/proxy/keeper"
-	"github.com/unibrightio/baseledger/x/proxy/messaging"
-	proxytypes "github.com/unibrightio/baseledger/x/proxy/types"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // postgres
 
 	_ "github.com/golang-migrate/migrate/source/file"
 
-	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
-	common "github.com/unibrightio/baseledger/common"
 	baseledgerLogger "github.com/unibrightio/baseledger/logger"
 )
 
@@ -152,7 +143,6 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
-		proxy.AppModuleBasic{},
 		baseledger.AppModuleBasic{},
 	)
 
@@ -180,52 +170,6 @@ func init() {
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
-}
-
-func subscribeToWorkgroupMessages() {
-	natsServerUrl, _ := viper.Get("NATS_URL").(string)
-	natsToken := "testToken1" // TODO: Read from configuration
-	baseledgerLogger.Infof("subscribeToWorkgroupMessages natsServerUrl %v", natsServerUrl)
-	messagingClient := &messaging.NatsMessagingClient{}
-	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
-}
-
-func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
-	// TODO: should we move this parsing to nats client and just get struct in this callback?
-	var natsMessage proxytypes.NatsMessage
-	err := json.Unmarshal(natsMsg.Data, &natsMessage)
-	if err != nil {
-		baseledgerLogger.Errorf("Error parsing nats message %v\n", err)
-	}
-
-	baseledgerLogger.Infof("message received %v\n", natsMessage)
-	entryType := common.SuggestionReceivedTrustmeshEntryType
-	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
-		entryType = common.FeedbackReceivedTrustmeshEntryType
-	}
-
-	trustmeshEntry := &proxytypes.TrustmeshEntry{
-		TendermintTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		OffchainProcessMessageId:             natsMessage.ProcessMessage.Id,
-		SenderOrgId:                          natsMessage.ProcessMessage.SenderId,
-		ReceiverOrgId:                        natsMessage.ProcessMessage.ReceiverId,
-		WorkgroupId:                          uuid.FromStringOrNil(natsMessage.ProcessMessage.Topic),
-		WorkstepType:                         natsMessage.ProcessMessage.WorkstepType,
-		BaseledgerTransactionType:            natsMessage.ProcessMessage.BaseledgerTransactionType,
-		BaseledgerTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		ReferencedBaseledgerTransactionId:    natsMessage.ProcessMessage.ReferencedBaseledgerTransactionId,
-		BusinessObjectType:                   natsMessage.ProcessMessage.BusinessObjectType,
-		BaseledgerBusinessObjectId:           natsMessage.ProcessMessage.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: natsMessage.ProcessMessage.ReferencedBaseledgerBusinessObjectId,
-		ReferencedProcessMessageId:           natsMessage.ProcessMessage.ReferencedOffchainProcessMessageId,
-		TransactionHash:                      natsMessage.TxHash,
-		EntryType:                            entryType,
-	}
-
-	if !trustmeshEntry.Create() {
-		baseledgerLogger.Errorf("error when creating new trustmesh entry")
-	}
-
 }
 
 // App extends an ABCI application, but with most of its parameters exported.
@@ -267,8 +211,6 @@ type App struct {
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	ProxyKeeper proxykeeper.Keeper
-
 	BaseledgerKeeper baseledgerkeeper.Keeper
 
 	// the module manager
@@ -299,7 +241,6 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		proxytypes.StoreKey,
 		baseledgertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -393,14 +334,6 @@ func New(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	app.ProxyKeeper = *proxykeeper.NewKeeper(
-		appCodec,
-		keys[proxytypes.StoreKey],
-		keys[proxytypes.MemStoreKey],
-	)
-
-	proxyModule := proxy.NewAppModule(appCodec, app.ProxyKeeper)
-
 	app.BaseledgerKeeper = *baseledgerkeeper.NewKeeper(
 		appCodec,
 		keys[baseledgertypes.StoreKey],
@@ -449,7 +382,6 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
-		proxyModule,
 		baseledgerModule,
 	)
 
@@ -484,7 +416,6 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		proxytypes.ModuleName,
 		baseledgertypes.ModuleName,
 	)
 
@@ -530,14 +461,6 @@ func New(
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 	baseledgerLogger.SetupLogger()
-
-	dbutil.InitDbIfNotExists()
-	dbutil.PerformMigrations()
-	dbutil.InitConnection()
-
-	subscribeToWorkgroupMessages()
-
-	// cron.StartCron()
 
 	return app
 }
@@ -684,7 +607,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(proxytypes.ModuleName)
 	paramsKeeper.Subspace(baseledgertypes.ModuleName)
 
 	return paramsKeeper

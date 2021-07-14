@@ -71,7 +71,7 @@ func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 			return
 		}
 
-		resp, err := http.Post("http://localhost:1317/proxy/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
+		resp, err := http.Post("http://localhost:1317/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
 
 		if err != nil {
 			logger.Errorf("error while sending feedback request %v\n", err.Error())
