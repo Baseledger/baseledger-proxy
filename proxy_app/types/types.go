@@ -110,4 +110,8 @@ type BaseledgerTransaction struct {
 	Payload                 string
 }
 
+type CommittedBaseledgerTransactionResponse struct {
+	BaseledgerTransaction BaseledgerTransaction
+}
+
 // all other types for hasing, privacy, off-chain messaging
