@@ -88,8 +88,6 @@ import (
 	"github.com/unibrightio/baseledger/dbutil"
 	"github.com/unibrightio/baseledger/docs"
 
-	"github.com/unibrightio/baseledger/app/cron"
-
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/unibrightio/baseledger/x/baseledger"
@@ -205,7 +203,7 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType
 	}
-	
+
 	trustmeshEntry := &proxytypes.TrustmeshEntry{
 		TendermintTransactionId:              natsMessage.ProcessMessage.BaseledgerTransactionIdOfStoredProof,
 		OffchainProcessMessageId:             natsMessage.ProcessMessage.Id,
@@ -539,7 +537,7 @@ func New(
 
 	subscribeToWorkgroupMessages()
 
-	cron.StartCron()
+	// cron.StartCron()
 
 	return app
 }
