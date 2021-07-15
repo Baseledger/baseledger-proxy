@@ -2,21 +2,12 @@ package handler
 
 import (
 	"database/sql"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/types"
 )
-
-func PingGet() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, map[string]string{
-			"hello": "world",
-		})
-	}
-}
 
 func GetTrustmeshesHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -1,10 +1,13 @@
 package restutil
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/unibrightio/proxy-api/logger"
 )
 
 const defaultResponseContentType = "application/json; charset=UTF-8"
@@ -18,6 +21,31 @@ type SignAndBroadcastPayload struct {
 	BaseReq       BaseReq `json:"base_req"`
 	TransactionId string  `json:"transaction_id"`
 	Payload       string  `json:"payload"`
+}
+
+func SignAndBroadcast(payload SignAndBroadcastPayload, c *gin.Context) *string {
+	jsonValue, err := json.Marshal(payload)
+
+	if err != nil {
+		logger.Error("Error marshaling sign and broadcast json")
+		return nil
+	}
+
+	resp, err := http.Post("http://localhost:1317/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
+
+	if err != nil {
+		logger.Errorf("error while sending feedback request %v\n", err.Error())
+		return nil
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logger.Errorf("error while reading sign and broadcast transaction response %v\n", err.Error())
+		return nil
+	}
+
+	txHash := string(body)
+	return &txHash
 }
 
 // Render an object and status using the given gin context
