@@ -84,7 +84,7 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 	}
 }
 
-// TODO: this needs to be tested, just building ok for now
+// TODO: BAS-33 this needs to be tested, just building ok for now
 func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransaction {
 	resp, err := http.Get("http://localhost:1317/proxy/committedTx/" + id.String())
 
