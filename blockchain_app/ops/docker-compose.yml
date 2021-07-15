@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    command: ["postgres", "-c", "log_statement=all"]
+    environment:
+      - POSTGRES_DB=ub
+      - POSTGRES_USER=ub
+      - POSTGRES_PASSWORD=ub123
+    volumes:
+      - baseledger-db:/var/lib/postgresql/data
+    networks:
+      - baseledger
+    hostname: postgres-local-node
+    ports:
+      - ${POSTGRES_EXPOSED_PORT}:5432
+    restart: always
+  nats:
+    image: nats
+    command: ["--auth", "testToken1", "-DV"]
+    hostname:
+      nats-local-node
+    networks:
+      - baseledger
+    ports:
+      - ${NATS_EXPOSED_PORT}:4222
+    restart: always
+  starport:
+      build:
+        context: ../
+        dockerfile: ops/Dockerfile
+        args:
+          - DB_HOST=postgres-local-node
+          - DB_UB_USER=ub
+          - DB_UB_PWD=ub123
+      image: starport
+      # container_name: ${prefix}-staport // TODO: Use this instead of -p first_node to avoid number suffix
+      hostname: starport-local-node
+      networks:
+        - baseledger
+      ports:
+        - ${STARPORT_API_PORT}:1317
+        - ${TENDERMINT_NODE_PORT}:26656
+        - ${TENDERMINT_NODE_GRPC_PORT}:26657
+      extra_hosts:
+          - "host.docker.internal:host-gateway" # enable targeting host machine with host.docker.internal
+
+networks:
+  baseledger:
+    driver: bridge
+
+volumes:
+  baseledger-db:    
