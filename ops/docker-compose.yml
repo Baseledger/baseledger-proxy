@@ -55,6 +55,9 @@ services:
       - ${PROXY_APP_PORT}:8080
     extra_hosts:
         - "host.docker.internal:host-gateway" # enable targeting host machine with host.docker.internal
+    depends_on:
+        - postgres
+        - nats
 
 networks:
   baseledger:
