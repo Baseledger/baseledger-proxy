@@ -17,7 +17,6 @@ docker-compose -p first_node up -d
 export POSTGRES_EXPOSED_PORT=5433  && export NATS_EXPOSED_PORT=4223  && export STARPORT_API_PORT=1318  && export TENDERMINT_NODE_GRPC_PORT=$second_node_tendermint_grpc_port && export TENDERMINT_NODE_PORT=$second_node_tendermint_p2p_port && export PROXY_APP_PORT=8082
 docker-compose -p second_node up -d
 
-
 # If needed, waiting mechanism
 # ./await_tcp.sh -h localhost -p 1317
 # ./await_tcp.sh -h localhost -p 1318
