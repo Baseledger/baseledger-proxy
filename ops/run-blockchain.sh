@@ -10,11 +10,11 @@ second_node_tendermint_p2p_port=26656
 tendermint_internal_grpc_port=26657
 
 # Sets up environment for first node and runs it
-export POSTGRES_EXPOSED_PORT=5432 && export NATS_EXPOSED_PORT=4222 && export STARPORT_API_PORT=1317 && export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port && export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port
+export POSTGRES_EXPOSED_PORT=5432 && export NATS_EXPOSED_PORT=4222 && export STARPORT_API_PORT=1317 && export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port && export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port && export PROXY_APP_PORT=8081
 docker-compose -p first_node up -d
 
 # Sets up environment for second node and runs it
-export POSTGRES_EXPOSED_PORT=5433  && export NATS_EXPOSED_PORT=4223  && export STARPORT_API_PORT=1318  && export TENDERMINT_NODE_GRPC_PORT=$second_node_tendermint_grpc_port && export TENDERMINT_NODE_PORT=$second_node_tendermint_p2p_port
+export POSTGRES_EXPOSED_PORT=5433  && export NATS_EXPOSED_PORT=4223  && export STARPORT_API_PORT=1318  && export TENDERMINT_NODE_GRPC_PORT=$second_node_tendermint_grpc_port && export TENDERMINT_NODE_PORT=$second_node_tendermint_p2p_port && export PROXY_APP_PORT=8082
 docker-compose -p second_node up -d
 
 

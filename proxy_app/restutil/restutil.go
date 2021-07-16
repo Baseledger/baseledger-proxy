@@ -31,7 +31,8 @@ func SignAndBroadcast(payload SignAndBroadcastPayload, c *gin.Context) *string {
 		return nil
 	}
 
-	resp, err := http.Post("http://localhost:1317/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
+	// All of these must be read from ENV. target should be localhost from host and host.docker.internal if dockerized
+	resp, err := http.Post("http://host.docker.internal:1317/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
 
 	if err != nil {
 		logger.Errorf("error while sending feedback request %v\n", err.Error())

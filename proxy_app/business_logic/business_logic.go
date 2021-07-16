@@ -86,7 +86,8 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 
 // TODO: BAS-33 this needs to be tested, just building ok for now
 func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransaction {
-	resp, err := http.Get("http://localhost:1317/committedTx/" + id.String())
+	// All of these must be read from ENV. target should be localhost from host and host.docker.internal if dockerized
+	resp, err := http.Get("http://host.docker.internal:1317/committedTx/" + id.String())
 
 	if err != nil {
 		logger.Errorf("error while fetching committed baseledger transaction %v\n", err.Error())
