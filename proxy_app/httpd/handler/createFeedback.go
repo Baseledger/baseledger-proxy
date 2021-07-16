@@ -1,10 +1,7 @@
 package handler
 
 import (
-	"bytes"
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
@@ -68,30 +65,14 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 			Payload:       payload,
 		}
 
-		jsonValue, err := json.Marshal(signAndBroadcastPayload)
+		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload, c)
 
-		if err != nil {
-			logger.Error("Error marshaling sign and broadcast json")
-			restutil.RenderError("Error marshaling sign and broadcast json", 500, c)
+		if transactionHash == nil {
+			restutil.RenderError("sign and broadcast transaction error", 500, c)
 			return
 		}
 
-		resp, err := http.Post("http://localhost:1317/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
-
-		if err != nil {
-			logger.Errorf("error while sending feedback request %v\n", err.Error())
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			logger.Errorf("error while reading sign and broadcast transaction response %v\n", err.Error())
-			restutil.RenderError("error while reading sign and broadcast transaction response", 500, c)
-			return
-		}
-
-		transactionHash := string(body)
-
-		trustmeshEntry := createFeedbackSentTrustmeshEntry(*req, transactionId, offchainMsg, feedbackMsg, transactionHash)
+		trustmeshEntry := createFeedbackSentTrustmeshEntry(*req, transactionId, offchainMsg, feedbackMsg, *transactionHash)
 
 		if !trustmeshEntry.Create() {
 			logger.Errorf("error when creating new trustmesh entry")
