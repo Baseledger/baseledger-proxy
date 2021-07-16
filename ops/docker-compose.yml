@@ -28,8 +28,8 @@ services:
     restart: always
   starport:
       build:
-        context: ../
-        dockerfile: ops/Dockerfile
+        context: ../blockchain_app
+        dockerfile: ../blockchain_app/ops/Dockerfile
         args:
           - DB_HOST=postgres-local-node
           - DB_UB_USER=ub
