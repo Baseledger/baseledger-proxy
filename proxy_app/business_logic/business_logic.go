@@ -69,6 +69,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			logger.Errorf("Error unmarshalling sync tree", err.Error())
 			return
 		}
+		logger.Infof("Sync tree unmarshalled", syncTree)
 
 		// type? is it possible in go?
 		// do we need it if we just pass this to sor?
@@ -79,6 +80,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			logger.Errorf("Error unmarshalling sync tree", err.Error())
 			return
 		}
+		logger.Infof("Business object unmarshalled", bo)
 
 		// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:
