@@ -46,6 +46,7 @@ type SynchronizationRequest struct {
 	BusinessObjectJson                   string
 	ReferencedBaseledgerBusinessObjectId string
 	ReferencedBaseledgerTransactionId    string
+	KnowledgeLimiters                    []string
 }
 
 type SynchronizationFeedback struct {
