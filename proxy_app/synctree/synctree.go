@@ -14,23 +14,6 @@ import (
 	"github.com/imdario/mergo"
 )
 
-type PurchaseOrder struct {
-	PurchaseOrderID string
-	Currency        string
-	MaterialID      string
-	Quantity        int
-	SinglePrice     float32
-	TotalPrice      float32
-	OrderItems      []OrderItem
-}
-
-type OrderItem struct {
-	ItemID         int
-	ItemMaterialID string
-	ItemQuantity   int
-	Texts          []string
-}
-
 type SyncTreeNode struct {
 	SyncTreeNodeID string
 	Value          string
@@ -45,28 +28,6 @@ type SyncTreeNode struct {
 type BaseledgerSyncTree struct {
 	RootProof string
 	Nodes     []SyncTreeNode
-}
-
-func ProcessPoJson(pojson string) {
-	var limiters []string
-
-	syncTree := CreateFromBusinessObjectJson(string(pojson), limiters)
-
-	fmt.Println("")
-	fmt.Println("Whole tree:")
-	fmt.Printf("%#v", syncTree)
-
-	//Marshall SyncTree to JSON String
-	treejson, _ := json.Marshal(syncTree)
-	fmt.Println("")
-	fmt.Println("JSON string:")
-	fmt.Println(string(treejson))
-
-	//Unflatten SyncTree meaning re-create BusinessOBject JSON out of tree data strcture
-	var jsonfromtree = GetBusinessObjectJson(syncTree)
-	fmt.Println("")
-	fmt.Println("Unflatten SyncTree:")
-	fmt.Println(string(jsonfromtree))
 }
 
 func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters []string) BaseledgerSyncTree {
