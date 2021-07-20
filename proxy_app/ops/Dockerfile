@@ -22,6 +22,8 @@ ENV DB_SSLMODE=disable
 ENV DB_BASELEDGER_NAME=baseledger
 ENV DB_BASELEDGER_USER=baseledger
 ENV NATS_URL=nats:4222
+ENV BLOCKCHAIN_APP_URL=starport:1317
+ENV TENDERMINT_API_URL=starport:26657
 
 RUN go build -o /proxy_app httpd/main.go
 
