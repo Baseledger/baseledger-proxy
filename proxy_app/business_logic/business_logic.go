@@ -87,7 +87,7 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 // TODO: BAS-33 this needs to be tested, just building ok for now
 func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransaction {
 	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
-	resp, err := http.Get("http://starport:1317/committedTx/" + id.String())
+	resp, err := http.Get("http://starport:1317/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
 
 	if err != nil {
 		logger.Errorf("error while fetching committed baseledger transaction %v\n", err.Error())
@@ -100,14 +100,14 @@ func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTrans
 		return nil
 	}
 
-	var transaction proxytypes.BaseledgerTransaction
-	err = json.Unmarshal(body, &transaction)
+	var transactionResponse proxytypes.CommittedBaseledgerTransactionResponse
+	err = json.Unmarshal(body, &transactionResponse)
 
 	if err != nil {
 		logger.Errorf("error while unmarshalling fetched committed baseledger transaction %v\n", err.Error())
 		return nil
 	}
 
-	logger.Infof("get committed baseleger transaction", transaction)
-	return &transaction
+	logger.Infof("get committed baseleger transaction", transactionResponse)
+	return &transactionResponse.BaseledgerTransaction
 }
