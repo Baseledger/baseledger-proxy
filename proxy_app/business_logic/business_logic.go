@@ -85,7 +85,7 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 }
 
 // TODO: BAS-33 this needs to be tested, just building ok for now
-func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransaction {
+func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransactionDto {
 	resp, err := http.Get("http://localhost:1317/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
 
 	if err != nil {
