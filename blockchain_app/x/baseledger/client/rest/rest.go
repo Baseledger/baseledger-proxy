@@ -20,7 +20,6 @@ func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 
 func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 3
-	r.HandleFunc("/committedTx/{txId}", getCommittedTransactionHandler(clientCtx)).Methods("GET")
 }
 
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
