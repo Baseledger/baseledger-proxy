@@ -45,7 +45,8 @@ func queryTrustmeshes() {
 func getTxInfo(txHash string) (txInfo *proxytypes.TxInfo, err error) {
 	// fetching tx details
 	// TODO: BAS-33
-	str := "http://localhost:26657/tx?hash=0x" + txHash
+	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
+	str := "http://starport:26657/tx?hash=0x" + txHash
 	httpRes, err := http.Get(str)
 	if err != nil {
 		logger.Errorf("error during http tx req %v\n", err)
@@ -67,7 +68,8 @@ func getTxInfo(txHash string) (txInfo *proxytypes.TxInfo, err error) {
 	}
 	// query for block at specific height to find timestamp
 	// TODO: BAS-33
-	str = "http://localhost:26657/block?height" + committedTx.TxResult.Height
+	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
+	str = "http://starport:26657/block?height" + committedTx.TxResult.Height
 	httpRes, err = http.Get(str)
 	if err != nil {
 		logger.Errorf("error during http block req %v\n", err)

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -74,11 +75,31 @@ func InitDbIfNotExists() {
 		dbDefaultName,
 		sslMode,
 	)
-	db, err := gorm.Open("postgres", args)
 
-	if err != nil {
-		logger.Errorf("db connection failed %v\n", err.Error())
-		panic(err)
+	var db *gorm.DB
+	var dbErr error
+	var connSucceded bool = false
+
+	connAttempt := 0
+	for connAttempt < 5 {
+		logger.Info("Tryin to init admin db connection")
+
+		db, dbErr = gorm.Open("postgres", args)
+
+		if dbErr != nil {
+			logger.Errorf("db connection failed %v\n", dbErr.Error())
+
+			time.Sleep(3 * time.Second)
+			connAttempt++
+		} else {
+			connSucceded = true
+			break
+		}
+	}
+
+	if !connSucceded {
+		logger.Errorf("failed to connect to db after %v attempts\n", connAttempt)
+		panic("failed to connect to db")
 	}
 
 	logger.Info("admin db connection successful")

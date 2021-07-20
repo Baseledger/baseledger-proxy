@@ -28,15 +28,10 @@ services:
     restart: always
   starport:
       build:
-        context: ../
-        dockerfile: ops/Dockerfile
-        args:
-          - DB_HOST=postgres-local-node
-          - DB_UB_USER=ub
-          - DB_UB_PWD=ub123
+        context: ../blockchain_app
+        dockerfile: ../blockchain_app/ops/Dockerfile
       image: starport
       # container_name: ${prefix}-staport // TODO: Use this instead of -p first_node to avoid number suffix
-      hostname: starport-local-node
       networks:
         - baseledger
       ports:
@@ -45,6 +40,24 @@ services:
         - ${TENDERMINT_NODE_GRPC_PORT}:26657
       extra_hosts:
           - "host.docker.internal:host-gateway" # enable targeting host machine with host.docker.internal
+  proxy_app:
+    build:
+      context: ../proxy_app
+      dockerfile: ../proxy_app/ops/Dockerfile
+      args:
+        - DB_HOST=postgres-local-node
+        - DB_UB_USER=ub
+        - DB_UB_PWD=ub123
+    image: proxy_app
+    networks:
+      - baseledger
+    ports:
+      - ${PROXY_APP_PORT}:8080
+    extra_hosts:
+        - "host.docker.internal:host-gateway" # enable targeting host machine with host.docker.internal
+    depends_on:
+        - postgres
+        - nats
 
 networks:
   baseledger:
