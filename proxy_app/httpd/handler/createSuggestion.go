@@ -44,15 +44,17 @@ func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 		syncReq := newSynchronizationRequest(*req)
 
 		syncTree := synctree.CreateFromBusinessObjectJson(syncReq.BusinessObjectJson, syncReq.KnowledgeLimiters)
-		syncTreeJson, err := json.Marshal(syncTree)
+		logger.Infof("Sync tree %v", syncTree)
 
+		syncTreeJson, err := json.Marshal(syncTree)
 		if err != nil {
 			logger.Errorf("error marshaling sync tree", err.Error())
 			restutil.RenderError("error marshaling sync tree", 500, c)
 			return
 		}
-		transactionId := uuid.NewV4()
+		logger.Infof("Sync tree json %v", string(syncTreeJson))
 
+		transactionId := uuid.NewV4()
 		offchainMsg := createSuggestOffchainMessage(*req, transactionId, string(syncTreeJson), syncTree.RootProof)
 
 		if !offchainMsg.Create() {
