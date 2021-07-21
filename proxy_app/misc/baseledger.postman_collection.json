@@ -1,0 +1,143 @@
+{
+	"info": {
+		"_postman_id": "028bae05-fc6b-4da1-8c94-625b79a86770",
+		"name": "baseledger",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create sync request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1zdagxuu0j6u39xppn3s87tldz9gfuj7ew6dxj6\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/suggestion",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"suggestion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "feedback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger128upmg5esqm6vw3t7e7s25yz7v99ppd5az5k9z\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"baseledger_proven_business_object_json\": \"{PurchaseOrderID: 5}\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"9eb0e15e-d38b-474c-a571-509026abd76\"\r\n}"
+				},
+				"url": {
+					"raw": "localhost:1317/proxy/feedback",
+					"host": [
+						"localhost"
+					],
+					"port": "1317",
+					"path": [
+						"proxy",
+						"feedback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "trustmeshes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/trustmeshes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"trustmeshes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sign and broadcast tx",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1xn0yt9zl56frdsfhuz9vrcky2kup9zpye4a30j\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"transaction_id\": \"cbf25e6e-cac1-4afc-8dbf-504eafb3d7d8\",\r\n    \"payload\": \"f6d0cf9d716e1935018bc68fec6030b9ad437683a544759d380d0adacd6173c8e4f742eebf5d083410822bd849a545d96d715d38871e35af158aa7b6095e04334eba4719d93b226cb4d07185ca2451a87ee2000dfd7f572d18f6adf5ddf9858ef479be6a9cb7734bc240d19a77de3b50a4a1a3eac4d0158936f68678da8a0b1c487a6d088a77fec05bd33a53889ca48d4de183d651065c505828c02e9da184469a97859da62b091bb2941ffb1b061a33b03956ec643b59a00c58d358f72746fac6aacb38b253e61849a7bfddc82fce3be44bc49483f0ccbca4a80f6234b6df4bb0d79c4a72f368063cfad8828ac1cc4abcee6af09c8fcfb8095cb4a60d0080571fed1078729c9e7f41e0914fa87f0ccc5447779563c68e5dbab0a9c6d0e8b37751aab8a5ead9fcbb18cbf587083f69e53badaba7f8c7ff8b85c0fa6361dbae865a755f437108ee1ab9430c1d29a4ae45754427c2aa4193b4bd74978f746819ce8bdcd4204086986f1f464fac2661ac32fffc56826f80762c8e783d6bccb0347743f833dc0c0359883e165ecae2c87af8f504be0e40e6d73ccb267a3163f0237fd81935a63e9c600af1f0f694c31fbc497f124b9518b224af77b485e41671c478fc88e99693d1cee3ab5cf53ff0de861c596ac33df2ceaef918c6c6424b217b7805d3cb4f17ff9e6a81bbaebd9484c9\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:1317/proxy/signAndBroadcast",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1317",
+					"path": [
+						"proxy",
+						"signAndBroadcast"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proxy create sync request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1vflry9dg9h6g0kcknl4fa902s3qynxk8ep49uw\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{PurchaseOrderID: 5}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/suggestion",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"suggestion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proxy create feedback request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1v3e6s8uep6ea7cnqszqvrl3g56vl0vp2eq0mvk\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"baseledger_proven_business_object_json\": \"{PurchaseOrderID: 5}\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"9eb0e15e-d38b-474c-a571-509026abd76\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/feedback",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"feedback"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
