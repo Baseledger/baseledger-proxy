@@ -72,8 +72,11 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 	startTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	endTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	senders := ""
+	sendersMap := make(map[string]int)
 	receivers := ""
+	receiversMap := make(map[string]int)
 	businessObjectTypes := ""
+	businessObjectTypesMap := make(map[string]int)
 	finalized := false
 	containsRejection := false
 
@@ -81,9 +84,9 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 		startTime = getBeforeTime(startTime, entry.TendermintTransactionTimestamp)
 		endTime = getAfterTime(endTime, entry.TendermintTransactionTimestamp)
 
-		senders = senders + getSeparator(senders) + entry.SenderOrgId.String()
-		receivers = receivers + getSeparator(receivers) + entry.ReceiverOrgId.String()
-		businessObjectTypes = businessObjectTypes + getSeparator(businessObjectTypes) + entry.BusinessObjectType
+		appendDistinct(sendersMap, entry.SenderOrgId.String(), &senders)
+		appendDistinct(receiversMap, entry.ReceiverOrgId.String(), &receivers)
+		appendDistinct(businessObjectTypesMap, entry.BusinessObjectType, &businessObjectTypes)
 
 		if entry.WorkstepType == "FinalWorkstep" && !finalized {
 			finalized = true
@@ -170,4 +173,11 @@ func getAfterTime(first sql.NullTime, second sql.NullTime) sql.NullTime {
 	}
 
 	return first
+}
+
+func appendDistinct(itemsMap map[string]int, newItem string, acc *string) {
+	if itemsMap[newItem] == 0 {
+		itemsMap[newItem] = 1
+		*acc = *acc + getSeparator(*acc) + newItem
+	}
 }
