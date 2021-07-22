@@ -44,7 +44,7 @@ func processTrustmesh(trustmesh *types.Trustmesh) {
 		receivers = receivers + getSeparator(receivers) + entry.ReceiverOrgId.String()
 		businessObjectTypes = businessObjectTypes + getSeparator(businessObjectTypes) + entry.BusinessObjectType
 
-		if entry.WorkstepType == "Final" && !finalized {
+		if entry.WorkstepType == "FinalWorkstep" && !finalized {
 			finalized = true
 		}
 
