@@ -40,7 +40,8 @@ func setupViper() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Println("viper read config error %v\n", err)
+		fmt.Println(fmt.Printf("viper read config error %v\n", err))
+		panic(err)
 	}
 }
 

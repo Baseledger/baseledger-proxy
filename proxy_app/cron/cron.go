@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/spf13/viper"
 
 	proxytypes "github.com/unibrightio/proxy-api/types"
 

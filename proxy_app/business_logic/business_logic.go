@@ -86,7 +86,7 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 	}
 }
 
-func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransaction {
+func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransactionDto {
 	resp, err := http.Get("http://" + viper.Get("TENDERMINT_API_URL").(string) + "/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
 
 	if err != nil {
