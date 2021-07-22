@@ -13,24 +13,24 @@ import (
 
 type trustmeshEntryDto struct {
 	TendermintBlockId                    string
-	TendermintTransactionId              uuid.UUID
+	TendermintTransactionId              string
 	TendermintTransactionTimestamp       time.Time
 	EntryType                            string
-	SenderOrgId                          uuid.UUID
-	ReceiverOrgId                        uuid.UUID
-	WorkgroupId                          uuid.UUID
+	SenderOrgId                          string
+	ReceiverOrgId                        string
+	WorkgroupId                          string
 	WorkstepType                         string
 	BaseledgerTransactionType            string
-	BaseledgerTransactionId              uuid.UUID
-	ReferencedBaseledgerTransactionId    uuid.UUID
+	BaseledgerTransactionId              string
+	ReferencedBaseledgerTransactionId    string
 	BusinessObjectType                   string
-	BaseledgerBusinessObjectId           uuid.UUID
-	ReferencedBaseledgerBusinessObjectId uuid.UUID
-	OffchainProcessMessageId             uuid.UUID
-	ReferencedProcessMessageId           uuid.UUID
+	BaseledgerBusinessObjectId           string
+	ReferencedBaseledgerBusinessObjectId string
+	OffchainProcessMessageId             string
+	ReferencedProcessMessageId           string
 	CommitmentState                      string
 	TransactionHash                      string
-	TrustmeshId                          uuid.UUID
+	TrustmeshId                          string
 }
 
 type trustmeshDto struct {
@@ -100,6 +100,8 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 		entriesDto = append(entriesDto, *entryDto)
 	}
 
+	trustmeshDto.Id = trustmesh.Id
+	trustmeshDto.CreatedAt = trustmesh.CreatedAt
 	trustmeshDto.StartTime = startTime.Time
 	trustmeshDto.EndTime = endTime.Time
 	trustmeshDto.Participants = senders + ", " + receivers
@@ -114,25 +116,32 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 func processTrustmeshEntry(trustmeshEntry types.TrustmeshEntry) *trustmeshEntryDto {
 	return &trustmeshEntryDto{
 		TendermintBlockId:                    trustmeshEntry.TendermintBlockId.String,
-		TendermintTransactionId:              trustmeshEntry.TendermintTransactionId,
+		TendermintTransactionId:              uuidToString(trustmeshEntry.TendermintTransactionId),
 		TendermintTransactionTimestamp:       trustmeshEntry.TendermintTransactionTimestamp.Time,
 		EntryType:                            trustmeshEntry.EntryType,
-		SenderOrgId:                          trustmeshEntry.SenderOrgId,
-		ReceiverOrgId:                        trustmeshEntry.ReceiverOrgId,
-		WorkgroupId:                          trustmeshEntry.WorkgroupId,
+		SenderOrgId:                          uuidToString(trustmeshEntry.SenderOrgId),
+		ReceiverOrgId:                        uuidToString(trustmeshEntry.ReceiverOrgId),
+		WorkgroupId:                          uuidToString(trustmeshEntry.WorkgroupId),
 		WorkstepType:                         trustmeshEntry.WorkstepType,
 		BaseledgerTransactionType:            trustmeshEntry.BaseledgerTransactionType,
-		BaseledgerTransactionId:              trustmeshEntry.BaseledgerTransactionId,
-		ReferencedBaseledgerTransactionId:    trustmeshEntry.ReferencedBaseledgerTransactionId,
+		BaseledgerTransactionId:              uuidToString(trustmeshEntry.BaseledgerTransactionId),
+		ReferencedBaseledgerTransactionId:    uuidToString(trustmeshEntry.ReferencedBaseledgerTransactionId),
 		BusinessObjectType:                   trustmeshEntry.BusinessObjectType,
-		BaseledgerBusinessObjectId:           trustmeshEntry.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
-		OffchainProcessMessageId:             trustmeshEntry.OffchainProcessMessageId,
-		ReferencedProcessMessageId:           trustmeshEntry.ReferencedProcessMessageId,
+		BaseledgerBusinessObjectId:           uuidToString(trustmeshEntry.BaseledgerBusinessObjectId),
+		ReferencedBaseledgerBusinessObjectId: uuidToString(trustmeshEntry.ReferencedBaseledgerBusinessObjectId),
+		OffchainProcessMessageId:             uuidToString(trustmeshEntry.OffchainProcessMessageId),
+		ReferencedProcessMessageId:           uuidToString(trustmeshEntry.ReferencedProcessMessageId),
 		CommitmentState:                      trustmeshEntry.CommitmentState,
 		TransactionHash:                      trustmeshEntry.TransactionHash,
-		TrustmeshId:                          trustmeshEntry.TrustmeshId,
+		TrustmeshId:                          uuidToString(trustmeshEntry.TrustmeshId),
 	}
+}
+
+func uuidToString(id uuid.UUID) string {
+	if id == uuid.Nil {
+		return ""
+	}
+	return id.String()
 }
 
 func getSeparator(str string) string {
