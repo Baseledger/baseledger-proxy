@@ -16,6 +16,7 @@ import (
 
 type SyncTreeNode struct {
 	SyncTreeNodeID string
+	ParentNodeID   string
 	Value          string
 	IsLeaf         bool
 	IsRoot         bool
@@ -162,6 +163,9 @@ func buildBONodesRecursive(nodes []SyncTreeNode) []SyncTreeNode {
 			parent.Index = i / 2
 			parent.Level = nodes[i].Level + 1
 			parentNodes = append(parentNodes, parent)
+
+			nodes[i].ParentNodeID = parent.SyncTreeNodeID
+			nodes[i+1].ParentNodeID = parent.SyncTreeNodeID
 		}
 
 		ret = append(ret, buildBONodesRecursive(parentNodes)...)

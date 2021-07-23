@@ -30,6 +30,7 @@ func main() {
 	r.GET("/trustmeshes", handler.GetTrustmeshesHandler())
 	r.POST("/suggestion", handler.CreateInitialSuggestionRequestHandler())
 	r.POST("/feedback", handler.CreateSynchronizationFeedbackHandler())
+	r.GET("/sunburst/:txId", handler.GetSunburstHandler())
 	r.POST("send_offchain_message", handler.SendOffchainMessageHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
