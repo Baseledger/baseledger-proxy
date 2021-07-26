@@ -15,9 +15,9 @@ type syncTreeSunburst struct {
 }
 
 type sunburstItem struct {
-	Name     string
-	Value    uint
-	Children []sunburstItem
+	Name     string         `json:"name"`
+	Value    uint           `json:"value"`
+	Children []sunburstItem `json:"children"`
 }
 
 func GetSunburstHandler() gin.HandlerFunc {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/imdario/mergo"
+	uuid "github.com/kthomas/go.uuid"
 )
 
 type SyncTreeNode struct {
@@ -46,6 +47,7 @@ func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters [
 	//Create a leaf data strcuture for every leaf node
 	for k, v := range FlattenOut {
 		leaf := SyncTreeNode{}
+		leaf.SyncTreeNodeID = uuid.NewV4().String()
 		leaf.IsCovered = false
 		leaf.IsHash = false
 		leaf.IsLeaf = true
@@ -61,7 +63,7 @@ func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters [
 	var x = math.Max(1, math.Ceil(math.Log2(float64(len(LeafNodeSlice)))))
 	//Now "fill" the dictionary up to 2^x entries
 	for l := len(LeafNodeSlice); l < int(math.Pow(float64(2), x)); l++ {
-		LeafNodeSlice = append(LeafNodeSlice, SyncTreeNode{IsLeaf: true, Index: leafIndex})
+		LeafNodeSlice = append(LeafNodeSlice, SyncTreeNode{SyncTreeNodeID: uuid.NewV4().String(), IsLeaf: true, Index: leafIndex})
 		leafIndex++
 	}
 
@@ -145,16 +147,16 @@ func VerifyHashMatch(blockchainProof string, existingBusinessObjectProof string,
 
 func buildBONodesRecursive(nodes []SyncTreeNode) []SyncTreeNode {
 	var ret []SyncTreeNode
-	ret = append(ret, nodes...)
 	//Only one leaf left? We determined the root
 	if len(nodes) <= 1 {
-		return ret
+		return append(ret, nodes...)
 	} else { //build leafs of higher level and dive into recursion
 		var parentNodes []SyncTreeNode
 		for i := 0; i < len(nodes); i += 2 {
 			var stohash string = nodes[i].Value + "|" + nodes[i+1].Value
 			//Create parent node
 			parent := SyncTreeNode{}
+			parent.SyncTreeNodeID = uuid.NewV4().String()
 			parent.IsCovered = false
 			parent.IsHash = true
 			parent.IsLeaf = false
@@ -167,7 +169,7 @@ func buildBONodesRecursive(nodes []SyncTreeNode) []SyncTreeNode {
 			nodes[i].ParentNodeID = parent.SyncTreeNodeID
 			nodes[i+1].ParentNodeID = parent.SyncTreeNodeID
 		}
-
+		ret = append(ret, nodes...)
 		ret = append(ret, buildBONodesRecursive(parentNodes)...)
 	}
 	return ret
