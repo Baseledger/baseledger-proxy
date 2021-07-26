@@ -103,6 +103,19 @@ func GetOffchainMsgById(id uuid.UUID) (msg *OffchainProcessMessage, err error) {
 	return &offchainMsg, nil
 }
 
+func GetOffchainMsgForSunburst(txId string) (msg *OffchainProcessMessage, err error) {
+	db := dbutil.Db.GetConn()
+	var offchainMsg OffchainProcessMessage
+	res := db.First(&offchainMsg, "tendermint_transaction_id_of_stored_proof = ?", txId)
+
+	if res.Error != nil {
+		logger.Errorf("error when getting offchain msg from db %v\n", err)
+		return nil, res.Error
+	}
+
+	return &offchainMsg, nil
+}
+
 type BaseledgerTransactionDto struct {
 	Creator                 string
 	Id                      string

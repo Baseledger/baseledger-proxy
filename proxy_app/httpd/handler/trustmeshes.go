@@ -2,12 +2,48 @@ package handler
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/types"
 )
+
+type trustmeshEntryDto struct {
+	TendermintBlockId                    string
+	TendermintTransactionId              string
+	TendermintTransactionTimestamp       time.Time
+	EntryType                            string
+	SenderOrgId                          string
+	ReceiverOrgId                        string
+	WorkgroupId                          string
+	WorkstepType                         string
+	BaseledgerTransactionType            string
+	BaseledgerTransactionId              string
+	ReferencedBaseledgerTransactionId    string
+	BusinessObjectType                   string
+	BaseledgerBusinessObjectId           string
+	ReferencedBaseledgerBusinessObjectId string
+	OffchainProcessMessageId             string
+	ReferencedProcessMessageId           string
+	CommitmentState                      string
+	TransactionHash                      string
+	TrustmeshId                          string
+}
+
+type trustmeshDto struct {
+	Id                  uuid.UUID
+	CreatedAt           time.Time
+	StartTime           time.Time
+	EndTime             time.Time
+	Participants        string
+	BusinessObjectTypes string
+	Finalized           bool
+	ContainsRejections  bool
+	Entries             []trustmeshEntryDto
+}
 
 func GetTrustmeshesHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -16,23 +52,31 @@ func GetTrustmeshesHandler() gin.HandlerFunc {
 		// preload seems good enough for now, revisit if it turns out to be performance bottleneck
 		dbutil.Paginate(c, db, &types.Trustmesh{}).Preload("Entries").Find(&trustmeshes)
 
+		var trustmeshesDtos []trustmeshDto
+
 		for i := 0; i < len(trustmeshes); i++ {
-			processTrustmesh(&trustmeshes[i])
+			trustmeshesDtos = append(trustmeshesDtos, *processTrustmesh(&trustmeshes[i]))
 		}
 
-		restutil.Render(trustmeshes, 200, c)
+		restutil.Render(trustmeshesDtos, 200, c)
 	}
 }
 
-func processTrustmesh(trustmesh *types.Trustmesh) {
+func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 	if len(trustmesh.Entries) == 0 {
-		return
+		return nil
 	}
+	trustmeshDto := &trustmeshDto{}
+	var entriesDto []trustmeshEntryDto
+
 	startTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	endTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	senders := ""
+	sendersMap := make(map[string]int)
 	receivers := ""
+	receiversMap := make(map[string]int)
 	businessObjectTypes := ""
+	businessObjectTypesMap := make(map[string]int)
 	finalized := false
 	containsRejection := false
 
@@ -40,25 +84,64 @@ func processTrustmesh(trustmesh *types.Trustmesh) {
 		startTime = getBeforeTime(startTime, entry.TendermintTransactionTimestamp)
 		endTime = getAfterTime(endTime, entry.TendermintTransactionTimestamp)
 
-		senders = senders + getSeparator(senders) + entry.SenderOrgId.String()
-		receivers = receivers + getSeparator(receivers) + entry.ReceiverOrgId.String()
-		businessObjectTypes = businessObjectTypes + getSeparator(businessObjectTypes) + entry.BusinessObjectType
+		appendDistinct(sendersMap, entry.SenderOrgId.String(), &senders)
+		appendDistinct(receiversMap, entry.ReceiverOrgId.String(), &receivers)
+		appendDistinct(businessObjectTypesMap, entry.BusinessObjectType, &businessObjectTypes)
 
-		if entry.WorkstepType == "Final" && !finalized {
+		if entry.WorkstepType == "FinalWorkstep" && !finalized {
 			finalized = true
 		}
 
 		if entry.BaseledgerTransactionType == "Reject" && !containsRejection {
 			containsRejection = true
 		}
+
+		entryDto := processTrustmeshEntry(entry)
+		entriesDto = append(entriesDto, *entryDto)
 	}
 
-	trustmesh.StartTime = startTime.Time
-	trustmesh.EndTime = endTime.Time
-	trustmesh.Participants = senders + ", " + receivers
-	trustmesh.BusinessObjectTypes = businessObjectTypes
-	trustmesh.Finalized = finalized
-	trustmesh.ContainsRejections = containsRejection
+	trustmeshDto.Id = trustmesh.Id
+	trustmeshDto.CreatedAt = trustmesh.CreatedAt
+	trustmeshDto.StartTime = startTime.Time
+	trustmeshDto.EndTime = endTime.Time
+	trustmeshDto.Participants = senders + ", " + receivers
+	trustmeshDto.BusinessObjectTypes = businessObjectTypes
+	trustmeshDto.Finalized = finalized
+	trustmeshDto.ContainsRejections = containsRejection
+	trustmeshDto.Entries = entriesDto
+
+	return trustmeshDto
+}
+
+func processTrustmeshEntry(trustmeshEntry types.TrustmeshEntry) *trustmeshEntryDto {
+	return &trustmeshEntryDto{
+		TendermintBlockId:                    trustmeshEntry.TendermintBlockId.String,
+		TendermintTransactionId:              uuidToString(trustmeshEntry.TendermintTransactionId),
+		TendermintTransactionTimestamp:       trustmeshEntry.TendermintTransactionTimestamp.Time,
+		EntryType:                            trustmeshEntry.EntryType,
+		SenderOrgId:                          uuidToString(trustmeshEntry.SenderOrgId),
+		ReceiverOrgId:                        uuidToString(trustmeshEntry.ReceiverOrgId),
+		WorkgroupId:                          uuidToString(trustmeshEntry.WorkgroupId),
+		WorkstepType:                         trustmeshEntry.WorkstepType,
+		BaseledgerTransactionType:            trustmeshEntry.BaseledgerTransactionType,
+		BaseledgerTransactionId:              uuidToString(trustmeshEntry.BaseledgerTransactionId),
+		ReferencedBaseledgerTransactionId:    uuidToString(trustmeshEntry.ReferencedBaseledgerTransactionId),
+		BusinessObjectType:                   trustmeshEntry.BusinessObjectType,
+		BaseledgerBusinessObjectId:           uuidToString(trustmeshEntry.BaseledgerBusinessObjectId),
+		ReferencedBaseledgerBusinessObjectId: uuidToString(trustmeshEntry.ReferencedBaseledgerBusinessObjectId),
+		OffchainProcessMessageId:             uuidToString(trustmeshEntry.OffchainProcessMessageId),
+		ReferencedProcessMessageId:           uuidToString(trustmeshEntry.ReferencedProcessMessageId),
+		CommitmentState:                      trustmeshEntry.CommitmentState,
+		TransactionHash:                      trustmeshEntry.TransactionHash,
+		TrustmeshId:                          uuidToString(trustmeshEntry.TrustmeshId),
+	}
+}
+
+func uuidToString(id uuid.UUID) string {
+	if id == uuid.Nil {
+		return ""
+	}
+	return id.String()
 }
 
 func getSeparator(str string) string {
@@ -99,4 +182,11 @@ func getAfterTime(first sql.NullTime, second sql.NullTime) sql.NullTime {
 	}
 
 	return first
+}
+
+func appendDistinct(itemsMap map[string]int, newItem string, acc *string) {
+	if itemsMap[newItem] == 0 {
+		itemsMap[newItem] = 1
+		*acc = *acc + getSeparator(*acc) + newItem
+	}
 }
