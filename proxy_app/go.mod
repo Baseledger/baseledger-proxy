@@ -3,6 +3,7 @@ module github.com/unibrightio/proxy-api
 go 1.16
 
 require (
+	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/containerd/containerd v1.5.3 // indirect
 	github.com/docker/docker v20.10.7+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -10,6 +11,7 @@ require (
 	github.com/go-co-op/gocron v1.6.2
 	github.com/go-playground/validator/v10 v10.7.0 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
+	github.com/imdario/mergo v0.3.12
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kthomas/go.uuid v1.2.0
 	github.com/leodido/go-urn v1.2.1 // indirect
