@@ -113,15 +113,6 @@ func GetOffchainMsgForSunburst(txId string) (msg *OffchainProcessMessage, err er
 		return nil, res.Error
 	}
 
-	if res.RowsAffected == 0 {
-		res = db.First(&offchainMsg)
-
-		if res.Error != nil {
-			logger.Errorf("error when getting offchain msg from db %v\n", err)
-			return nil, res.Error
-		}
-	}
-
 	return &offchainMsg, nil
 }
 
