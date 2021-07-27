@@ -39,12 +39,11 @@ func main() {
 func setupViper() {
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
-	viper.AutomaticEnv() // Overwrite config with env variables if exist
+	viper.AutomaticEnv() // Overwrite config with env variables if exist, important for debugging session
 
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Println(fmt.Printf("viper read config error %v\n", err))
-		panic(err)
 	}
 }
 
