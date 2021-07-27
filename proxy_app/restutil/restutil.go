@@ -12,15 +12,9 @@ import (
 
 const defaultResponseContentType = "application/json; charset=UTF-8"
 
-type BaseReq struct {
-	From    string `json:"from"`
-	ChainID string `json:"chain_id"`
-}
-
 type SignAndBroadcastPayload struct {
-	BaseReq       BaseReq `json:"base_req"`
-	TransactionId string  `json:"transaction_id"`
-	Payload       string  `json:"payload"`
+	TransactionId string `json:"transaction_id"`
+	Payload       string `json:"payload"`
 }
 
 func SignAndBroadcast(payload SignAndBroadcastPayload, c *gin.Context) *string {

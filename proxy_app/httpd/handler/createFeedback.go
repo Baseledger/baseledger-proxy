@@ -13,17 +13,16 @@ import (
 )
 
 type createSynchronizationFeedbackRequest struct {
-	BaseReq                                    restutil.BaseReq `json:"base_req"`
-	WorkgroupId                                string           `json:"workgroup_id"`
-	BusinessObjectType                         string           `json:"business_object_type"`
-	Recipient                                  string           `json:"recipient"`
-	Approved                                   bool             `json:"approved"`
-	BaseledgerBusinessObjectIdOfApprovedObject string           `json:"baseledger_business_object_id_of_approved_object"`
-	HashOfObjectToApprove                      string           `json:"hash_of_object_to_approve"`
-	OriginalBaseledgerTransactionId            string           `json:"original_baseledger_transaction_id"`
-	OriginalOffchainProcessMessageId           string           `json:"original_offchain_process_message_id"`
-	FeedbackMessage                            string           `json:"feedback_message"`
-	BaseledgerProvenBusinessObjectJson         string           `json:"baseledger_proven_business_object_json"`
+	WorkgroupId                                string `json:"workgroup_id"`
+	BusinessObjectType                         string `json:"business_object_type"`
+	Recipient                                  string `json:"recipient"`
+	Approved                                   bool   `json:"approved"`
+	BaseledgerBusinessObjectIdOfApprovedObject string `json:"baseledger_business_object_id_of_approved_object"`
+	HashOfObjectToApprove                      string `json:"hash_of_object_to_approve"`
+	OriginalBaseledgerTransactionId            string `json:"original_baseledger_transaction_id"`
+	OriginalOffchainProcessMessageId           string `json:"original_offchain_process_message_id"`
+	FeedbackMessage                            string `json:"feedback_message"`
+	BaseledgerProvenBusinessObjectJson         string `json:"baseledger_proven_business_object_json"`
 }
 
 func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
@@ -60,7 +59,6 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 		payload := proxyutil.CreateBaseledgerTransactionFeedbackPayload(createFeedbackReq, &offchainMsg)
 
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
-			BaseReq:       req.BaseReq,
 			TransactionId: transactionId.String(),
 			Payload:       payload,
 		}
