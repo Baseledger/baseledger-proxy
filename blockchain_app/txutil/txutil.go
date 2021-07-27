@@ -22,24 +22,32 @@ var (
 	recoverRegexp = regexp.MustCompile(`^account sequence mismatch, expected (\d+), got (\d+):`)
 )
 
-func BuildClientCtx(clientCtx client.Context, from string) (*client.Context, error) {
-	fromAddress, err := sdk.AccAddressFromBech32(from)
-
+func BuildClientCtx(clientCtx client.Context) (*client.Context, error) {
 	keyring, err := NewKeyringInstance()
-	key, err := keyring.KeyByAddress(fromAddress)
+
+	keysList, err := keyring.List()
+	if err != nil {
+		logger.Errorf("error getting key list %v\n", err.Error())
+		return nil, errors.New("")
+	}
+
+	if len(keysList) == 0 {
+		logger.Errorf("key list empty %v\n", err.Error())
+		return nil, errors.New("")
+	}
 
 	if err != nil {
 		logger.Errorf("error getting key %v\n", err.Error())
 		return nil, errors.New("")
 	}
 
-	logger.Infof("key found %v %v\n", key, key.GetName())
+	logger.Infof("key found %v %v\n", keysList[0], keysList[0].GetName())
 
 	clientCtx = clientCtx.
 		WithKeyring(keyring).
-		WithFromAddress(fromAddress).
+		WithFromAddress(keysList[0].GetAddress()).
 		WithSkipConfirmation(true).
-		WithFromName(key.GetName()).
+		WithFromName(keysList[0].GetName()).
 		WithBroadcastMode("sync")
 
 	return &clientCtx, nil
