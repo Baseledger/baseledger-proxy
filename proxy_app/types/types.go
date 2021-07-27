@@ -46,6 +46,7 @@ type SynchronizationRequest struct {
 	BusinessObjectJson                   string
 	ReferencedBaseledgerBusinessObjectId string
 	ReferencedBaseledgerTransactionId    string
+	KnowledgeLimiters                    []string
 }
 
 type SynchronizationFeedback struct {
@@ -93,6 +94,19 @@ func GetOffchainMsgById(id uuid.UUID) (msg *OffchainProcessMessage, err error) {
 	db := dbutil.Db.GetConn()
 	var offchainMsg OffchainProcessMessage
 	res := db.First(&offchainMsg, "id = ?", id.String())
+
+	if res.Error != nil {
+		logger.Errorf("error when getting offchain msg from db %v\n", err)
+		return nil, res.Error
+	}
+
+	return &offchainMsg, nil
+}
+
+func GetOffchainMsgForSunburst(txId string) (msg *OffchainProcessMessage, err error) {
+	db := dbutil.Db.GetConn()
+	var offchainMsg OffchainProcessMessage
+	res := db.First(&offchainMsg, "tendermint_transaction_id_of_stored_proof = ?", txId)
 
 	if res.Error != nil {
 		logger.Errorf("error when getting offchain msg from db %v\n", err)

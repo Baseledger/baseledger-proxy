@@ -11,6 +11,7 @@ import (
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/cron"
 	"github.com/unibrightio/proxy-api/dbutil"
+	"github.com/unibrightio/proxy-api/helpers"
 	"github.com/unibrightio/proxy-api/httpd/handler"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/messaging"
@@ -25,9 +26,11 @@ func main() {
 	subscribeToWorkgroupMessages()
 
 	r := gin.Default()
+	r.Use(helpers.CORSMiddleware())
 	r.GET("/trustmeshes", handler.GetTrustmeshesHandler())
 	r.POST("/suggestion", handler.CreateInitialSuggestionRequestHandler())
 	r.POST("/feedback", handler.CreateSynchronizationFeedbackHandler())
+	r.GET("/sunburst/:txId", handler.GetSunburstHandler())
 	r.POST("send_offchain_message", handler.SendOffchainMessageHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

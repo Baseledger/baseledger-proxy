@@ -13,6 +13,7 @@ import (
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
+	"github.com/unibrightio/proxy-api/synctree"
 	proxytypes "github.com/unibrightio/proxy-api/types"
 )
 
@@ -46,8 +47,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 
-		offchainMessageBusinessObjectProof := proxyutil.CreateHashFromBusinessObject(offchainMessage.BaseledgerSyncTreeJson)
-		if baseledgerTransactionPayload.Proof == offchainMessage.BusinessObjectProof && baseledgerTransactionPayload.Proof == offchainMessageBusinessObjectProof {
+		if synctree.VerifyHashMatch(baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson) {
 			logger.Info("Hashes match, processing feedback")
 			// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 			return
@@ -64,6 +64,25 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		if baseledgerTransaction == nil {
 			return
 		}
+
+		syncTree := &synctree.BaseledgerSyncTree{}
+		err = json.Unmarshal([]byte(offchainMessage.BaseledgerSyncTreeJson), &syncTree)
+		if err != nil {
+			logger.Errorf("Error unmarshalling sync tree", err.Error())
+			return
+		}
+		logger.Infof("Sync tree unmarshalled", syncTree)
+
+		// type? is it possible in go?
+		// do we need it if we just pass this to sor?
+		var bo map[string]interface{}
+		boJson := synctree.GetBusinessObjectJson(*syncTree)
+		err = json.Unmarshal([]byte(boJson), &bo)
+		if err != nil {
+			logger.Errorf("Error unmarshalling sync tree", err.Error())
+			return
+		}
+		logger.Infof("Business object unmarshalled", bo)
 
 		// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 	default:

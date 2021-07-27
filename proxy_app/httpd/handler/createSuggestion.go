@@ -9,6 +9,7 @@ import (
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
 	"github.com/unibrightio/proxy-api/restutil"
+	"github.com/unibrightio/proxy-api/synctree"
 	"github.com/unibrightio/proxy-api/types"
 )
 
@@ -22,6 +23,7 @@ type createInitialSuggestionRequest struct {
 	BusinessObjectJson                   string           `json:"business_object_json"`
 	ReferencedBaseledgerBusinessObjectId string           `json:"referenced_baseledger_business_object_id"`
 	ReferencedBaseledgerTransactionId    string           `json:"referenced_baseledger_transaction_id"`
+	KnowledgeLimiters                    []string         `json:"knowledge_limiters"`
 }
 
 func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
@@ -41,10 +43,19 @@ func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 
 		syncReq := newSynchronizationRequest(*req)
 
-		hash := proxyutil.CreateHashFromBusinessObject(req.BusinessObjectJson)
-		transactionId := uuid.NewV4()
+		syncTree := synctree.CreateFromBusinessObjectJson(syncReq.BusinessObjectJson, syncReq.KnowledgeLimiters)
+		logger.Infof("Sync tree %v", syncTree)
 
-		offchainMsg := createSuggestOffchainMessage(*req, transactionId, hash)
+		syncTreeJson, err := json.Marshal(syncTree)
+		if err != nil {
+			logger.Errorf("error marshaling sync tree", err.Error())
+			restutil.RenderError("error marshaling sync tree", 500, c)
+			return
+		}
+		logger.Infof("Sync tree json %v", string(syncTreeJson))
+
+		transactionId := uuid.NewV4()
+		offchainMsg := createSuggestOffchainMessage(*req, transactionId, string(syncTreeJson), syncTree.RootProof)
 
 		if !offchainMsg.Create() {
 			logger.Errorf("error when creating new offchain msg entry")
@@ -88,6 +99,7 @@ func newSynchronizationRequest(req createInitialSuggestionRequest) *types.Synchr
 		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
 		BusinessObjectJson:                   req.BusinessObjectJson,
 		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
+		KnowledgeLimiters:                    req.KnowledgeLimiters,
 	}
 }
 
@@ -112,7 +124,7 @@ func createSuggestionSentTrustmeshEntry(req createInitialSuggestionRequest, tran
 	}
 }
 
-func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId uuid.UUID, hash string) types.OffchainProcessMessage {
+func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId uuid.UUID, syncTreeJson string, rootProof string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		// TODO: define proxy identifier
 		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
@@ -120,8 +132,8 @@ func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactio
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         req.WorkstepType,
 		ReferencedOffchainProcessMessageId:   uuid.FromStringOrNil(""),
-		BaseledgerSyncTreeJson:               req.BusinessObjectJson,
-		BusinessObjectProof:                  hash,
+		BaseledgerSyncTreeJson:               syncTreeJson,
+		BusinessObjectProof:                  rootProof,
 		BaseledgerBusinessObjectId:           uuid.FromStringOrNil(req.BaseledgerBusinessObjectId),
 		ReferencedBaseledgerBusinessObjectId: uuid.FromStringOrNil(req.ReferencedBaseledgerBusinessObjectId),
 		StatusTextMessage:                    req.WorkstepType + " suggested",
