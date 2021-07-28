@@ -27,13 +27,14 @@ VALUES ('Org1'), ('Org2');
 
 CREATE TABLE public.workgroups (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-  workgroup_name text NOT NULL
+  workgroup_name text NOT NULL,
+  privatize_key text NOT NULL
 );
 
 ALTER TABLE public.workgroups OWNER TO baseledger;
 
-INSERT INTO public.workgroups (workgroup_name)
-VALUES ('Workgroup1');
+INSERT INTO public.workgroups (workgroup_name, privatize_key)
+VALUES ('Workgroup1', '0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314');
 
 CREATE TABLE public.workgroup_members (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
