@@ -31,8 +31,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	switch txResult.Job.TrustmeshEntry.EntryType {
 	case common.SuggestionSentTrustmeshEntryType:
 		logger.Info(common.SuggestionSentTrustmeshEntryType)
-		// TODO: Ognjen, use msg client
-		proxyutil.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
+
+		var payload, _ = json.Marshal(offchainMessage) // TODO: candidate to be moved a messaging util together with the line bellow
+		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.ReceiverOrgId.String())
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -56,8 +57,8 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		// restutil.RejectFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
 	case common.FeedbackSentTrustmeshEntryType:
 		logger.Info(common.FeedbackSentTrustmeshEntryType)
-		// TODO: Ognjen, use msg client
-		proxyutil.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
+		var payload, _ = json.Marshal(offchainMessage) // TODO: candidate to be moved a messaging util together with the line bellow
+		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.SenderOrgId.String())
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)

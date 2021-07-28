@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 
@@ -153,13 +154,22 @@ func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
 	}
 }
 
-// TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
-func SendOffchainProcessMessage(message types.OffchainProcessMessage, receiver string, txHash string) {
-	logger.Infof("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
-	// marshal natsMessage to byte array
-	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
-	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
-	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)
+func SendOffchainMessage(payload []byte, workgroupId string, recipientId string) (err error) {
+	workgroupClient := &workgroups.PostgresWorkgroupClient{}
+
+	logger.Infof("trying to find workgroup member - workgroup id: %s recipient id: %s \n", workgroupId, recipientId)
+	workgroupMembership := workgroupClient.FindWorkgroupMember(workgroupId, recipientId)
+
+	if workgroupMembership == nil {
+		return errors.New("failed to find a workgroup member")
+	}
+
+	logger.Infof("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+
+	messagingClient := &messaging.NatsMessagingClient{}
+	messagingClient.SendMessage(payload, workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+
+	return nil
 }
 
 // func receiveOffchainProcessMessage(sender string, message string) {
