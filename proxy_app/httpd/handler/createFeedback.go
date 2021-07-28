@@ -63,7 +63,7 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 			Payload:       payload,
 		}
 
-		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload, c)
+		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload)
 
 		if transactionHash == nil {
 			restutil.RenderError("sign and broadcast transaction error", 500, c)
