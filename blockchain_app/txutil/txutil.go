@@ -41,6 +41,7 @@ func BuildClientCtx(clientCtx client.Context) (*client.Context, error) {
 		return nil, errors.New("")
 	}
 
+	// every node should configure key for this purpose, and it should be first in key list
 	logger.Infof("key found %v %v\n", keysList[0], keysList[0].GetName())
 
 	clientCtx = clientCtx.
