@@ -338,6 +338,8 @@ func New(
 		appCodec,
 		keys[baseledgertypes.StoreKey],
 		keys[baseledgertypes.MemStoreKey],
+
+		app.BankKeeper,
 	)
 	baseledgerModule := baseledger.NewAppModule(appCodec, app.BaseledgerKeeper)
 
