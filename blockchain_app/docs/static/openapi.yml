@@ -1373,13 +1373,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -1587,13 +1584,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -1823,13 +1817,10 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := anypb.New(foo)
-                       if err != nil {
-                         ...
-                       }
+                       any, err := ptypes.MarshalAny(foo)
                        ...
                        foo := &pb.Foo{}
-                       if err := any.UnmarshalTo(foo); err != nil {
+                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
                          ...
                        }
 
@@ -2013,13 +2004,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -2284,13 +2272,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -2492,13 +2477,10 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
+                             any, err := ptypes.MarshalAny(foo)
                              ...
                              foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
+                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
                                ...
                              }
 
@@ -2779,13 +2761,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -3058,13 +3037,10 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := anypb.New(foo)
-                           if err != nil {
-                             ...
-                           }
+                           any, err := ptypes.MarshalAny(foo)
                            ...
                            foo := &pb.Foo{}
-                           if err := any.UnmarshalTo(foo); err != nil {
+                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
                              ...
                            }
 
@@ -3322,13 +3298,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -3585,13 +3558,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -3875,13 +3845,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -4106,13 +4073,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -4370,13 +4334,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -4659,13 +4620,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -5238,13 +5196,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -5628,13 +5583,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -5970,13 +5922,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -6224,13 +6173,10 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
+                             any, err := ptypes.MarshalAny(foo)
                              ...
                              foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
+                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
                                ...
                              }
 
@@ -6563,13 +6509,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -6815,13 +6758,10 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := anypb.New(foo)
-                           if err != nil {
-                             ...
-                           }
+                           any, err := ptypes.MarshalAny(foo)
                            ...
                            foo := &pb.Foo{}
-                           if err := any.UnmarshalTo(foo); err != nil {
+                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
                              ...
                            }
 
@@ -7132,13 +7072,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -7425,13 +7362,10 @@ paths:
                              Example 4: Pack and unpack a message in Go
 
                                  foo := &pb.Foo{...}
-                                 any, err := anypb.New(foo)
-                                 if err != nil {
-                                   ...
-                                 }
+                                 any, err := ptypes.MarshalAny(foo)
                                  ...
                                  foo := &pb.Foo{}
-                                 if err := any.UnmarshalTo(foo); err != nil {
+                                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
                                    ...
                                  }
 
@@ -7748,13 +7682,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -7986,13 +7917,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -8197,13 +8125,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -8397,13 +8322,10 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
+                             any, err := ptypes.MarshalAny(foo)
                              ...
                              foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
+                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
                                ...
                              }
 
@@ -8736,13 +8658,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -8986,13 +8905,10 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := anypb.New(foo)
-                           if err != nil {
-                             ...
-                           }
+                           any, err := ptypes.MarshalAny(foo)
                            ...
                            foo := &pb.Foo{}
-                           if err := any.UnmarshalTo(foo); err != nil {
+                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
                              ...
                            }
 
@@ -9303,13 +9219,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -9582,13 +9495,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -9887,13 +9797,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -10154,13 +10061,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -10443,13 +10347,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -10741,13 +10642,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -11013,13 +10911,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -11242,13 +11137,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -11582,13 +11474,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -11944,13 +11833,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -12156,13 +12042,10 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := anypb.New(foo)
-                           if err != nil {
-                             ...
-                           }
+                           any, err := ptypes.MarshalAny(foo)
                            ...
                            foo := &pb.Foo{}
-                           if err := any.UnmarshalTo(foo); err != nil {
+                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
                              ...
                            }
 
@@ -12386,13 +12269,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -12588,13 +12468,10 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := anypb.New(foo)
-                       if err != nil {
-                         ...
-                       }
+                       any, err := ptypes.MarshalAny(foo)
                        ...
                        foo := &pb.Foo{}
-                       if err := any.UnmarshalTo(foo); err != nil {
+                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
                          ...
                        }
 
@@ -12813,13 +12690,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -13078,13 +12952,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -13382,13 +13253,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -13683,13 +13551,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -13991,13 +13856,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -14290,13 +14152,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -14553,13 +14412,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -14819,13 +14675,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -15082,13 +14935,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -15441,13 +15291,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -15709,13 +15556,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -15907,13 +15751,10 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
+                             any, err := ptypes.MarshalAny(foo)
                              ...
                              foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
+                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
                                ...
                              }
 
@@ -16139,13 +15980,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -16375,13 +16213,10 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := anypb.New(foo)
-                       if err != nil {
-                         ...
-                       }
+                       any, err := ptypes.MarshalAny(foo)
                        ...
                        foo := &pb.Foo{}
-                       if err := any.UnmarshalTo(foo); err != nil {
+                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
                          ...
                        }
 
@@ -16602,13 +16437,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -16832,13 +16664,10 @@ paths:
                          Example 4: Pack and unpack a message in Go
 
                              foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
+                             any, err := ptypes.MarshalAny(foo)
                              ...
                              foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
+                             if err := ptypes.UnmarshalAny(any, foo); err != nil {
                                ...
                              }
 
@@ -17060,13 +16889,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -17305,13 +17131,10 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := anypb.New(foo)
-                       if err != nil {
-                         ...
-                       }
+                       any, err := ptypes.MarshalAny(foo)
                        ...
                        foo := &pb.Foo{}
-                       if err := any.UnmarshalTo(foo); err != nil {
+                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
                          ...
                        }
 
@@ -17531,13 +17354,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -17801,13 +17621,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -18156,13 +17973,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -18535,13 +18349,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -18740,13 +18551,10 @@ paths:
                        Example 4: Pack and unpack a message in Go
 
                            foo := &pb.Foo{...}
-                           any, err := anypb.New(foo)
-                           if err != nil {
-                             ...
-                           }
+                           any, err := ptypes.MarshalAny(foo)
                            ...
                            foo := &pb.Foo{}
-                           if err := any.UnmarshalTo(foo); err != nil {
+                           if err := ptypes.UnmarshalAny(any, foo); err != nil {
                              ...
                            }
 
@@ -18970,13 +18778,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -19167,13 +18972,10 @@ paths:
                    Example 4: Pack and unpack a message in Go
 
                        foo := &pb.Foo{...}
-                       any, err := anypb.New(foo)
-                       if err != nil {
-                         ...
-                       }
+                       any, err := ptypes.MarshalAny(foo)
                        ...
                        foo := &pb.Foo{}
-                       if err := any.UnmarshalTo(foo); err != nil {
+                       if err := ptypes.UnmarshalAny(any, foo); err != nil {
                          ...
                        }
 
@@ -19392,13 +19194,10 @@ paths:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -19498,6 +19297,9 @@ paths:
                       type: string
                     payload:
                       type: string
+                    opCode:
+                      type: integer
+                      format: int64
               pagination:
                 type: object
                 properties:
@@ -19615,6 +19417,9 @@ paths:
                     type: string
                   payload:
                     type: string
+                  opCode:
+                    type: integer
+                    format: int64
         default:
           description: An unexpected error response.
           schema:
@@ -20250,13 +20055,10 @@ definitions:
        Example 4: Pack and unpack a message in Go
 
            foo := &pb.Foo{...}
-           any, err := anypb.New(foo)
-           if err != nil {
-             ...
-           }
+           any, err := ptypes.MarshalAny(foo)
            ...
            foo := &pb.Foo{}
-           if err := any.UnmarshalTo(foo); err != nil {
+           if err := ptypes.UnmarshalAny(any, foo); err != nil {
              ...
            }
 
@@ -20425,13 +20227,10 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := anypb.New(foo)
-                 if err != nil {
-                   ...
-                 }
+                 any, err := ptypes.MarshalAny(foo)
                  ...
                  foo := &pb.Foo{}
-                 if err := any.UnmarshalTo(foo); err != nil {
+                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
                    ...
                  }
 
@@ -20955,13 +20754,10 @@ definitions:
              Example 4: Pack and unpack a message in Go
 
                  foo := &pb.Foo{...}
-                 any, err := anypb.New(foo)
-                 if err != nil {
-                   ...
-                 }
+                 any, err := ptypes.MarshalAny(foo)
                  ...
                  foo := &pb.Foo{}
-                 if err := any.UnmarshalTo(foo); err != nil {
+                 if err := ptypes.UnmarshalAny(any, foo); err != nil {
                    ...
                  }
 
@@ -21144,13 +20940,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -21378,13 +21171,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -21793,13 +21583,10 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := anypb.New(foo)
-                   if err != nil {
-                     ...
-                   }
+                   any, err := ptypes.MarshalAny(foo)
                    ...
                    foo := &pb.Foo{}
-                   if err := any.UnmarshalTo(foo); err != nil {
+                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
                      ...
                    }
 
@@ -22043,13 +21830,10 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := anypb.New(foo)
-                     if err != nil {
-                       ...
-                     }
+                     any, err := ptypes.MarshalAny(foo)
                      ...
                      foo := &pb.Foo{}
-                     if err := any.UnmarshalTo(foo); err != nil {
+                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
                        ...
                      }
 
@@ -22906,13 +22690,10 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := anypb.New(foo)
-                     if err != nil {
-                       ...
-                     }
+                     any, err := ptypes.MarshalAny(foo)
                      ...
                      foo := &pb.Foo{}
-                     if err := any.UnmarshalTo(foo); err != nil {
+                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
                        ...
                      }
 
@@ -23468,13 +23249,10 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := anypb.New(foo)
-                   if err != nil {
-                     ...
-                   }
+                   any, err := ptypes.MarshalAny(foo)
                    ...
                    foo := &pb.Foo{}
-                   if err := any.UnmarshalTo(foo); err != nil {
+                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
                      ...
                    }
 
@@ -23766,13 +23544,10 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := anypb.New(foo)
-                     if err != nil {
-                       ...
-                     }
+                     any, err := ptypes.MarshalAny(foo)
                      ...
                      foo := &pb.Foo{}
-                     if err := any.UnmarshalTo(foo); err != nil {
+                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
                        ...
                      }
 
@@ -24169,13 +23944,10 @@ definitions:
                      Example 4: Pack and unpack a message in Go
 
                          foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
+                         any, err := ptypes.MarshalAny(foo)
                          ...
                          foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
+                         if err := ptypes.UnmarshalAny(any, foo); err != nil {
                            ...
                          }
 
@@ -24772,13 +24544,10 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := anypb.New(foo)
-                   if err != nil {
-                     ...
-                   }
+                   any, err := ptypes.MarshalAny(foo)
                    ...
                    foo := &pb.Foo{}
-                   if err := any.UnmarshalTo(foo); err != nil {
+                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
                      ...
                    }
 
@@ -25139,13 +24908,10 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := anypb.New(foo)
-                     if err != nil {
-                       ...
-                     }
+                     any, err := ptypes.MarshalAny(foo)
                      ...
                      foo := &pb.Foo{}
-                     if err := any.UnmarshalTo(foo); err != nil {
+                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
                        ...
                      }
 
@@ -25724,13 +25490,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -26581,13 +26344,10 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := anypb.New(foo)
-                   if err != nil {
-                     ...
-                   }
+                   any, err := ptypes.MarshalAny(foo)
                    ...
                    foo := &pb.Foo{}
-                   if err := any.UnmarshalTo(foo); err != nil {
+                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
                      ...
                    }
 
@@ -26784,13 +26544,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -27788,13 +27545,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -27982,13 +27736,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -28189,13 +27940,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -28405,13 +28153,10 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := anypb.New(foo)
-                     if err != nil {
-                       ...
-                     }
+                     any, err := ptypes.MarshalAny(foo)
                      ...
                      foo := &pb.Foo{}
-                     if err := any.UnmarshalTo(foo); err != nil {
+                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
                        ...
                      }
 
@@ -28612,13 +28357,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -28852,13 +28594,10 @@ definitions:
                  Example 4: Pack and unpack a message in Go
 
                      foo := &pb.Foo{...}
-                     any, err := anypb.New(foo)
-                     if err != nil {
-                       ...
-                     }
+                     any, err := ptypes.MarshalAny(foo)
                      ...
                      foo := &pb.Foo{}
-                     if err := any.UnmarshalTo(foo); err != nil {
+                     if err := ptypes.UnmarshalAny(any, foo); err != nil {
                        ...
                      }
 
@@ -29333,13 +29072,10 @@ definitions:
                Example 4: Pack and unpack a message in Go
 
                    foo := &pb.Foo{...}
-                   any, err := anypb.New(foo)
-                   if err != nil {
-                     ...
-                   }
+                   any, err := ptypes.MarshalAny(foo)
                    ...
                    foo := &pb.Foo{}
-                   if err := any.UnmarshalTo(foo); err != nil {
+                   if err := ptypes.UnmarshalAny(any, foo); err != nil {
                      ...
                    }
 
@@ -29536,13 +29272,10 @@ definitions:
            Example 4: Pack and unpack a message in Go
 
                foo := &pb.Foo{...}
-               any, err := anypb.New(foo)
-               if err != nil {
-                 ...
-               }
+               any, err := ptypes.MarshalAny(foo)
                ...
                foo := &pb.Foo{}
-               if err := any.UnmarshalTo(foo); err != nil {
+               if err := ptypes.UnmarshalAny(any, foo); err != nil {
                  ...
                }
 
@@ -29939,6 +29672,9 @@ definitions:
         type: string
       payload:
         type: string
+      opCode:
+        type: integer
+        format: int64
   unibrightio.baseledger.baseledger.MsgCreateBaseledgerTransactionResponse:
     type: object
     properties:
@@ -29964,6 +29700,9 @@ definitions:
               type: string
             payload:
               type: string
+            opCode:
+              type: integer
+              format: int64
       pagination:
         type: object
         properties:
@@ -30003,3 +29742,6 @@ definitions:
             type: string
           payload:
             type: string
+          opCode:
+            type: integer
+            format: int64

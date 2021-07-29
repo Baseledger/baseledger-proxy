@@ -19,6 +19,7 @@ const defaultResponseContentType = "application/json; charset=UTF-8"
 type SignAndBroadcastPayload struct {
 	TransactionId string `json:"transaction_id"`
 	Payload       string `json:"payload"`
+	OpCode        uint32 `json:"op_code"`
 }
 
 func SignAndBroadcast(payload SignAndBroadcastPayload) *string {
