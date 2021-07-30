@@ -33,7 +33,7 @@ CREATE TABLE public.workgroups (
 ALTER TABLE public.workgroups OWNER TO baseledger;
 
 INSERT INTO public.workgroups (workgroup_name)
-VALUES ('Workgroup1');
+VALUES ('Workgroup1'); -- TODO: Id must be shared between nodes
 
 CREATE TABLE public.workgroup_members (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
