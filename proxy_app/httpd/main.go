@@ -74,6 +74,7 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 
 	logger.Infof("message received %v\n", natsMessage)
 
+	natsMessage.ProcessMessage.Id = uuid.Nil // set to nil so that it can be created in the DB
 	if !natsMessage.ProcessMessage.Create() {
 		logger.Errorf("error when creating new offchain msg entry")
 		return
