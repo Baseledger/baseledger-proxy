@@ -12,6 +12,7 @@ import (
 	"io"
 
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/spf13/viper"
 
 	// "github.com/cosmos/cosmos-sdk/client/tx"
 	common "github.com/unibrightio/proxy-api/common"
@@ -62,8 +63,7 @@ func CreateBaseledgerTransactionPayload(
 	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
 
 	payload := &types.BaseledgerTransactionPayload{
-		// TODO proper identifier BAS-33
-		SenderId:                             "123",
+		SenderId:                             viper.Get("ORGANIZATION_ID").(string),
 		TransactionType:                      "Suggest",
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
@@ -95,8 +95,7 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		feedbackMsg = "Reject"
 	}
 	payload := &types.BaseledgerTransactionPayload{
-		// TODO proper identifier BAS-33
-		SenderId:                             "123",
+		SenderId:                             viper.Get("ORGANIZATION_ID").(string),
 		TransactionType:                      feedbackMsg,
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),

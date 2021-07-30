@@ -22,8 +22,8 @@ CREATE TABLE public.organizations (
 
 ALTER TABLE public.organizations OWNER TO baseledger;
 
-INSERT INTO public.organizations (organization_name)
-VALUES ('Org1'), ('Org2');
+INSERT INTO public.organizations (id, organization_name)
+VALUES ('d45c9b93-3eef-4993-add6-aa1c84d17eea', 'Org1'), ('969e989c-bb61-4180-928c-0d48afd8c6a3', 'Org2');
 
 CREATE TABLE public.workgroups (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
