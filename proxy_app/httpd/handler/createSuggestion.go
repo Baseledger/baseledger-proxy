@@ -108,7 +108,7 @@ func createSuggestionSentTrustmeshEntry(req createInitialSuggestionRequest, tran
 	return &types.TrustmeshEntry{
 		TendermintTransactionId:              transactionId,
 		OffchainProcessMessageId:             offchainMsg.Id,
-		SenderOrgId:                          viper.Get("ORGANIZATION_ID").(uuid.UUID),
+		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 		WorkstepType:                         offchainMsg.WorkstepType,
