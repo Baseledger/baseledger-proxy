@@ -11,15 +11,15 @@ import (
 )
 
 type signAndBroadcastTransactionRequest struct {
-	BaseReq       rest.BaseReq `json:"base_req"`
-	TransactionId string       `json:"transaction_id"`
-	Payload       string       `json:"payload"`
+	TransactionId string `json:"transaction_id"`
+	Payload       string `json:"payload"`
 }
 
 func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := parseSignAndBroadcastTransactionRequest(w, r, clientCtx)
-		clientCtx, err := txutil.BuildClientCtx(clientCtx, req.BaseReq.From)
+
+		clientCtx, err := txutil.BuildClientCtx(clientCtx)
 
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -68,12 +68,6 @@ func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFu
 func parseSignAndBroadcastTransactionRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *signAndBroadcastTransactionRequest {
 	var req signAndBroadcastTransactionRequest
 	if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-		return nil
-	}
-
-	baseReq := req.BaseReq.Sanitize()
-	if !baseReq.ValidateBasic(w) {
-		rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 		return nil
 	}
 

@@ -11,10 +11,9 @@ import (
 )
 
 type sendOffchainMessageRequest struct {
-	BaseReq     restutil.BaseReq `json:"base_req"`
-	WorkgroupId string           `json:"workgroup_id"`
-	RecipientId string           `json:"recipient_id"`
-	Payload     string           `json:"payload"`
+	WorkgroupId string `json:"workgroup_id"`
+	RecipientId string `json:"recipient_id"`
+	Payload     string `json:"payload"`
 }
 
 func SendOffchainMessageHandler() gin.HandlerFunc {

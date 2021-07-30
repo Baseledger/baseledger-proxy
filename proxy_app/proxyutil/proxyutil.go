@@ -57,8 +57,10 @@ func CreateBaseledgerTransactionPayload(
 	synchronizationRequest *types.SynchronizationRequest,
 	offchainProcessMessage *types.OffchainProcessMessage,
 ) string {
-	workgroup := findWorkgroupMock(synchronizationRequest.WorkgroupId)
-	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
+	// Do we need client anymore now when we split apps? Maybe just simple query util like for other entities?
+	// should we load workgroup at start and keep it in memory, we are querying it all the time and it won't change
+	workgroupClient := &workgroups.PostgresWorkgroupClient{}
+	workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId.String())
 
 	payload := &types.BaseledgerTransactionPayload{
 		// TODO proper identifier BAS-33
@@ -86,8 +88,8 @@ func CreateBaseledgerTransactionFeedbackPayload(
 	synchronizationFeedback *types.SynchronizationFeedback,
 	offchainProcessMessage *types.OffchainProcessMessage,
 ) string {
-	workgroup := findWorkgroupMock(synchronizationFeedback.WorkgroupId)
-	// workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId)
+	workgroupClient := &workgroups.PostgresWorkgroupClient{}
+	workgroup := workgroupClient.FindWorkgroup(synchronizationFeedback.WorkgroupId.String())
 
 	feedbackMsg := "Approve"
 	if !synchronizationFeedback.Approved {
@@ -144,15 +146,6 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 	}
 }
 
-// TODO: skos remove this and read from db
-func findWorkgroupMock(workgroupId uuid.UUID) *workgroupMock {
-	return &workgroupMock{
-		BaselineWorkgroupID: workgroupId,
-		Description:         "Mocked workgroup",
-		PrivatizeKey:        "0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314",
-	}
-}
-
 // TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
 func SendOffchainProcessMessage(message types.OffchainProcessMessage, receiver string, txHash string) {
 	logger.Infof("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
@@ -173,7 +166,8 @@ func CreateHashFromBusinessObject(bo string) string {
 }
 
 func DeprivatizeBaseledgerTransactionPayload(payload string, workgroupId uuid.UUID) string {
-	workgroup := findWorkgroupMock(workgroupId)
+	workgroupClient := &workgroups.PostgresWorkgroupClient{}
+	workgroup := workgroupClient.FindWorkgroup(workgroupId.String())
 	return deprivatizePayload(payload, workgroup.PrivatizeKey)
 }
 
