@@ -69,9 +69,16 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	err := json.Unmarshal(natsMsg.Data, &natsMessage)
 	if err != nil {
 		logger.Errorf("Error parsing nats message %v\n", err)
+		return
 	}
 
 	logger.Infof("message received %v\n", natsMessage)
+
+	if !natsMessage.ProcessMessage.Create() {
+		logger.Errorf("error when creating new offchain msg entry")
+		return
+	}
+
 	entryType := common.SuggestionReceivedTrustmeshEntryType
 	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType

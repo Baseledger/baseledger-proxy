@@ -32,7 +32,13 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	case common.SuggestionSentTrustmeshEntryType:
 		logger.Info(common.SuggestionSentTrustmeshEntryType)
 
-		var payload, _ = json.Marshal(offchainMessage) // TODO: candidate to be moved a messaging util together with the line bellow
+		// TODO: bellow lines should be moved to send offchain message
+		var natsMessage proxytypes.NatsMessage
+
+		natsMessage.ProcessMessage = *offchainMessage
+		natsMessage.TxHash = txResult.Job.TrustmeshEntry.TransactionHash
+
+		var payload, _ = json.Marshal(natsMessage)
 		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.ReceiverOrgId.String())
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)

@@ -171,11 +171,6 @@ func SendOffchainMessage(payload []byte, workgroupId string, recipientId string)
 	return nil
 }
 
-// func receiveOffchainProcessMessage(sender string, message string) {
-// 	fmt.Printf("\n sender %v \n", sender)
-// 	fmt.Printf("\n message %v \n", message)
-// }
-
 func CreateHashFromBusinessObject(bo string) string {
 	hash := md5.Sum([]byte(bo))
 	return hex.EncodeToString(hash[:])
