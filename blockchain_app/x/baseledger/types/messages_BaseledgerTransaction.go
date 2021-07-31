@@ -7,12 +7,13 @@ import (
 
 var _ sdk.Msg = &MsgCreateBaseledgerTransaction{}
 
-func NewMsgCreateBaseledgerTransaction(id string, creator string, baseledgerTransactionId string, payload string) *MsgCreateBaseledgerTransaction {
+func NewMsgCreateBaseledgerTransaction(id string, creator string, baseledgerTransactionId string, payload string, opCode uint32) *MsgCreateBaseledgerTransaction {
 	return &MsgCreateBaseledgerTransaction{
 		Id:                      id,
 		Creator:                 creator,
 		BaseledgerTransactionId: baseledgerTransactionId,
 		Payload:                 payload,
+		OpCode:                  opCode,
 	}
 }
 
@@ -47,12 +48,13 @@ func (msg *MsgCreateBaseledgerTransaction) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgUpdateBaseledgerTransaction{}
 
-func NewMsgUpdateBaseledgerTransaction(creator string, id string, baseledgerTransactionId string, payload string) *MsgUpdateBaseledgerTransaction {
+func NewMsgUpdateBaseledgerTransaction(creator string, id string, baseledgerTransactionId string, payload string, opCode uint32) *MsgUpdateBaseledgerTransaction {
 	return &MsgUpdateBaseledgerTransaction{
 		Id:                      id,
 		Creator:                 creator,
 		BaseledgerTransactionId: baseledgerTransactionId,
 		Payload:                 payload,
+		OpCode:                  opCode,
 	}
 }
 

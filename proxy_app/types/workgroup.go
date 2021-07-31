@@ -9,6 +9,7 @@ import (
 type Workgroup struct {
 	Id            uuid.UUID
 	WorkgroupName string
+	PrivatizeKey  string
 }
 
 func (t *Workgroup) Create() bool {

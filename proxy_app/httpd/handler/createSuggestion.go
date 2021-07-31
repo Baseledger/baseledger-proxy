@@ -15,16 +15,15 @@ import (
 )
 
 type createInitialSuggestionRequest struct {
-	BaseReq                              restutil.BaseReq `json:"base_req"`
-	WorkgroupId                          string           `json:"workgroup_id"`
-	Recipient                            string           `json:"recipient"`
-	WorkstepType                         string           `json:"workstep_type"`
-	BusinessObjectType                   string           `json:"business_object_type"`
-	BaseledgerBusinessObjectId           string           `json:"baseledger_business_object_id"`
-	BusinessObjectJson                   string           `json:"business_object_json"`
-	ReferencedBaseledgerBusinessObjectId string           `json:"referenced_baseledger_business_object_id"`
-	ReferencedBaseledgerTransactionId    string           `json:"referenced_baseledger_transaction_id"`
-	KnowledgeLimiters                    []string         `json:"knowledge_limiters"`
+	WorkgroupId                          string   `json:"workgroup_id"`
+	Recipient                            string   `json:"recipient"`
+	WorkstepType                         string   `json:"workstep_type"`
+	BusinessObjectType                   string   `json:"business_object_type"`
+	BaseledgerBusinessObjectId           string   `json:"baseledger_business_object_id"`
+	BusinessObjectJson                   string   `json:"business_object_json"`
+	ReferencedBaseledgerBusinessObjectId string   `json:"referenced_baseledger_business_object_id"`
+	ReferencedBaseledgerTransactionId    string   `json:"referenced_baseledger_transaction_id"`
+	KnowledgeLimiters                    []string `json:"knowledge_limiters"`
 }
 
 func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
@@ -67,12 +66,12 @@ func CreateInitialSuggestionRequestHandler() gin.HandlerFunc {
 		payload := proxyutil.CreateBaseledgerTransactionPayload(syncReq, &offchainMsg)
 
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
-			BaseReq:       req.BaseReq,
 			TransactionId: transactionId.String(),
 			Payload:       payload,
+			OpCode:        0,
 		}
 
-		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload, c)
+		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload)
 
 		if transactionHash == nil {
 			restutil.RenderError("sign and broadcast transaction error", 500, c)

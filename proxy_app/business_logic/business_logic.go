@@ -13,6 +13,7 @@ import (
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
+	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/synctree"
 	proxytypes "github.com/unibrightio/proxy-api/types"
 )
@@ -59,8 +60,8 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
 			return
 		}
-		logger.Warn("Hashes don't match")
-		// restutil.RejectFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
+		logger.Warnf("Hashes don't match, rejecting feedback %v %v %v", baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson)
+		restutil.SendRejectFeedback(offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
 	case common.FeedbackSentTrustmeshEntryType:
 		logger.Info(common.FeedbackSentTrustmeshEntryType)
 		var payload, _ = json.Marshal(offchainMessage) // TODO: candidate to be moved a messaging util together with the line bellow
