@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
@@ -104,10 +105,9 @@ func newSynchronizationRequest(req createInitialSuggestionRequest) *types.Synchr
 
 func createSuggestionSentTrustmeshEntry(req createInitialSuggestionRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, txHash string) *types.TrustmeshEntry {
 	return &types.TrustmeshEntry{
-		TendermintTransactionId:  transactionId,
-		OffchainProcessMessageId: offchainMsg.Id,
-		// TODO: define proxy identifier, BAS-33
-		SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		TendermintTransactionId:              transactionId,
+		OffchainProcessMessageId:             offchainMsg.Id,
+		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 		WorkstepType:                         offchainMsg.WorkstepType,

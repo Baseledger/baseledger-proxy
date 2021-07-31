@@ -5,9 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/unibrightio/proxy-api/logger"
-	"github.com/unibrightio/proxy-api/messaging"
+	"github.com/unibrightio/proxy-api/proxyutil"
 	"github.com/unibrightio/proxy-api/restutil"
-	"github.com/unibrightio/proxy-api/workgroups"
 )
 
 type sendOffchainMessageRequest struct {
@@ -32,18 +31,13 @@ func SendOffchainMessageHandler() gin.HandlerFunc {
 			return
 		}
 
-		workgroupClient := &workgroups.PostgresWorkgroupClient{}
-		logger.Infof("trying to find workgroup member\n")
-		workgroupMembership := workgroupClient.FindWorkgroupMember(req.WorkgroupId, req.RecipientId)
+		err = proxyutil.SendOffchainMessage([]byte(req.Payload), req.WorkgroupId, req.RecipientId)
 
-		if workgroupMembership == nil {
-			restutil.RenderError("failed to find a workgroup member", 404, c)
+		if err != nil {
+			restutil.RenderError(err.Error(), 404, c)
 			return
 		}
 
-		logger.Infof("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
-		messagingClient := &messaging.NatsMessagingClient{}
-		messagingClient.SendMessage([]byte(req.Payload), workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
 		restutil.Render(nil, 200, c)
 	}
 }

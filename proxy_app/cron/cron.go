@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/spf13/viper"
 
 	proxytypes "github.com/unibrightio/proxy-api/types"
 
@@ -44,9 +45,7 @@ func queryTrustmeshes() {
 
 func getTxInfo(txHash string) (txInfo *proxytypes.TxInfo, err error) {
 	// fetching tx details
-	// TODO: BAS-33
-	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
-	str := "http://starport:26657/tx?hash=0x" + txHash
+	str := "http://" + viper.Get("TENDERMINT_API_URL").(string) + "/tx?hash=0x" + txHash
 	httpRes, err := http.Get(str)
 	if err != nil {
 		logger.Errorf("error during http tx req %v\n", err)
@@ -67,9 +66,7 @@ func getTxInfo(txHash string) (txInfo *proxytypes.TxInfo, err error) {
 		return &proxytypes.TxInfo{}, errors.New("error decoding tx")
 	}
 	// query for block at specific height to find timestamp
-	// TODO: BAS-33
-	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
-	str = "http://starport:26657/block?height" + committedTx.TxResult.Height
+	str = "http://" + viper.Get("TENDERMINT_API_URL").(string) + "/block?height" + committedTx.TxResult.Height
 	httpRes, err = http.Get(str)
 	if err != nil {
 		logger.Errorf("error during http block req %v\n", err)

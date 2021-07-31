@@ -7,10 +7,12 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/spf13/viper"
 
 	// "github.com/cosmos/cosmos-sdk/client/tx"
 	common "github.com/unibrightio/proxy-api/common"
@@ -63,8 +65,7 @@ func CreateBaseledgerTransactionPayload(
 	workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId.String())
 
 	payload := &types.BaseledgerTransactionPayload{
-		// TODO proper identifier BAS-33
-		SenderId:                             "123",
+		SenderId:                             viper.Get("ORGANIZATION_ID").(string),
 		TransactionType:                      "Suggest",
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
@@ -96,8 +97,7 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		feedbackMsg = "Reject"
 	}
 	payload := &types.BaseledgerTransactionPayload{
-		// TODO proper identifier BAS-33
-		SenderId:                             "123",
+		SenderId:                             viper.Get("ORGANIZATION_ID").(string),
 		TransactionType:                      feedbackMsg,
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
 		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
@@ -146,19 +146,23 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 	}
 }
 
-// TODO: made this public just as a mock, we will integrate with NATS here and implement real logic
-func SendOffchainProcessMessage(message types.OffchainProcessMessage, receiver string, txHash string) {
-	logger.Infof("SENDING OFFCHAIN PROCESS MESSAGE WITH ID %v AND TX HASH %v\n", message.Id, txHash)
-	// marshal natsMessage to byte array
-	// recipientMessagingEndpoint := workgroupClient.FindRecipientMessagingEndpoint(recipientId)
-	// recipientMessagingToken := workgroupClient.FindRecipientMessagingToken(recipientId)
-	// messagingClient.SendMessage("TODO: convert message to correct payload", recipientMessagingEndpoint, recipientMessagingToken)
-}
+func SendOffchainMessage(payload []byte, workgroupId string, recipientId string) (err error) {
+	workgroupClient := &workgroups.PostgresWorkgroupClient{}
 
-// func receiveOffchainProcessMessage(sender string, message string) {
-// 	fmt.Printf("\n sender %v \n", sender)
-// 	fmt.Printf("\n message %v \n", message)
-// }
+	logger.Infof("trying to find workgroup member - workgroup id: %s recipient id: %s \n", workgroupId, recipientId)
+	workgroupMembership := workgroupClient.FindWorkgroupMember(workgroupId, recipientId)
+
+	if workgroupMembership == nil {
+		return errors.New("failed to find a workgroup member")
+	}
+
+	logger.Infof("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+
+	messagingClient := &messaging.NatsMessagingClient{}
+	messagingClient.SendMessage(payload, workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+
+	return nil
+}
 
 func CreateHashFromBusinessObject(bo string) string {
 	hash := md5.Sum([]byte(bo))

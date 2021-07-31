@@ -32,7 +32,7 @@ func (client *PostgresWorkgroupClient) FindWorkgroupMember(workgroupId string, r
 	dbError := dbutil.Db.GetConn().First(&member, "workgroup_id = ? AND organization_id = ?", workgroupId, recipientId).Error
 
 	if dbError != nil {
-		logger.Errorf("error trying to fetch workgroup membership with workgroup id %s and organization with id %s\n", recipientId, recipientId)
+		logger.Errorf("error %s trying to fetch workgroup membership with workgroup id %s and organization with id %s\n", dbError, workgroupId, recipientId)
 		return nil
 	}
 

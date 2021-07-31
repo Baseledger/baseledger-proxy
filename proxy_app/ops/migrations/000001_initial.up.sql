@@ -24,8 +24,8 @@ ALTER TABLE public.organizations OWNER TO baseledger;
 
 ALTER TABLE ONLY public.organizations ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
 
-INSERT INTO public.organizations (organization_name)
-VALUES ('Org1'), ('Org2');
+INSERT INTO public.organizations (id, organization_name)
+VALUES ('d45c9b93-3eef-4993-add6-aa1c84d17eea', 'Org1'), ('969e989c-bb61-4180-928c-0d48afd8c6a3', 'Org2');
 
 CREATE TABLE public.workgroups (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -37,8 +37,8 @@ ALTER TABLE public.workgroups OWNER TO baseledger;
 
 ALTER TABLE ONLY public.workgroups ADD CONSTRAINT workgroups_pkey PRIMARY KEY (id);
 
-INSERT INTO public.workgroups (workgroup_name, privatize_key)
-VALUES ('Workgroup1', '0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314');
+INSERT INTO public.workgroups (id, workgroup_name, privatize_key)
+VALUES ('734276bc-4adc-4621-acf8-ac66dc91cb27', 'Workgroup1', '0c2e08bc9249fb42568e5a478e9af87a208471c46211a08f3ad9f0c5dbf57314');
 
 CREATE TABLE public.workgroup_members (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,

@@ -39,11 +39,11 @@ func main() {
 func setupViper() {
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
-	viper.AutomaticEnv() // Overwrite config with env variables if exist
+	viper.AutomaticEnv() // Overwrite config with env variables if exist, important for debugging session
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Println("viper read config error %v\n", err)
+		fmt.Println(fmt.Printf("viper read config error %v\n", err))
 	}
 }
 
@@ -69,9 +69,17 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	err := json.Unmarshal(natsMsg.Data, &natsMessage)
 	if err != nil {
 		logger.Errorf("Error parsing nats message %v\n", err)
+		return
 	}
 
 	logger.Infof("message received %v\n", natsMessage)
+
+	natsMessage.ProcessMessage.Id = uuid.Nil // set to nil so that it can be created in the DB
+	if !natsMessage.ProcessMessage.Create() {
+		logger.Errorf("error when creating new offchain msg entry")
+		return
+	}
+
 	entryType := common.SuggestionReceivedTrustmeshEntryType
 	if natsMessage.ProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
 		entryType = common.FeedbackReceivedTrustmeshEntryType

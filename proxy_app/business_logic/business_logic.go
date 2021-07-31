@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/spf13/viper"
+
 	uuid "github.com/kthomas/go.uuid"
 	common "github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/dbutil"
@@ -30,8 +32,15 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	switch txResult.Job.TrustmeshEntry.EntryType {
 	case common.SuggestionSentTrustmeshEntryType:
 		logger.Info(common.SuggestionSentTrustmeshEntryType)
-		// TODO: Ognjen, use msg client
-		proxyutil.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.ReceiverOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
+
+		// TODO: bellow lines should be moved to send offchain message
+		var natsMessage proxytypes.NatsMessage
+
+		natsMessage.ProcessMessage = *offchainMessage
+		natsMessage.TxHash = txResult.Job.TrustmeshEntry.TransactionHash
+
+		var payload, _ = json.Marshal(natsMessage)
+		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.ReceiverOrgId.String())
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -55,8 +64,8 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		restutil.SendRejectFeedback(offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
 	case common.FeedbackSentTrustmeshEntryType:
 		logger.Info(common.FeedbackSentTrustmeshEntryType)
-		// TODO: Ognjen, use msg client
-		proxyutil.SendOffchainProcessMessage(*offchainMessage, txResult.Job.TrustmeshEntry.SenderOrgId.String(), txResult.Job.TrustmeshEntry.TransactionHash)
+		var payload, _ = json.Marshal(offchainMessage) // TODO: candidate to be moved a messaging util together with the line bellow
+		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.SenderOrgId.String())
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -104,10 +113,8 @@ func setTxStatusToCommitted(txResult proxytypes.Result) {
 	}
 }
 
-// TODO: BAS-33 this needs to be tested, just building ok for now
 func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransactionDto {
-	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
-	resp, err := http.Get("http://starport:1317/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
+	resp, err := http.Get("http://" + viper.Get("TENDERMINT_API_URL").(string) + "/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
 
 	if err != nil {
 		logger.Errorf("error while fetching committed baseledger transaction %v\n", err.Error())

@@ -81,7 +81,7 @@ func InitDbIfNotExists() {
 	var connSucceded bool = false
 
 	connAttempt := 0
-	for connAttempt < 5 {
+	for connAttempt <= 10 {
 		logger.Info("Tryin to init admin db connection")
 
 		db, dbErr = gorm.Open("postgres", args)
@@ -89,7 +89,7 @@ func InitDbIfNotExists() {
 		if dbErr != nil {
 			logger.Errorf("db connection failed %v\n", dbErr.Error())
 
-			time.Sleep(3 * time.Second)
+			time.Sleep(5 * time.Second)
 			connAttempt++
 		} else {
 			connSucceded = true

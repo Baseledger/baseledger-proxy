@@ -46,8 +46,7 @@ services:
       dockerfile: ../proxy_app/ops/Dockerfile
       args:
         - DB_HOST=postgres-local-node
-        - DB_UB_USER=ub
-        - DB_UB_PWD=ub123
+        - ORGANIZATION_ID=${ORGANIZATION_ID}
     image: proxy_app
     networks:
       - baseledger

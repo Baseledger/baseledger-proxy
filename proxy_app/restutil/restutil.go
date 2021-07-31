@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
@@ -30,8 +31,7 @@ func SignAndBroadcast(payload SignAndBroadcastPayload) *string {
 		return nil
 	}
 
-	// All of these must be read from ENV. target should be localhost from host and blockchain app container name if dockerized
-	resp, err := http.Post("http://starport:1317/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
+	resp, err := http.Post("http://"+viper.Get("BLOCKCHAIN_APP_URL").(string)+"/signAndBroadcast", "application/json", bytes.NewBuffer(jsonValue))
 
 	if err != nil {
 		logger.Errorf("error while sending feedback request %v\n", err.Error())

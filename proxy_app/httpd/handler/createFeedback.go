@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
@@ -85,7 +86,7 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 
 func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
-		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         "Feedback",
@@ -108,10 +109,9 @@ func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, tra
 
 func createFeedbackSentTrustmeshEntry(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, feedbackMsg string, txHash string) *types.TrustmeshEntry {
 	trustmeshEntry := &types.TrustmeshEntry{
-		TendermintTransactionId:  transactionId,
-		OffchainProcessMessageId: offchainMsg.Id,
-		// TODO: define proxy identifier, BAS-33
-		SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		TendermintTransactionId:              transactionId,
+		OffchainProcessMessageId:             offchainMsg.Id,
+		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 		WorkstepType:                         offchainMsg.WorkstepType,
