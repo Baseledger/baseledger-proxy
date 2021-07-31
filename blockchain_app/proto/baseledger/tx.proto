@@ -20,6 +20,7 @@ message MsgCreateBaseledgerTransaction {
   string id = 2;
   string baseledgerTransactionId = 3;
   string payload = 4;
+  uint32 opCode = 5;
 }
 
 message MsgCreateBaseledgerTransactionResponse {
@@ -31,6 +32,7 @@ message MsgUpdateBaseledgerTransaction {
   string id = 2;
   string baseledgerTransactionId = 3;
   string payload = 4;
+  uint32 opCode = 5;
 }
 
 message MsgUpdateBaseledgerTransactionResponse { }

@@ -13,7 +13,7 @@ import (
 
 func CmdCreateBaseledgerTransaction() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-BaseledgerTransaction [baseledgerTransactionId] [payload]",
+		Use:   "create-BaseledgerTransaction [baseledgerTransactionId] [payload] [opCode]",
 		Short: "Create a new BaseledgerTransaction",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -25,13 +25,17 @@ func CmdCreateBaseledgerTransaction() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			argsOpCode, err := cast.ToUint32E(args[2])
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreateBaseledgerTransaction(argsBaseledgerTransactionId, clientCtx.GetFromAddress().String(), argsBaseledgerTransactionId, argsPayload)
+			msg := types.NewMsgCreateBaseledgerTransaction(argsBaseledgerTransactionId, clientCtx.GetFromAddress().String(), argsBaseledgerTransactionId, argsPayload, argsOpCode)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
@@ -46,7 +50,7 @@ func CmdCreateBaseledgerTransaction() *cobra.Command {
 
 func CmdUpdateBaseledgerTransaction() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update-BaseledgerTransaction [id] [baseledgerTransactionId] [payload]",
+		Use:   "update-BaseledgerTransaction [id] [baseledgerTransactionId] [payload] [opCode]",
 		Short: "Update a BaseledgerTransaction",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -60,12 +64,17 @@ func CmdUpdateBaseledgerTransaction() *cobra.Command {
 				return err
 			}
 
+			argsOpCode, err := cast.ToUint32E(args[2])
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgUpdateBaseledgerTransaction(clientCtx.GetFromAddress().String(), args[0], argsBaseledgerTransactionId, argsPayload)
+			msg := types.NewMsgUpdateBaseledgerTransaction(clientCtx.GetFromAddress().String(), args[0], argsBaseledgerTransactionId, argsPayload, argsOpCode)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

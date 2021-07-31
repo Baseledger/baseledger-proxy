@@ -13,6 +13,7 @@ import (
 type signAndBroadcastTransactionRequest struct {
 	TransactionId string `json:"transaction_id"`
 	Payload       string `json:"payload"`
+	OpCode        uint32 `json:"op_code"`
 }
 
 func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFunc {
@@ -34,7 +35,7 @@ func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFu
 			return
 		}
 
-		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(req.TransactionId, clientCtx.GetFromAddress().String(), req.TransactionId, req.Payload)
+		msg := baseledgerTypes.NewMsgCreateBaseledgerTransaction(req.TransactionId, clientCtx.GetFromAddress().String(), req.TransactionId, req.Payload, req.OpCode)
 		if err := msg.ValidateBasic(); err != nil {
 			logger.Errorf("msg validate basic failed %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())

@@ -61,6 +61,7 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
 			Payload:       payload,
+			OpCode:        0,
 		}
 
 		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload)
