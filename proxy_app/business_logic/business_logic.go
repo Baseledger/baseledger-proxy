@@ -18,6 +18,12 @@ import (
 
 func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	if txResult.TxInfo.TxHeight == "" || txResult.TxInfo.TxTimestamp == "" {
+		logger.Infof("Transaction %v not yet committed", txResult.Job.TrustmeshEntry.TransactionHash)
+		return
+	}
+	if !txResult.TxInfo.TxValid {
+		logger.Warnf("Transaction %v is invalid with code %v and log %v", txResult.Job.TrustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
+		setTxStatus(txResult, common.InvalidCommitmentState)
 		return
 	}
 	logger.Infof("Execute business logic for result %v\n", txResult)
@@ -88,12 +94,12 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		logger.Errorf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
-	setTxStatusToCommitted(txResult)
+	setTxStatus(txResult, common.CommittedCommitmentState)
 }
 
-func setTxStatusToCommitted(txResult proxytypes.Result) {
+func setTxStatus(txResult proxytypes.Result, commitmentState string) {
 	result := dbutil.Db.GetConn().Exec("UPDATE trustmesh_entries SET commitment_state = ?, tendermint_block_id = ?, tendermint_transaction_timestamp = ? WHERE tendermint_transaction_id = ?",
-		common.CommittedCommitmentState,
+		commitmentState,
 		txResult.TxInfo.TxHeight,
 		txResult.TxInfo.TxTimestamp,
 		txResult.Job.TrustmeshEntry.TendermintTransactionId)

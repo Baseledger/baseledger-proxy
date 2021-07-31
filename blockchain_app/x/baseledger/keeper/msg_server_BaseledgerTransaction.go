@@ -20,9 +20,38 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 
 	fmt.Printf("TX CREATOR ACCOUNT %v %v\n", txCreatorAddress, txCreatorAddress.String())
 
+	coinz := k.bankKeeper.GetAllBalances(ctx, txCreatorAddress)
+
+	fmt.Printf("BALANCES BEFORE SENDING %v\n", coinz)
+
+	coinz = k.bankKeeper.GetAllBalances(ctx, moduleAcct)
+
+	fmt.Printf("BALANCE MODULE ACCOUNT BEFORE SENDING %v\n", coinz)
+
 	if err != nil {
 		panic(err)
 	}
+
+	coinFee, err := sdk.ParseCoinsNormalized("1token")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("SENDING %v", coinFee)
+	sdkError := k.bankKeeper.SendCoins(ctx, txCreatorAddress, moduleAcct, coinFee)
+	if sdkError != nil {
+		fmt.Printf("SEND COINS ERROR %v\n", sdkError.Error())
+		return nil, sdkError
+	}
+
+	coinz = k.bankKeeper.GetAllBalances(ctx, txCreatorAddress)
+
+	fmt.Printf("BALANCES AFTER SENDING 2 %v\n", coinz)
+
+	coinz = k.bankKeeper.GetAllBalances(ctx, moduleAcct)
+
+	fmt.Printf("BALANCE MODULE ACCOUNT AFTER SENDING %v\n", coinz)
+
 	var BaseledgerTransaction = types.BaseledgerTransaction{
 		Id:                      msg.Id,
 		Creator:                 msg.Creator,
