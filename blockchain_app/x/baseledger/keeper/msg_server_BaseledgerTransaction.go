@@ -20,13 +20,13 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 
 	fmt.Printf("TX CREATOR ACCOUNT %v %v\n", txCreatorAddress, txCreatorAddress.String())
 
-	coinz := k.bankKeeper.GetAllBalances(ctx, txCreatorAddress)
+	coins := k.bankKeeper.GetAllBalances(ctx, txCreatorAddress)
 
-	fmt.Printf("BALANCES BEFORE SENDING %v\n", coinz)
+	fmt.Printf("BALANCES BEFORE SENDING %v\n", coins)
 
-	coinz = k.bankKeeper.GetAllBalances(ctx, moduleAcct)
+	coins = k.bankKeeper.GetAllBalances(ctx, moduleAcct)
 
-	fmt.Printf("BALANCE MODULE ACCOUNT BEFORE SENDING %v\n", coinz)
+	fmt.Printf("BALANCE MODULE ACCOUNT BEFORE SENDING %v\n", coins)
 
 	if err != nil {
 		panic(err)
@@ -44,13 +44,13 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 		return nil, sdkError
 	}
 
-	coinz = k.bankKeeper.GetAllBalances(ctx, txCreatorAddress)
+	coins = k.bankKeeper.GetAllBalances(ctx, txCreatorAddress)
 
-	fmt.Printf("BALANCES AFTER SENDING 2 %v\n", coinz)
+	fmt.Printf("BALANCES AFTER SENDING 2 %v\n", coins)
 
-	coinz = k.bankKeeper.GetAllBalances(ctx, moduleAcct)
+	coins = k.bankKeeper.GetAllBalances(ctx, moduleAcct)
 
-	fmt.Printf("BALANCE MODULE ACCOUNT AFTER SENDING %v\n", coinz)
+	fmt.Printf("BALANCE MODULE ACCOUNT AFTER SENDING %v\n", coins)
 
 	var BaseledgerTransaction = types.BaseledgerTransaction{
 		Id:                      msg.Id,
