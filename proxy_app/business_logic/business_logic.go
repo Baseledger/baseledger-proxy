@@ -120,7 +120,7 @@ func setTxStatus(txResult proxytypes.Result, commitmentState string) {
 }
 
 func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTransactionDto {
-	resp, err := http.Get("http://" + viper.Get("TENDERMINT_API_URL").(string) + "/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
+	resp, err := http.Get("http://" + viper.Get("BLOCKCHAIN_APP_URL").(string) + "/unibrightio/baseledger/baseledger/BaseledgerTransaction/" + id.String())
 
 	if err != nil {
 		logger.Errorf("error while fetching committed baseledger transaction %v\n", err.Error())
@@ -133,6 +133,8 @@ func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTrans
 		return nil
 	}
 
+	logger.Infof("trying to unmarshal body: %v to CommittedBaseledgerTransactionResponse", string(body))
+
 	var transactionResponse proxytypes.CommittedBaseledgerTransactionResponse
 	err = json.Unmarshal(body, &transactionResponse)
 
@@ -141,6 +143,6 @@ func getCommittedBaseledgerTransaction(id uuid.UUID) *proxytypes.BaseledgerTrans
 		return nil
 	}
 
-	logger.Infof("get committed baseleger transaction", transactionResponse)
+	logger.Infof("commited baseledger transaction ", transactionResponse)
 	return &transactionResponse.BaseledgerTransaction
 }
