@@ -70,7 +70,7 @@ func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, a
 	logger.Infof("retrieved account %v %v\n", accNum, accSeq)
 	txFactory := tx.Factory{}.
 		WithChainID(clientCtx.ChainID).
-		// TODO: sometimes this gas is not enough, check why is this used and how to configure it...
+		// hardcoding gasWanted to high number since fees will allways be 1 token
 		WithGas(1000000).
 		WithTxConfig(clientCtx.TxConfig).
 		WithAccountNumber(accNum).
