@@ -79,10 +79,17 @@ func getTxInfo(txHash string) (txInfo *proxytypes.TxInfo, err error) {
 		return &proxytypes.TxInfo{}, errors.New("error decoding block")
 	}
 	logger.Infof("DECODED COMMITTED TX HEIGHT %v AND TIMESTAMP %v\n", committedTx.TxResult.Height, commitedBlock.BlockResult.Block.Header.Time)
+	txValid := true
+	if committedTx.TxResult.TxResultInfo.Code != 0 {
+		txValid = false
+	}
 	return &proxytypes.TxInfo{
 		TxHeight:    committedTx.TxResult.Height,
 		TxTimestamp: commitedBlock.BlockResult.Block.Header.Time,
 		TxCommitted: true,
+		TxValid:     txValid,
+		TxCode:      committedTx.TxResult.TxResultInfo.Code,
+		TxLog:       committedTx.TxResult.TxResultInfo.Log,
 	}, nil
 }
 
