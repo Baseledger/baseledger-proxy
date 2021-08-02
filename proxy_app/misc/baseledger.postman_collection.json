@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "028bae05-fc6b-4da1-8c94-625b79a86770",
+		"_postman_id": "f5656712-6070-40fd-baca-55f31af8eea9",
 		"name": "baseledger",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -12,14 +12,14 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1zdagxuu0j6u39xppn3s87tldz9gfuj7ew6dxj6\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger16vf5nvkt8r78v823te3d25wms9att0y5dexqzk\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
 				},
 				"url": {
-					"raw": "localhost:8080/suggestion",
+					"raw": "localhost:8081/suggestion",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"suggestion"
 					]
@@ -134,6 +134,29 @@
 					"port": "8080",
 					"path": [
 						"feedback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "query baseledger transation from blockchain app",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1317/unibrightio/baseledger/baseledger/BaseledgerTransaction/460d0bf1-085a-4994-b761-9e175fa2dff5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1317",
+					"path": [
+						"unibrightio",
+						"baseledger",
+						"baseledger",
+						"BaseledgerTransaction",
+						"460d0bf1-085a-4994-b761-9e175fa2dff5"
 					]
 				}
 			},
