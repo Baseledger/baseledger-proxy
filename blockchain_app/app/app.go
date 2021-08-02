@@ -192,6 +192,7 @@ type App struct {
 	// keepers
 	AccountKeeper    authkeeper.AccountKeeper
 	BankKeeper       bankkeeper.Keeper
+	ViewKeeper       bankkeeper.ViewKeeper
 	CapabilityKeeper *capabilitykeeper.Keeper
 	StakingKeeper    stakingkeeper.Keeper
 	SlashingKeeper   slashingkeeper.Keeper
@@ -338,6 +339,8 @@ func New(
 		appCodec,
 		keys[baseledgertypes.StoreKey],
 		keys[baseledgertypes.MemStoreKey],
+
+		app.BankKeeper,
 	)
 	baseledgerModule := baseledger.NewAppModule(appCodec, app.BaseledgerKeeper)
 

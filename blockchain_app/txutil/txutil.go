@@ -70,7 +70,8 @@ func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, a
 	logger.Infof("retrieved account %v %v\n", accNum, accSeq)
 	txFactory := tx.Factory{}.
 		WithChainID(clientCtx.ChainID).
-		WithGas(100000).
+		// hardcoding gasWanted to high number since fees will allways be 1 token
+		WithGas(1000000).
 		WithTxConfig(clientCtx.TxConfig).
 		WithAccountNumber(accNum).
 		WithSequence(accSeq).
@@ -127,6 +128,11 @@ func BroadcastAndGetTxHash(clientCtx client.Context, msg sdk.Msg, accNum uint64,
 
 	// if code is not 0 and is not missmatch, don't handle it and return
 	if res.Code != errCodeMismatch {
+		return nil, err
+	}
+
+	if res.Code != 0 && res.Code != errCodeMismatch {
+		logger.Errorf("broadcast failed with code different than missmatch %v %v\n", res.Code, res)
 		return nil, err
 	}
 

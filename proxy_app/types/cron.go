@@ -2,8 +2,14 @@ package types
 
 // these structs are related to tendermint jsonrpc
 type TxResult struct {
-	Hash   string `json:"hash"`
-	Height string `json:"height"`
+	Hash         string       `json:"hash"`
+	Height       string       `json:"height"`
+	TxResultInfo TxResultInfo `json:"tx_result"`
+}
+
+type TxResultInfo struct {
+	Code uint   `json:"code"`
+	Log  string `json:"log"`
 }
 
 type Header struct {
@@ -39,4 +45,7 @@ type TxInfo struct {
 	TxHeight    string
 	TxTimestamp string
 	TxCommitted bool
+	TxValid     bool
+	TxCode      uint
+	TxLog       string
 }

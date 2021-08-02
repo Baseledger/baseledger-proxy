@@ -6,11 +6,31 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/x/baseledger/types"
 )
 
 func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types.MsgCreateBaseledgerTransaction) (*types.MsgCreateBaseledgerTransactionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	moduleAcct := sdk.AccAddress(crypto.AddressHash([]byte(types.ModuleName)))
+	txCreatorAddress, err := sdk.AccAddressFromBech32(msg.Creator)
+
+	if err != nil {
+		panic(err)
+	}
+
+	coinFee, err := sdk.ParseCoinsNormalized("1token")
+	if err != nil {
+		panic(err)
+	}
+
+	err = k.bankKeeper.SendCoins(ctx, txCreatorAddress, moduleAcct, coinFee)
+	if err != nil {
+		logger.Errorf("send 1 token error %v\n", err.Error())
+		return nil, err
+	}
 
 	var BaseledgerTransaction = types.BaseledgerTransaction{
 		Id:                      msg.Id,
