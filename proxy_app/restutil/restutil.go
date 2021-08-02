@@ -115,7 +115,7 @@ func RenderError(message string, status int, c *gin.Context) {
 
 func createFeedbackOffchainMessage(req types.SynchronizationFeedback, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
-		SenderId:                             uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId.String(),
 		WorkstepType:                         "Feedback",

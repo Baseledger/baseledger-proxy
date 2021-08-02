@@ -69,7 +69,7 @@ func NewKeyringInstance() (keyring.Keyring, error) {
 func SignTxAndGetTxBytes(clientCtx client.Context, msg sdk.Msg, accNum uint64, accSeq uint64) ([]byte, error) {
 	logger.Infof("retrieved account %v %v\n", accNum, accSeq)
 	txFactory := tx.Factory{}.
-		WithChainID(clientCtx.ChainID).
+		WithChainID("baseledger").
 		WithGas(100000).
 		WithTxConfig(clientCtx.TxConfig).
 		WithAccountNumber(accNum).
