@@ -31,6 +31,17 @@ export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a3
 
 docker-compose -p second_node up -d
 
+# Sets up environment for third node and runs it
+export POSTGRES_EXPOSED_PORT=5434 && 
+export NATS_EXPOSED_PORT=4224 && 
+export STARPORT_API_PORT=1319 && 
+export TENDERMINT_NODE_GRPC_PORT=26659 && 
+export TENDERMINT_NODE_PORT=26671 && 
+export PROXY_APP_PORT=8083 &&
+export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a4
+
+docker-compose -p third_node up -d
+
 # If needed, waiting mechanism
 # ./await_tcp.sh -h localhost -p 1317
 # ./await_tcp.sh -h localhost -p 1318
@@ -43,14 +54,14 @@ docker exec first_node_starport_1 baseledgerd keys add node1_validator --keyring
 
 # Add first node validator account as genesis
 node1_validator_address=$(docker exec first_node_starport_1 baseledgerd keys show node1_validator -a --keyring-backend test)
-docker exec first_node_starport_1 baseledgerd add-genesis-account ${node1_validator_address} 100000000000stake
+docker exec first_node_starport_1 baseledgerd add-genesis-account ${node1_validator_address} 100000000000stake,100000000000token
 
 # Initialize second node validator account
 docker exec second_node_starport_1 baseledgerd keys add node2_validator --keyring-backend test
 
 # Add second node validator account as genesis
 node2_validator_address=$(docker exec second_node_starport_1 baseledgerd keys show node2_validator -a --keyring-backend test)
-docker exec first_node_starport_1 baseledgerd add-genesis-account ${node2_validator_address} 100000000000stake
+docker exec first_node_starport_1 baseledgerd add-genesis-account ${node2_validator_address} 100000000000stake,100000000000token
 
 # Copy genesis from first to second node via host machine for gentx generation
 docker cp first_node_starport_1:/root/.baseledger/config/genesis.json .
