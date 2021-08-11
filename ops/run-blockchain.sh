@@ -111,8 +111,8 @@ docker exec first_node_starport_1 sed -i 's/allow_duplicate_ip = false/allow_dup
 docker exec second_node_starport_1 sed -i 's/allow_duplicate_ip = false/allow_duplicate_ip = true/' ~/.baseledger/config/config.toml
 
 # This increases the timeout between blocks to 30s
-docker exec first_node_starport_1 sed -i 's/timeout_commit = "5s"/timeout_commit = "30s"/' ~/.baseledger/config/config.toml
-docker exec second_node_starport_1 sed -i 's/timeout_commit = "5s"/timeout_commit = "30s"/' ~/.baseledger/config/config.toml
+# docker exec first_node_starport_1 sed -i 's/timeout_commit = "5s"/timeout_commit = "30s"/' ~/.baseledger/config/config.toml
+# docker exec second_node_starport_1 sed -i 's/timeout_commit = "5s"/timeout_commit = "30s"/' ~/.baseledger/config/config.toml
 
 
 # start first node - TODO: Has to  be executed in a separate window after running this script in order to have logs
