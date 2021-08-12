@@ -25,4 +25,5 @@ func registerQueryRoutes(clientCtx client.Context, r *mux.Router) {
 func registerTxHandlers(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 4
 	r.HandleFunc("/signAndBroadcast", signAndBroadcastTransactionHandler(clientCtx)).Methods("POST")
+	r.HandleFunc("/balanceCheck", checkBalanceHandler(clientCtx)).Methods("GET")
 }

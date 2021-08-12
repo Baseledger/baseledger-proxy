@@ -48,6 +48,17 @@ func SignAndBroadcast(payload SignAndBroadcastPayload) *string {
 	return &txHash
 }
 
+func HasEnoughBalance() bool {
+	resp, err := http.Get("http://" + viper.Get("BLOCKCHAIN_APP_URL").(string) + "/balanceCheck")
+
+	if err != nil {
+		logger.Errorf("error while sending feedback request %v\n", err.Error())
+		return false
+	}
+
+	return resp.StatusCode == 200
+}
+
 func SendRejectFeedback(offchainProcessMessage *types.OffchainProcessMessage, workgroupId string) {
 	var feedback = &types.SynchronizationFeedback{
 		WorkgroupId:        uuid.FromStringOrNil(workgroupId),
