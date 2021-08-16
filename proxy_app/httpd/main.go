@@ -32,6 +32,17 @@ func main() {
 	r.POST("/feedback", handler.CreateSynchronizationFeedbackHandler())
 	r.GET("/sunburst/:txId", handler.GetSunburstHandler())
 	r.POST("send_offchain_message", handler.SendOffchainMessageHandler())
+	r.GET("/organization", handler.GetOrganizationsHandler())
+	r.POST("/organization", handler.CreateOrganizationHandler())
+	r.DELETE("/organization/:id", handler.DeleteOrganizationHandler())
+	r.GET("/workgroup", handler.GetWorkgroupsHandler())
+	r.POST("/workgroup", handler.CreateWorkgroupHandler())
+	r.DELETE("/workgroup/:id", handler.DeleteWorkgroupHandler())
+	r.GET("/participation", handler.GetWorkgroupMemberHandler())
+	r.POST("/participation", handler.CreateWorkgroupMemberHandler())
+	r.DELETE("/participation/:id", handler.DeleteWorkgroupMemberHandler())
+	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
+	// full details of workgroup, including organization
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
@@ -52,6 +63,7 @@ func setupViper() {
 func setupDb() {
 	dbutil.InitDbIfNotExists()
 	dbutil.PerformMigrations()
+	// TODO: BAS-29 Add own org id to database with some dummy name
 	dbutil.InitConnection()
 }
 

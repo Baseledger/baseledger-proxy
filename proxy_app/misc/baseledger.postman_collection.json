@@ -1,10 +1,218 @@
 {
 	"info": {
-		"_postman_id": "028bae05-fc6b-4da1-8c94-625b79a86770",
+		"_postman_id": "f5656712-6070-40fd-baca-55f31af8eea9",
 		"name": "baseledger",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "organizations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/organization",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "organizations",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Another org\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/organization",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "organizations",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/organization/ecacb5b7-269e-4194-9c85-b462ee49e00a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"organization",
+								"ecacb5b7-269e-4194-9c85-b462ee49e00a"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Workgroups",
+			"item": [
+				{
+					"name": "workgroups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/workgroup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"workgroup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workgroups",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Another org\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/workgroup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"workgroup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workgroups",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/workgroup/f40628ee-cad5-4563-b653-a2ecf73bbc8f",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"workgroup",
+								"f40628ee-cad5-4563-b653-a2ecf73bbc8f"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Participations",
+			"item": [
+				{
+					"name": "participations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/participation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"participation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "participations",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"organization_id\": \"7205c0d3-2c4b-41bf-b06b-35b7072cc826\",\r\n    \"organization_endpoint\": \"Test endpoint\",\r\n    \"organization_token\": \"Tokensecret\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/participation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"participation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "participations",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/participation/7f77f014-9b73-40a9-8d70-f23040333c03",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"participation",
+								"7f77f014-9b73-40a9-8d70-f23040333c03"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "create sync request",
 			"request": {
@@ -12,14 +220,14 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"Initial\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"a28a27ce-ea1f-4134-bdb5-9065913afbb6\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"123\\\"}\",\r\n    \"referenced_baseledger_business_object_id\": \"6a954c56-e85c-4d2b-bcd6-6d8b73d3797d\",\r\n    \"referenced_baseledger_transaction_id\": \"\",\r\n    \"knowledge_limiters\": []\r\n}"
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
 				},
 				"url": {
-					"raw": "localhost:8080/suggestion",
+					"raw": "localhost:8081/suggestion",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8081",
 					"path": [
 						"suggestion"
 					]
@@ -28,22 +236,22 @@
 			"response": []
 		},
 		{
-			"name": "create feedback request",
+			"name": "feedback",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"MerkleTreeForExiting\",\r\n    \"baseledger_proven_business_object_json\": \"{\\\"RootProof\\\":\\\"fcb305074baf8ec24ae56dd7b48c4cd4\\\",\\\"Nodes\\\":[{\\\"SyncTreeNodeID\\\":\\\"1afbfbc4-5fb6-4561-87ce-bfbed37e5072\\\",\\\"ParentNodeID\\\":\\\"5c07271b-03fd-44b4-95ab-e3cd2052d1cc\\\",\\\"Value\\\":\\\"MTId:123\\\",\\\"IsLeaf\\\":true,\\\"IsRoot\\\":false,\\\"IsHash\\\":false,\\\"IsCovered\\\":false,\\\"Level\\\":0,\\\"Index\\\":0},{\\\"SyncTreeNodeID\\\":\\\"9f9b2b6c-fe01-43e6-9714-51a9f3e11c05\\\",\\\"ParentNodeID\\\":\\\"5c07271b-03fd-44b4-95ab-e3cd2052d1cc\\\",\\\"Value\\\":\\\"\\\",\\\"IsLeaf\\\":true,\\\"IsRoot\\\":false,\\\"IsHash\\\":false,\\\"IsCovered\\\":false,\\\"Level\\\":0,\\\"Index\\\":1},{\\\"SyncTreeNodeID\\\":\\\"5c07271b-03fd-44b4-95ab-e3cd2052d1cc\\\",\\\"ParentNodeID\\\":\\\"\\\",\\\"Value\\\":\\\"fcb305074baf8ec24ae56dd7b48c4cd4\\\",\\\"IsLeaf\\\":false,\\\"IsRoot\\\":true,\\\"IsHash\\\":true,\\\"IsCovered\\\":false,\\\"Level\\\":1,\\\"Index\\\":0}]}\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"e917c5a6-b7e4-459e-b208-07f7dca12808\",\r\n    \"original_baseledger_transaction_id\": \"\",\r\n    \"original_offchain_process_message_id\": \"\",\r\n    \"hash_of_object_to_approve\": \"\",\r\n    \"feedback_message\": \"\"\r\n}"
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger128upmg5esqm6vw3t7e7s25yz7v99ppd5az5k9z\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"baseledger_proven_business_object_json\": \"{PurchaseOrderID: 5}\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"9eb0e15e-d38b-474c-a571-509026abd76\"\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/feedback",
-					"protocol": "http",
+					"raw": "localhost:1317/proxy/feedback",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "1317",
 					"path": [
+						"proxy",
 						"feedback"
 					]
 				}
@@ -94,20 +302,69 @@
 			"response": []
 		},
 		{
-			"name": "sunburst",
+			"name": "proxy create sync request",
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1vflry9dg9h6g0kcknl4fa902s3qynxk8ep49uw\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{PurchaseOrderID: 5}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+				},
 				"url": {
-					"raw": "http://localhost:8080/sunburst/467dca32-ba2a-4352-9685-6144df7336e4",
+					"raw": "http://localhost:8080/suggestion",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"sunburst",
-						"467dca32-ba2a-4352-9685-6144df7336e4"
+						"suggestion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proxy create feedback request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1v3e6s8uep6ea7cnqszqvrl3g56vl0vp2eq0mvk\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"workgroup_id\": \"68f6fb46-7fe5-4536-ac98-52b475418f7e\",\r\n    \"recipient\": \"61ded832-b7ca-4100-8bc1-fb0935ff4436\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"baseledger_proven_business_object_json\": \"{PurchaseOrderID: 5}\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"9eb0e15e-d38b-474c-a571-509026abd76\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/feedback",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"feedback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "query baseledger transation from blockchain app",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:1317/unibrightio/baseledger/baseledger/BaseledgerTransaction/460d0bf1-085a-4994-b761-9e175fa2dff5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1317",
+					"path": [
+						"unibrightio",
+						"baseledger",
+						"baseledger",
+						"BaseledgerTransaction",
+						"460d0bf1-085a-4994-b761-9e175fa2dff5"
 					]
 				}
 			},

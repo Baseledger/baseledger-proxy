@@ -138,10 +138,9 @@ func createFeedbackOffchainMessage(req types.SynchronizationFeedback, transactio
 
 func createFeedbackSentTrustmeshEntry(req types.SynchronizationFeedback, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, feedbackMsg string, txHash string) *types.TrustmeshEntry {
 	trustmeshEntry := &types.TrustmeshEntry{
-		TendermintTransactionId:  transactionId,
-		OffchainProcessMessageId: offchainMsg.Id,
-		// TODO: define proxy identifier, BAS-33
-		SenderOrgId:                          uuid.FromStringOrNil("5d187a23-c4f6-4780-b8bf-aeeaeafcb1e8"),
+		TendermintTransactionId:              transactionId,
+		OffchainProcessMessageId:             offchainMsg.Id,
+		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
 		WorkgroupId:                          req.WorkgroupId,
 		WorkstepType:                         offchainMsg.WorkstepType,
