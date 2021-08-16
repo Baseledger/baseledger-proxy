@@ -1,13 +1,18 @@
 package rest
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/logger"
 	txutil "github.com/unibrightio/baseledger/txutil"
 	baseledgerTypes "github.com/unibrightio/baseledger/x/baseledger/types"
+	"google.golang.org/grpc"
 )
 
 type signAndBroadcastTransactionRequest struct {
@@ -32,6 +37,20 @@ func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFu
 		if err != nil {
 			logger.Errorf("error while retrieving acc %v\n", err.Error())
 			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error while retrieving acc")
+			return
+		}
+
+		balanceOk, err := checkTokenBalance(clientCtx.GetFromAddress().String())
+
+		if err != nil {
+			fmt.Printf("check balance failed %v\n", err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error while checking balance")
+			return
+		}
+
+		if !balanceOk {
+			fmt.Printf("check balance failed %v\n", err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, "not enough tokens")
 			return
 		}
 
@@ -64,6 +83,61 @@ func signAndBroadcastTransactionHandler(clientCtx client.Context) http.HandlerFu
 		w.WriteHeader(http.StatusOK)
 		return
 	}
+}
+
+func checkBalanceHandler(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		clientCtx, err := txutil.BuildClientCtx(clientCtx)
+
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		balanceOk, err := checkTokenBalance(clientCtx.GetFromAddress().String())
+
+		if err != nil {
+			fmt.Printf("check balance failed %v\n", err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, "error while checking balance")
+			return
+		}
+
+		if !balanceOk {
+			fmt.Printf("check balance failed %v\n", err)
+			rest.WriteErrorResponse(w, http.StatusInternalServerError, "not enough tokens")
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+}
+
+func checkTokenBalance(address string) (bool, error) {
+	grpcConn, err := grpc.Dial(
+		"127.0.0.1:9090",
+		// The SDK doesn't support any transport security mechanism.
+		grpc.WithInsecure(),
+	)
+
+	defer grpcConn.Close()
+
+	if err != nil {
+		logger.Errorf("grpc conn failed %v\n", err.Error())
+		return false, err
+	}
+
+	queryClient := banktypes.NewQueryClient(grpcConn)
+	res, err := queryClient.Balance(context.Background(), &banktypes.QueryBalanceRequest{Address: address, Denom: common.WorkTokenDenom})
+
+	if err != nil {
+		logger.Errorf("grpc query failed %v\n", err.Error())
+		return false, err
+	}
+
+	logger.Infof("found acc balance %v\n", res.Balance.Amount)
+	return res.Balance.Amount.IsPositive(), nil
 }
 
 func parseSignAndBroadcastTransactionRequest(w http.ResponseWriter, r *http.Request, clientCtx client.Context) *signAndBroadcastTransactionRequest {

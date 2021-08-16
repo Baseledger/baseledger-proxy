@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/tendermint/tendermint/crypto"
+	"github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/x/baseledger/types"
 )
@@ -21,7 +22,7 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 		panic(err)
 	}
 
-	coinFee, err := sdk.ParseCoinsNormalized("1token")
+	coinFee, err := sdk.ParseCoinsNormalized(common.WorkTokenFee)
 	if err != nil {
 		panic(err)
 	}
