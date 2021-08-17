@@ -81,23 +81,16 @@ docker exec baseledger_node_blockchain_app_1 sed -i 's/persistent_peers = ""/per
 
 ### Run both nodes
 28. NODE 1: docker exec baseledger_node_blockchain_app_1 baseledgerd start
-28. NODE 2: docker exec baseledger_node_blockchain_app_1 baseledgerd start
+29. NODE 2: docker exec baseledger_node_blockchain_app_1 baseledgerd start
 
 
-## Setup a third 'general' node
-1. NODE 3: docker exec baseledger_node_blockchain_app_1 baseledgerd init node3 --chain-id baseledger
-
-2. NODE 3: docker exec baseledger_node_blockchain_app_1 baseledgerd keys add node3_validator --keyring-backend test
-
-3. NODE 3: docker exec baseledger_node_blockchain_app_1 sed -i 's/persistent_peers = ""/persistent_peers = "'${node1_id}'@'<static_ip_of_node1>':'26655'"/' ~/.baseledger/config/config.toml
-
-4. NODE 3: docker exec baseledger_node_blockchain_app_1 sed -i 's/addr_book_strict = true/addr_book_strict = false/' ~/.baseledger/config/config.toml
-
-5. NODE 3: docker exec baseledger_node_blockchain_app_1 sed -i 's/allow_duplicate_ip = false/allow_duplicate_ip = true/' ~/.baseledger/config/config.toml
-
-6. step 19 but from node 1 to node 3
-
-7. NODE 3: docker exec baseledger_node_blockchain_app_1 baseledgerd start
+## Setup a third replicating node
+30. NODE 3: copy *genesis.json*, *setup-node-infrastructure-for-testnet.sh* and *add-node-to-running-blokchain.sh* to the box
+31. NODE 3: generate a new uuid for organization id and add to ORGANIZATION_ID in the *setup-node-infrastructure-for-testnet.sh*
+32. NODE 3: run *setup-node-infrastructure-for-testnet.sh*
+33. NODE 3: give an id to node in *add-node-to-running-blokchain.sh*. Currently set to node55
+34. NODE 3: run *add-node-to-running-blokchain.sh*
+35. NODE 3: run *docker exec baseledger-node_blockchain_app_1 baseledgerd start* and wait for sync
 
 ## Add third node as validator TODO - format in the same manner as above
 
