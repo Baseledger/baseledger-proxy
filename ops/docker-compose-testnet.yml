@@ -26,18 +26,18 @@ services:
     ports:
       - ${NATS_EXPOSED_PORT}:4222
     restart: always
-  starport:
-      image: ognjenognjen/starport
+  blockchain_app:
+      image: baseledger/blockchain_app
       networks:
         - baseledger
       ports:
-        - ${STARPORT_API_PORT}:1317
+        - ${BLOCKCHAIN_APP_API_PORT}:1317
         - ${TENDERMINT_NODE_PORT}:26656
         - ${TENDERMINT_NODE_GRPC_PORT}:26657
       extra_hosts:
           - "host.docker.internal:host-gateway" # enable targeting host machine with host.docker.internal
   proxy_app:
-    image: ognjenognjen/proxy_app
+    image: baseledger/proxy_app
     environment:
       - DB_HOST=postgres-local-node
       - ORGANIZATION_ID=${ORGANIZATION_ID}
