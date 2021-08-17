@@ -53,7 +53,7 @@ services:
 
 networks:
   baseledger:
-    driver: host
+    driver: bridge
 
 volumes:
   baseledger-db:    
