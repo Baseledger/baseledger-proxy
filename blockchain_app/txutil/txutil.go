@@ -5,6 +5,9 @@ import (
 	"regexp"
 	"strconv"
 
+	"math/rand"
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -36,19 +39,22 @@ func BuildClientCtx(clientCtx client.Context) (*client.Context, error) {
 		return nil, errors.New("")
 	}
 
+	rand.Seed(time.Now().UnixNano())
+	min := 0
+	max := len(keysList) - 1
+	randomAccIdx := rand.Intn(max-min+1) + min
+
 	if err != nil {
 		logger.Errorf("error getting key %v\n", err.Error())
 		return nil, errors.New("")
 	}
 
 	// every node should configure key for this purpose, and it should be first in key list
-	logger.Infof("key found %v %v\n", keysList[0], keysList[0].GetName())
-
 	clientCtx = clientCtx.
 		WithKeyring(keyring).
-		WithFromAddress(keysList[0].GetAddress()).
+		WithFromAddress(keysList[randomAccIdx].GetAddress()).
 		WithSkipConfirmation(true).
-		WithFromName(keysList[0].GetName()).
+		WithFromName(keysList[randomAccIdx].GetName()).
 		WithBroadcastMode("sync")
 
 	return &clientCtx, nil
