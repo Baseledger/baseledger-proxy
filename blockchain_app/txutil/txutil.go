@@ -44,11 +44,6 @@ func BuildClientCtx(clientCtx client.Context) (*client.Context, error) {
 	max := len(keysList) - 1
 	randomAccIdx := rand.Intn(max-min+1) + min
 
-	if err != nil {
-		logger.Errorf("error getting key %v\n", err.Error())
-		return nil, errors.New("")
-	}
-
 	// every node should configure key for this purpose, and it should be first in key list
 	clientCtx = clientCtx.
 		WithKeyring(keyring).
