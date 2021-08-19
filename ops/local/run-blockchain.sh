@@ -12,7 +12,7 @@ tendermint_internal_grpc_port=26657
 # Sets up environment for first node and runs it
 export POSTGRES_EXPOSED_PORT=5432 && 
 export NATS_EXPOSED_PORT=4222 && 
-export blockchain_app_API_PORT=1317 && 
+export BLOCKCHAIN_APP_API_PORT=1317 && 
 export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port && 
 export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8081 &&
@@ -27,24 +27,9 @@ export BLOCKCHAIN_APP_API_PORT=1318 &&
 export TENDERMINT_NODE_GRPC_PORT=$second_node_tendermint_grpc_port && 
 export TENDERMINT_NODE_PORT=$second_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8082 &&
-export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a3
+export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a3 # unique identifier of the organization, currently hardcoded in seed data
 
 docker-compose -p second_node up -d
-
-# Sets up environment for third node and runs it
-export POSTGRES_EXPOSED_PORT=5434 && 
-export NATS_EXPOSED_PORT=4224 && 
-export BLOCKCHAIN_APP_API_PORT=1319 && 
-export TENDERMINT_NODE_GRPC_PORT=26659 && 
-export TENDERMINT_NODE_PORT=26671 && 
-export PROXY_APP_PORT=8083 &&
-export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a4
-
-docker-compose -p third_node up -d
-
-# If needed, waiting mechanism
-# ./await_tcp.sh -h localhost -p 1317
-# ./await_tcp.sh -h localhost -p 1318
 
 # Initialize first node
 docker exec first_node_blockchain_app_1 baseledgerd init node1 --chain-id baseledger
@@ -117,6 +102,8 @@ docker exec second_node_blockchain_app_1 sed -i 's/allow_duplicate_ip = false/al
 
 # start first node - TODO: Has to  be executed in a separate window after running this script in order to have logs
 # docker exec first_node_blockchain_app_1 baseledgerd start
+# node2_adress = docker exec second_node_blockchain_app_1 baseledgerd keys show node2_validator -a
+# docker exec first_node_blockchain_app_1 baseledgerd tx bank send node1_validator node2_adress 1000token --yes
 
 # start second node - TODO: Has to  be executed in a separate window after running this script in order to have logs
 # docker exec second_node_blockchain_app_1 baseledgerd start

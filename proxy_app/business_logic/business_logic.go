@@ -51,6 +51,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
+			logger.Error("Failed to get committed baseledger transaction")
 			return
 		}
 		baseledgerTransactionPayload := proxytypes.BaseledgerTransactionPayload{}
@@ -64,7 +65,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		if synctree.VerifyHashMatch(baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson) {
 			logger.Info("Hashes match, processing feedback")
 			// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
-			return
+			break
 		}
 		logger.Warnf("Hashes don't match, rejecting feedback %v %v %v", baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson)
 		restutil.SendRejectFeedback(offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
@@ -109,6 +110,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		logger.Errorf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
+
 	setTxStatus(txResult, common.CommittedCommitmentState)
 }
 

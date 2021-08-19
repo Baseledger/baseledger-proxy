@@ -130,7 +130,6 @@ func createSuggestionSentTrustmeshEntry(req createInitialSuggestionRequest, tran
 
 func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactionId uuid.UUID, syncTreeJson string, rootProof string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
-		// TODO: define proxy identifier
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId,
