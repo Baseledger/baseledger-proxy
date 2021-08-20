@@ -50,6 +50,8 @@ NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd start
 NODE 2: repeat first five steps or running the *setup-node-infrastructure-for-testnet.sh* on the machine
 NODE 2: copy *add-node-to-running-blokchain.sh* to the same folder on the machine
 NODE 2: make sure node1_id and node1_ip adress in the script are correct
+NODE 2: make sure to give a unique name for new node (nodexxx) in script:           
+      baseledgerd init node... and baseledgerd keys add nodexxxxx_replicator_address_1 
 NODE 2: copy genesis.json from node 1 to the same folder on the machine
 NODE 2: run *add-node-to-running-blokchain.sh*
 

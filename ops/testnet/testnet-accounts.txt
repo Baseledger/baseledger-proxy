@@ -200,3 +200,75 @@ resource again armor mutual canyon struggle cross begin noise sport gather chimn
   mnemonic: ""
   threshold: 0
   pubkeys: []
+
+
+
+  ******************* NODE 12 Replicator ******************
+  
+
+ceiling trophy change online estate steak talk tilt eyebrow tobacco height captain wisdom hawk maze fury please bacon disease much initial option access guide
+- name: node12_replicator_address_1
+  type: local
+  address: baseledger1004sq4ra78gj6vmcu3uuqupynvqhnlawcnreu6
+  pubkey: baseledgerpub1addwnpepqd3kalm89dg57unv3lzgqa6xjtsk9mzwquelxfz0chyev9tur7v0647qaql
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+put maximum know work wrong agree better turkey sorry wrestle giggle ten rent tortoise ethics remember measure coach wave obtain tomorrow woman envelope jealous
+- name: node12_replicator_address_2
+  type: local
+  address: baseledger1xy2ps4qxxaa8kynxjyax5qwmnwp0tk2zhqtrum
+  pubkey: baseledgerpub1addwnpepq2fxcznt73x9hzmlw7rvs9k3836ta6gg2xkp43c4sy6mjugpxr9wxeg6q2m
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+drop weird say embrace leg sick catch harvest cram demand risk initial toddler silk gas month material lamp expect can pond tennis mention taste
+- name: node12_replicator_address_3
+  type: local
+  address: baseledger1zxktlkkjqrxu9f0zma2g2fc54sj7vsjhgf6jk2
+  pubkey: baseledgerpub1addwnpepqg0cqm5zuh4p2y8n86tfww8c9qhk3rdk2jj9ju22fpnp4scgc5gl70l2mf9
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+hand sentence clap slush artwork roast tribe sudden nose ignore swing elegant cover casual another shed charge agent dream chase index inform weather eagle
+- name: node12_replicator_address_4
+  type: local
+  address: baseledger1rwx20hhf5qpz9x0w0aymmwzmmm97xsp9kpqg2t
+  pubkey: baseledgerpub1addwnpepqf5d8f4rgdxvzh5uaehy3enuqnlp4yjz6usjhrr5xpq2d0jhlmzfwxn3rs4
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+inhale snake antenna slide alpha tattoo best shy exotic slam hole fortune vivid theory kick view parade crucial away sunset often method estate prefer
+- name: node12_replicator_address_5
+  type: local
+  address: baseledger1285lvtfza25j22yqydvkga6n5rpnndz0ftvptg
+  pubkey: baseledgerpub1addwnpepqturs9slpf9zfcav429cnsuztc6ms2vyh2ttty2vdhd779hrt8facym6n0y
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+  
