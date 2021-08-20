@@ -1,0 +1,202 @@
+*************NODE1 VALIDATOR********************
+
+- name: node1_validator_address_1
+  type: local
+  address: baseledger1qkvmcsmdgjd8wtnn2ejxnj59eskqmjq78jejs2
+  pubkey: baseledgerpub1addwnpepqtyhy39wfu2ys0rd2387fkglnxrwlyg4u8stlryrdqva7v0peqt3xpxzf7j
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+  - name: faucet
+  type: local
+  address: baseledger1ecskwhmn9l0j7zt98lfps3dtv4y4fuq8lh67ls
+  pubkey: baseledgerpub1addwnpepqvw2ulewu4k58w9pwezt6yzwpu5mmkkcg8k4qe8gyyes9d3hfkdks42fz7j
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+brush sample release document pig decade strong tourist upon marine awful ivory giant tide strike fade town plunge pull post spy avoid arrive sphere
+- name: node1_validator_address_2
+  type: local
+  address: baseledger15rvx7mvs948fxpxuuzqsy6f46tgv7dqxkxgenm
+  pubkey: baseledgerpub1addwnpepq0qmevfzfm07tr8qlwldsweqptaaty2pt54tnxkk5jkrvdps9hxks0rph3s
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+law lend love jewel rent rifle kiwi blade twice split tenant shoot rent cannon analyst improve chair dutch fine brisk warrior meadow mandate measure
+- name: node1_validator_address_3
+  type: local
+  address: baseledger1ne9ma2c6n0rxn8l797z9qh8v2su86kskvzt6qe
+  pubkey: baseledgerpub1addwnpepq2pg2kdvpged6zvr4cwm0pqx7ney9vjre6a9cuhffnaedhdxnvpqvtzq57a
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+tongue penalty inside breeze fragile wise vacuum library indicate settle uniform appear country payment edge whip memory thank park parrot degree push battle eight
+- name: node1_validator_address_4
+  type: local
+  address: baseledger17j8py0whmey2xhg7f4mqqkrvtddgjc2ntgaktd
+  pubkey: baseledgerpub1addwnpepqfx227n92javlmdkdh0j2v9my62drm0x5gz99actgr7zp6w6ppnkjr93tfn
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+entry surge deliver gift scheme dad eagle fatigue hazard elder wonder clinic dove fold fence over obtain churn until motor kind broccoli depart garage
+- name: node1_validator_address_5
+  type: local
+  address: baseledger127hxrldwa8jkpv9u9rghdua2k5ja3xde6jhd49
+  pubkey: baseledgerpub1addwnpepqv04eclz6eqlxzzat654gqqk207tvucp99qyacawwcy3y49x7n27ur059xf
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+tendermint node id d172fc55469d6b093d4144a9699403818282ebfb
+
+
+
+
+
+*************NODE55 VALIDATOR********************
+
+
+- name: node55_validator_address1
+  type: local
+  address: baseledger1kkf4ujsjj8vuj9575qw5tlm53nnwxufy88rsm0
+  pubkey: baseledgerpub1addwnpepq2rmywt9x8f4j3ck0rev5ggr7aha9ds5cea4d4dqaxm74rfrkmvlz39u08r
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+analyst leaf cliff fog humble gap birth volcano key erase snap want tower south hobby venture burst rib stereo practice special crystal finish physical
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+affair lens nasty dry note rebel goose proud comic thumb search arrest patch garage acoustic runway list master sword salon tooth hire size scatter
+- name: node55_validator_address2
+  type: local
+  address: baseledger1v9u9r0ujmuzrtdvpvxw6aj685ln78hy079wu02
+  pubkey: baseledgerpub1addwnpepqga94srr65zkkghdswjespsxgjd5yv5ckn0jg2wk5ml0g6zr42pgytp0592
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+penalty detail coconut twin twelve object turtle orbit soon segment naive typical hill stereo copy liquid spend album dream priority total grain fresh air
+- name: node55_validator_address3
+  type: local
+  address: baseledger1mgtg9w0ugzst3q9eft4huw6uwplllhh55lyp43
+  pubkey: baseledgerpub1addwnpepqf88d4kxwmtldyau5gw0kvkclmu9ugjxxp3cnerpz79mk6m2ls6ux7an6ar
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+- name: node55_validator_address4
+  type: local
+  address: baseledger14lwep84a2vqgucszv8plag7gmlgdle4wghhw42
+  pubkey: baseledgerpub1addwnpepqdjttmagx3pnug84y4f4s29qln7p0wzftv73k6tka3xtjz2zha28yy4fdls
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+patient empower forest analyst brain post search motor robot human finish tail piece curious resource master medal tuna weird early you pledge pen unlock
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+tide theme regular liar control appear pill sad hold economy already item school pepper photo high any brown high snake report lab eyebrow agent
+- name: node55_validator_address5
+  type: local
+  address: baseledger16kn7y300tp5wqgadlvh2mctjqexwc8mtfkuydf
+  pubkey: baseledgerpub1addwnpepqfvqq0v4uwtsytmzl370sncg02trcr4ye3d2lgqd28e39utap434jx6cs6y
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+*************NODE42 REPLICATOR********************
+
+
+- name: node42_replicator_address_1
+  type: local
+  address: baseledger1cws98m5cfp9cap70uastmllqma90rv82v9xh9h
+  pubkey: baseledgerpub1addwnpepqvh7qzdqutul5vk95lh69zykgdsd63t505r9400wxcejrvsvpq3muu95fse
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+quit home scatter mystery exact worth soup supply any village wonder increase strike alien wedding curtain quote tourist car stem current gentle child marble
+
+- name: node42_replicator_address_2
+  type: local
+  address: baseledger15gs6cdw7c7mdhe6rm34f6fdemfprewspjkhy0h
+  pubkey: baseledgerpub1addwnpepqw5ncznyvk2ym099d7rd08qelem6r5mz6lp4d8n4y9exam2dpuffgzylest
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+nation hospital moment wreck alert civil fiction sugar depend acquire action box first invite divert result silk wheat situate polar toilet case lab index
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+bench exact camera reform unfair coach alcohol athlete omit unusual timber absorb loud point marriage punch rich fine autumn nut hybrid taste song imitate
+- name: node42_replicator_address_3
+  type: local
+  address: baseledger1njl6uu45g7tlpn44qp3clhh49gkzkrrwna9tjr
+  pubkey: baseledgerpub1addwnpepqdqeaknqccrevzq8sef609w4p9m6l6assaf046mdddc6tjnxx8wtc2mgy9x
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+resource again armor mutual canyon struggle cross begin noise sport gather chimney weather patrol arrow scare reflect ill sibling fly glance eyebrow desk odor
+- name: node42_replicator_address_4
+  type: local
+  address: baseledger1fm5md5spaamwuvq96lf88s2ez3qprn5f0xd9u8
+  pubkey: baseledgerpub1addwnpepq072j2948jhe3dprt4jvx5uvl4etda40fghdk7wu6v9fy6dde6umwj3fzpx
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+- name: node42_replicator_address_5
+  type: local
+  address: baseledger1xjhjx3eg95jg6lnjwaws0yemfkz9y5s0dsmr2t
+  pubkey: baseledgerpub1addwnpepqw4hr6qy5rkdpr09epaexawl22j4g3x9wd032p2jywfkjsh8jtjzjw792v9
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
