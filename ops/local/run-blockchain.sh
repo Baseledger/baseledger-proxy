@@ -16,7 +16,8 @@ export BLOCKCHAIN_APP_API_PORT=1317 &&
 export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port && 
 export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8081 &&
-export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea # unique identifier of the organization, currently hardcoded in seed data
+export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea && # unique identifier of the organization, currently hardcoded in seed data
+export FAUCET_ACC=baseledger1ecskwhmn9l0j7zt98lfps3dtv4y4fuq8lh67ls
 
 docker-compose -p first_node up -d
 
@@ -40,6 +41,15 @@ docker exec first_node_blockchain_app_1 baseledgerd keys add node1_validator --k
 # Add first node validator account as genesis
 node1_validator_address=$(docker exec first_node_blockchain_app_1 baseledgerd keys show node1_validator -a --keyring-backend test)
 docker exec first_node_blockchain_app_1 baseledgerd add-genesis-account ${node1_validator_address} 100000000000stake,100000000000token
+
+# Set up faucet account
+docker exec -ti first_node_blockchain_app_1 sh
+baseledgerd keys add faucet --recover=true
+#enter mnemonic
+exit
+
+# Add faucet account as genesis
+docker exec first_node_blockchain_app_1 baseledgerd add-genesis-account baseledger1ecskwhmn9l0j7zt98lfps3dtv4y4fuq8lh67ls 100000000000stake,100000000000token
 
 # Initialize second node validator account
 docker exec second_node_blockchain_app_1 baseledgerd keys add node2_validator --keyring-backend test

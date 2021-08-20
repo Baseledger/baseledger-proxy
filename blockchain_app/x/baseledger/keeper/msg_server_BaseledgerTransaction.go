@@ -6,7 +6,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/tendermint/tendermint/crypto"
 	"github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/x/baseledger/types"
@@ -15,8 +14,10 @@ import (
 func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types.MsgCreateBaseledgerTransaction) (*types.MsgCreateBaseledgerTransactionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	moduleAcct := sdk.AccAddress(crypto.AddressHash([]byte(types.ModuleName)))
 	txCreatorAddress, err := sdk.AccAddressFromBech32(msg.Creator)
+
+	// faucet address needs to be hard coded like this, otherwise some node could change configuration and send to arbitrary acc
+	faucetAccAddress, err := sdk.AccAddressFromBech32(common.UbtFaucetAddress)
 
 	if err != nil {
 		panic(err)
@@ -27,7 +28,7 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 		panic(err)
 	}
 
-	err = k.bankKeeper.SendCoins(ctx, txCreatorAddress, moduleAcct, coinFee)
+	err = k.bankKeeper.SendCoins(ctx, txCreatorAddress, faucetAccAddress, coinFee)
 	if err != nil {
 		logger.Errorf("send 1 token error %v\n", err.Error())
 		return nil, err

@@ -2,6 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"math/rand"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
@@ -67,7 +69,7 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
 			Payload:       payload,
-			OpCode:        0,
+			OpCode:        uint32(getRandomFeedbackOpCode()),
 		}
 
 		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload)
@@ -87,6 +89,14 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 
 		restutil.Render(transactionHash, 200, c)
 	}
+}
+
+func getRandomFeedbackOpCode() int {
+	rand.Seed(time.Now().UnixNano())
+	min := 7
+	max := 8
+
+	return rand.Intn(max-min+1) + min
 }
 
 func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
