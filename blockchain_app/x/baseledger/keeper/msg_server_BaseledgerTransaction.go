@@ -6,7 +6,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/spf13/viper"
 	"github.com/unibrightio/baseledger/common"
 	"github.com/unibrightio/baseledger/logger"
 	"github.com/unibrightio/baseledger/x/baseledger/types"
@@ -17,8 +16,8 @@ func (k msgServer) CreateBaseledgerTransaction(goCtx context.Context, msg *types
 
 	txCreatorAddress, err := sdk.AccAddressFromBech32(msg.Creator)
 
-	faucetAcc := viper.GetString("FAUCET_ACC")
-	faucetAccAddress, err := sdk.AccAddressFromBech32(faucetAcc)
+	// faucet address needs to be hard coded like this, otherwise some node could change configuration and send to arbitrary acc
+	faucetAccAddress, err := sdk.AccAddressFromBech32(common.UbtFaucetAddress)
 
 	if err != nil {
 		panic(err)
