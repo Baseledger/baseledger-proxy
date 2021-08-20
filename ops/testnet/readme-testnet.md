@@ -14,24 +14,69 @@
 ## SETUP INITIAL VALIDATOR NODE
 
 NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd init node1 --chain-id baseledger
-NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node1_validator --keyring-backend test
+NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node1_validator_address_1 --keyring-backend test
 
-- name: node1_validator
+- name: node1_validator_address_1
   type: local
-  address: baseledger1clfvetf3qzsghyquj7hz02v0juyap504wt9rww
-  pubkey: baseledgerpub1addwnpepq2ulja9xav85vrgdkej7x67d3vlykl7cu0whe2sjrjmwldgtct5syts4e3y
+  address: baseledger1qkvmcsmdgjd8wtnn2ejxnj59eskqmjq78jejs2
+  pubkey: baseledgerpub1addwnpepqtyhy39wfu2ys0rd2387fkglnxrwlyg4u8stlryrdqva7v0peqt3xpxzf7j
   mnemonic: ""
   threshold: 0
   pubkeys: []
 
-tendermint node id fa9e205e2591309888374fe6f1e931e92a7352e1
+  - name: faucet
+  type: local
+  address: baseledger1ecskwhmn9l0j7zt98lfps3dtv4y4fuq8lh67ls
+  pubkey: baseledgerpub1addwnpepqvw2ulewu4k58w9pwezt6yzwpu5mmkkcg8k4qe8gyyes9d3hfkdks42fz7j
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+brush sample release document pig decade strong tourist upon marine awful ivory giant tide strike fade town plunge pull post spy avoid arrive sphere
+- name: node1_validator_address_2
+  type: local
+  address: baseledger15rvx7mvs948fxpxuuzqsy6f46tgv7dqxkxgenm
+  pubkey: baseledgerpub1addwnpepq0qmevfzfm07tr8qlwldsweqptaaty2pt54tnxkk5jkrvdps9hxks0rph3s
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+law lend love jewel rent rifle kiwi blade twice split tenant shoot rent cannon analyst improve chair dutch fine brisk warrior meadow mandate measure
+- name: node1_validator_address_3
+  type: local
+  address: baseledger1ne9ma2c6n0rxn8l797z9qh8v2su86kskvzt6qe
+  pubkey: baseledgerpub1addwnpepq2pg2kdvpged6zvr4cwm0pqx7ney9vjre6a9cuhffnaedhdxnvpqvtzq57a
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+tongue penalty inside breeze fragile wise vacuum library indicate settle uniform appear country payment edge whip memory thank park parrot degree push battle eight
+- name: node1_validator_address_4
+  type: local
+  address: baseledger17j8py0whmey2xhg7f4mqqkrvtddgjc2ntgaktd
+  pubkey: baseledgerpub1addwnpepqfx227n92javlmdkdh0j2v9my62drm0x5gz99actgr7zp6w6ppnkjr93tfn
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+entry surge deliver gift scheme dad eagle fatigue hazard elder wonder clinic dove fold fence over obtain churn until motor kind broccoli depart garage
+- name: node1_validator_address_5
+  type: local
+  address: baseledger127hxrldwa8jkpv9u9rghdua2k5ja3xde6jhd49
+  pubkey: baseledgerpub1addwnpepqv04eclz6eqlxzzat654gqqk207tvucp99qyacawwcy3y49x7n27ur059xf
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+tendermint node id d172fc55469d6b093d4144a9699403818282ebfb
 
 ### Add first node validator account as genesis
 NODE 1: node1_validator_address=$(docker exec baseledger-node_blockchain_app_1 baseledgerd keys show node1_validator -a --keyring-backend test)
-           docker exec baseledger-node_blockchain_app_1 baseledgerd add-genesis-account baseledger1clfvetf3qzsghyquj7hz02v0juyap504wt9rww 100000000000stake,100000000000token
+           docker exec baseledger-node_blockchain_app_1 baseledgerd add-genesis-account baseledger1qkvmcsmdgjd8wtnn2ejxnj59eskqmjq78jejs2 100000000000stake,100000000000token
 
 ### Generate genensis transaction on the first node
-NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd gentx node1_validator 100000000stake --chain-id baseledger --keyring-backend test
+NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd gentx node1_validator_address_1 100000000stake --chain-id baseledger --keyring-backend test
 
 ### Collect genesis transactions
 NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd collect-gentxs
@@ -63,18 +108,75 @@ NODE 2: make sure node1_id and node1_ip adress in the script are correct
 NODE 2: copy genesis.json from node 1 to the same folder on the machine
 NODE 2: run *add-node-to-running-blokchain.sh*
 
-*****************************************
-- name: node55_replicator
+- name: node55_validator_address1
   type: local
-  address: baseledger1quz8telhz7tt3sv4m7fdh6ueu6lpn0ypt6w2ff
-  pubkey: baseledgerpub1addwnpepqgtdm7laxgq6fltf0ujfx0cp6y3ksctfxqfwvr072zg3u7m07wt5vxrqdmp
+  address: baseledger1kkf4ujsjj8vuj9575qw5tlm53nnwxufy88rsm0
+  pubkey: baseledgerpub1addwnpepq2rmywt9x8f4j3ck0rev5ggr7aha9ds5cea4d4dqaxm74rfrkmvlz39u08r
   mnemonic: ""
   threshold: 0
   pubkeys: []
 
-tendermint node id 1228ef8024fa89d8d9ab756689856813ce69682b
-tendermint validator id baseledgervalconspub1zcjduepq3sp0443lqkltzxwe2vfs09psjmw6ps9umssqz7n0c3n5ampggh0q6df0m7
-validator operator address baseledgervaloper1quz8telhz7tt3sv4m7fdh6ueu6lpn0yp5wll36
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+analyst leaf cliff fog humble gap birth volcano key erase snap want tower south hobby venture burst rib stereo practice special crystal finish physical
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+affair lens nasty dry note rebel goose proud comic thumb search arrest patch garage acoustic runway list master sword salon tooth hire size scatter
+- name: node55_validator_address2
+  type: local
+  address: baseledger1v9u9r0ujmuzrtdvpvxw6aj685ln78hy079wu02
+  pubkey: baseledgerpub1addwnpepqga94srr65zkkghdswjespsxgjd5yv5ckn0jg2wk5ml0g6zr42pgytp0592
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+penalty detail coconut twin twelve object turtle orbit soon segment naive typical hill stereo copy liquid spend album dream priority total grain fresh air
+- name: node55_validator_address3
+  type: local
+  address: baseledger1mgtg9w0ugzst3q9eft4huw6uwplllhh55lyp43
+  pubkey: baseledgerpub1addwnpepqf88d4kxwmtldyau5gw0kvkclmu9ugjxxp3cnerpz79mk6m2ls6ux7an6ar
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+- name: node55_validator_address4
+  type: local
+  address: baseledger14lwep84a2vqgucszv8plag7gmlgdle4wghhw42
+  pubkey: baseledgerpub1addwnpepqdjttmagx3pnug84y4f4s29qln7p0wzftv73k6tka3xtjz2zha28yy4fdls
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+patient empower forest analyst brain post search motor robot human finish tail piece curious resource master medal tuna weird early you pledge pen unlock
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+tide theme regular liar control appear pill sad hold economy already item school pepper photo high any brown high snake report lab eyebrow agent
+- name: node55_validator_address5
+  type: local
+  address: baseledger16kn7y300tp5wqgadlvh2mctjqexwc8mtfkuydf
+  pubkey: baseledgerpub1addwnpepqfvqq0v4uwtsytmzl370sncg02trcr4ye3d2lgqd28e39utap434jx6cs6y
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
 
 *****************************************
 name: node42_replicator

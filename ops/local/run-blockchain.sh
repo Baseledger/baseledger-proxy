@@ -17,7 +17,6 @@ export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port &&
 export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8081 &&
 export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea && # unique identifier of the organization, currently hardcoded in seed data
-export FAUCET_ACC=baseledger1ecskwhmn9l0j7zt98lfps3dtv4y4fuq8lh67ls
 
 docker-compose -p first_node up -d
 
@@ -44,7 +43,7 @@ docker exec first_node_blockchain_app_1 baseledgerd add-genesis-account ${node1_
 
 # Set up faucet account
 docker exec -ti first_node_blockchain_app_1 sh
-baseledgerd keys add faucet --recover=true
+baseledgerd keys add faucet --recover=true --keyring-backend test
 #enter mnemonic
 exit
 
