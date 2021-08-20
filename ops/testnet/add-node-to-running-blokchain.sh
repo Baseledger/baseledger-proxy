@@ -1,14 +1,14 @@
 first_node_tendermint_p2p_port=26655
 tendermint_internal_grpc_port=26657
-node1_id=fa9e205e2591309888374fe6f1e931e92a7352e1
+node1_id=d172fc55469d6b093d4144a9699403818282ebfb
 node1_ip=46.163.116.182
 
-docker exec baseledger-node_blockchain_app_1 baseledgerd init <new_name> --chain-id baseledger
-docker exec baseledger-node_blockchain_app_1 baseledgerd keys add <new_name_role>1 --keyring-backend test
-docker exec baseledger-node_blockchain_app_1 baseledgerd keys add <new_name_role>2 --keyring-backend test
-docker exec baseledger-node_blockchain_app_1 baseledgerd keys add <new_name_role>3 --keyring-backend test
-docker exec baseledger-node_blockchain_app_1 baseledgerd keys add <new_name_role>4 --keyring-backend test
-docker exec baseledger-node_blockchain_app_1 baseledgerd keys add <new_name_role>5 --keyring-backend test
+docker exec baseledger-node_blockchain_app_1 baseledgerd init node42 --chain-id baseledger
+docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node42_replicator_address_1 --keyring-backend test
+docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node42_replicator_address_2 --keyring-backend test
+docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node42_replicator_address_3 --keyring-backend test
+docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node42_replicator_address_4 --keyring-backend test
+docker exec baseledger-node_blockchain_app_1 baseledgerd keys add node42_replicator_address_5 --keyring-backend test
 docker exec baseledger-node_blockchain_app_1 sed -i 's/persistent_peers = ""/persistent_peers = "'${node1_id}'@'${node1_ip}':'${first_node_tendermint_p2p_port}'"/' ~/.baseledger/config/config.toml
 docker exec baseledger-node_blockchain_app_1 sed -i 's/addr_book_strict = true/addr_book_strict = false/' ~/.baseledger/config/config.toml
 docker exec baseledger-node_blockchain_app_1 sed -i 's/allow_duplicate_ip = false/allow_duplicate_ip = true/' ~/.baseledger/config/config.toml

@@ -179,10 +179,66 @@ tide theme regular liar control appear pill sad hold economy already item school
   pubkeys: []
 
 *****************************************
-name: node42_replicator
+- name: node42_replicator_address_1
   type: local
-  address: baseledger14q4zlymjfa39swywtk3vtcy3fgjjgtszt2vfs4
-  pubkey: baseledgerpub1addwnpepqf3ukpzazk4f98wdcp5p8a5dz4thm0p46vgafz4xf2znp0ay8faljac5dgz
+  address: baseledger1cws98m5cfp9cap70uastmllqma90rv82v9xh9h
+  pubkey: baseledgerpub1addwnpepqvh7qzdqutul5vk95lh69zykgdsd63t505r9400wxcejrvsvpq3muu95fse
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+quit home scatter mystery exact worth soup supply any village wonder increase strike alien wedding curtain quote tourist car stem current gentle child marble
+
+- name: node42_replicator_address_2
+  type: local
+  address: baseledger15gs6cdw7c7mdhe6rm34f6fdemfprewspjkhy0h
+  pubkey: baseledgerpub1addwnpepqw5ncznyvk2ym099d7rd08qelem6r5mz6lp4d8n4y9exam2dpuffgzylest
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+nation hospital moment wreck alert civil fiction sugar depend acquire action box first invite divert result silk wheat situate polar toilet case lab index
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+bench exact camera reform unfair coach alcohol athlete omit unusual timber absorb loud point marriage punch rich fine autumn nut hybrid taste song imitate
+- name: node42_replicator_address_3
+  type: local
+  address: baseledger1njl6uu45g7tlpn44qp3clhh49gkzkrrwna9tjr
+  pubkey: baseledgerpub1addwnpepqdqeaknqccrevzq8sef609w4p9m6l6assaf046mdddc6tjnxx8wtc2mgy9x
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+resource again armor mutual canyon struggle cross begin noise sport gather chimney weather patrol arrow scare reflect ill sibling fly glance eyebrow desk odor
+- name: node42_replicator_address_4
+  type: local
+  address: baseledger1fm5md5spaamwuvq96lf88s2ez3qprn5f0xd9u8
+  pubkey: baseledgerpub1addwnpepq072j2948jhe3dprt4jvx5uvl4etda40fghdk7wu6v9fy6dde6umwj3fzpx
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+- name: node42_replicator_address_5
+  type: local
+  address: baseledger1xjhjx3eg95jg6lnjwaws0yemfkz9y5s0dsmr2t
+  pubkey: baseledgerpub1addwnpepqw4hr6qy5rkdpr09epaexawl22j4g3x9wd032p2jywfkjsh8jtjzjw792v9
   mnemonic: ""
   threshold: 0
   pubkeys: []
@@ -209,13 +265,13 @@ NODE1: docker exec baseledger-node_blockchain_app_1 baseledgerd tx bank send nod
 
 ### Send a minimal amount of STAKE tokens from Node1 to the Node_to_become_validator
 
-NODE1: docker exec baseledger-node_blockchain_app_1 baseledgerd tx bank send node1_validator baseledger1quz8telhz7tt3sv4m7fdh6ueu6lpn0ypt6w2ff 1stake --yes
+NODE1: docker exec baseledger-node_blockchain_app_1 baseledgerd tx bank send node1_validator baseledger1kkf4ujsjj8vuj9575qw5tlm53nnwxufy88rsm0 1stake --yes
 
 Here baseledger1xax2e85vqn4n26wxk0qfcy9jgmwlgvnw750hzm is the receiver address obtained from baseledgerd keys list command
 
 ### Node_To_become_Validator now take the minimal amount of STAKE tokens received and stakes them to make him a validator:
 
-NODE 2: docker exec baseledger-node_blockchain_app_1 baseledgerd tx staking create-validator  --amount=1stake  --pubkey=baseledgervalconspub1zcjduepq3sp0443lqkltzxwe2vfs09psjmw6ps9umssqz7n0c3n5ampggh0q6df0m7 --moniker="node55"  --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1" --from=node55_replicator --yes 
+NODE 2: docker exec baseledger-node_blockchain_app_1 baseledgerd tx staking create-validator  --amount=1stake  --pubkey=baseledgervalconspub1zcjduepq0y6gpu79m6ltgjlxs2x0t0ygfdkhnjjxkdl75ejcslcpat3zytlqjp6sty --moniker="node55"  --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1" --from=node55_validator_address1 --yes 
 
 In the command above i removed (-gas="200000" --gas-prices="0.025stake" ) as we assume to have 0 gas costs that way
 Params explanation:
@@ -227,7 +283,7 @@ Params explanation:
 ### Now the new validator should be in the validator set in status UNBONDED (he has to few tokens staked to participate). 
 We stake the right amount from Node1 (our token controlling node):
 
-NODE1: docker exec baseledger-node_blockchain_app_1 baseledgerd tx staking delegate baseledgervaloper1quz8telhz7tt3sv4m7fdh6ueu6lpn0yp5wll36 100000000stake --from=node1_validator --yes 
+NODE1: docker exec baseledger-node_blockchain_app_1 baseledgerd tx staking delegate baseledgervaloper1kkf4ujsjj8vuj9575qw5tlm53nnwxufycnj9ru 100000000stake --from=node1_validator_address_1 --yes 
 
 Params explanation:
 --baseledgervaloper-address from the new validator node, can be seen in "docker exec first_node_blockchain_app_1 baseledgerd query staking validators"
