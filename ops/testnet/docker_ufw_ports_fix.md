@@ -12,7 +12,7 @@
 
 5. reboot the machine if ports accesible
 
-6. if reboot, docker start both proxyapp and blockchainapp containers
+6. if reboot, docker start both proxy_app and blockchain_app containers since they stopped after the restart
 
 7. docker exec baseledger-node_blockchain_app_1 baseledgerd start
 
