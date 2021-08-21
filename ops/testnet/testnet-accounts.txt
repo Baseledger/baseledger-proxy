@@ -271,4 +271,74 @@ inhale snake antenna slide alpha tattoo best shy exotic slam hole fortune vivid 
   threshold: 0
   pubkeys: []
 
+  ************** NODE 9 validator ***********************
   
+- name: node9_validator_address_1
+  type: local
+  address: baseledger16nf3940awl6f8jluwgaxzsg8glqvcvcz0yah8v
+  pubkey: baseledgerpub1addwnpepqfrcen7qea9lg4grx4c3gzgw0nee5x75e7tgm4n56079rrmfsxdpqx8y2ux
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+rescue shed list stadium bus syrup puzzle accident return void goat document foam genius bird spice flash final tape symptom peace game language order
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+maze siege empower vote ensure broken tuition school humor enjoy card squeeze swarm prevent dish about life fly coach abandon tip cattle umbrella occur
+- name: node9_validator_address_2
+  type: local
+  address: baseledger1dd4gjnn2449hsc2av7g2a7hl3vzlmm2uljv7pf
+  pubkey: baseledgerpub1addwnpepq26rkkz3l4l26tqqdgqzqqm8j0ap59etrqkx3tltycfgmsfnfs84kevx346
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+cream alert monkey tone track virtual december drift domain debate stock police tenant elevator venue crush topic youth donkey consider spawn resource surge safe
+- name: node9_validator_address_3
+  type: local
+  address: baseledger12dlrnsyme938k6z4r45l437xlpnr4de53x54yu
+  pubkey: baseledgerpub1addwnpepqv45zd9qnqg5cy0v0aeey55ckd8v47a3usc89v3qen4grjwcg2p3g6htn79
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+dizzy emotion valid enroll curve bundle color flag warrior come captain father clock build right reunion gospel provide offer siege wink twin unable tent
+- name: node9_validator_address_4
+  type: local
+  address: baseledger1vl9g7eqr9rj8v5vcwuew0gs50tr3tx327gdrhw
+  pubkey: baseledgerpub1addwnpepq06wg3mzldpnddsm7qlets57plnamphw3xluelp8l2kgxc3ft5tryzxktqj
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+- name: node9_validator_address_5
+  type: local
+  address: baseledger1yu7u2g34u83vudfmh7dz3qm6dm0s9sxqp49jfm
+  pubkey: baseledgerpub1addwnpepqgnwggfhxyjp7ldq783c3xcy6pr5ml7wzcuwrx39eh80f3w76cq6vlan6v3
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+shaft sauce travel acoustic pupil exist pelican panda valley treat test recycle total light sport chimney iron theme half security coconut insect high similar
