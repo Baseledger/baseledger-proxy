@@ -200,3 +200,145 @@ resource again armor mutual canyon struggle cross begin noise sport gather chimn
   mnemonic: ""
   threshold: 0
   pubkeys: []
+
+
+
+  ******************* NODE 12 Replicator ******************
+  
+
+ceiling trophy change online estate steak talk tilt eyebrow tobacco height captain wisdom hawk maze fury please bacon disease much initial option access guide
+- name: node12_replicator_address_1
+  type: local
+  address: baseledger1004sq4ra78gj6vmcu3uuqupynvqhnlawcnreu6
+  pubkey: baseledgerpub1addwnpepqd3kalm89dg57unv3lzgqa6xjtsk9mzwquelxfz0chyev9tur7v0647qaql
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+put maximum know work wrong agree better turkey sorry wrestle giggle ten rent tortoise ethics remember measure coach wave obtain tomorrow woman envelope jealous
+- name: node12_replicator_address_2
+  type: local
+  address: baseledger1xy2ps4qxxaa8kynxjyax5qwmnwp0tk2zhqtrum
+  pubkey: baseledgerpub1addwnpepq2fxcznt73x9hzmlw7rvs9k3836ta6gg2xkp43c4sy6mjugpxr9wxeg6q2m
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+drop weird say embrace leg sick catch harvest cram demand risk initial toddler silk gas month material lamp expect can pond tennis mention taste
+- name: node12_replicator_address_3
+  type: local
+  address: baseledger1zxktlkkjqrxu9f0zma2g2fc54sj7vsjhgf6jk2
+  pubkey: baseledgerpub1addwnpepqg0cqm5zuh4p2y8n86tfww8c9qhk3rdk2jj9ju22fpnp4scgc5gl70l2mf9
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+hand sentence clap slush artwork roast tribe sudden nose ignore swing elegant cover casual another shed charge agent dream chase index inform weather eagle
+- name: node12_replicator_address_4
+  type: local
+  address: baseledger1rwx20hhf5qpz9x0w0aymmwzmmm97xsp9kpqg2t
+  pubkey: baseledgerpub1addwnpepqf5d8f4rgdxvzh5uaehy3enuqnlp4yjz6usjhrr5xpq2d0jhlmzfwxn3rs4
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+inhale snake antenna slide alpha tattoo best shy exotic slam hole fortune vivid theory kick view parade crucial away sunset often method estate prefer
+- name: node12_replicator_address_5
+  type: local
+  address: baseledger1285lvtfza25j22yqydvkga6n5rpnndz0ftvptg
+  pubkey: baseledgerpub1addwnpepqturs9slpf9zfcav429cnsuztc6ms2vyh2ttty2vdhd779hrt8facym6n0y
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+  ************** NODE 9 validator ***********************
+  
+- name: node9_validator_address_1
+  type: local
+  address: baseledger16nf3940awl6f8jluwgaxzsg8glqvcvcz0yah8v
+  pubkey: baseledgerpub1addwnpepqfrcen7qea9lg4grx4c3gzgw0nee5x75e7tgm4n56079rrmfsxdpqx8y2ux
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+rescue shed list stadium bus syrup puzzle accident return void goat document foam genius bird spice flash final tape symptom peace game language order
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+maze siege empower vote ensure broken tuition school humor enjoy card squeeze swarm prevent dish about life fly coach abandon tip cattle umbrella occur
+- name: node9_validator_address_2
+  type: local
+  address: baseledger1dd4gjnn2449hsc2av7g2a7hl3vzlmm2uljv7pf
+  pubkey: baseledgerpub1addwnpepq26rkkz3l4l26tqqdgqzqqm8j0ap59etrqkx3tltycfgmsfnfs84kevx346
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+cream alert monkey tone track virtual december drift domain debate stock police tenant elevator venue crush topic youth donkey consider spawn resource surge safe
+- name: node9_validator_address_3
+  type: local
+  address: baseledger12dlrnsyme938k6z4r45l437xlpnr4de53x54yu
+  pubkey: baseledgerpub1addwnpepqv45zd9qnqg5cy0v0aeey55ckd8v47a3usc89v3qen4grjwcg2p3g6htn79
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+dizzy emotion valid enroll curve bundle color flag warrior come captain father clock build right reunion gospel provide offer siege wink twin unable tent
+- name: node9_validator_address_4
+  type: local
+  address: baseledger1vl9g7eqr9rj8v5vcwuew0gs50tr3tx327gdrhw
+  pubkey: baseledgerpub1addwnpepq06wg3mzldpnddsm7qlets57plnamphw3xluelp8l2kgxc3ft5tryzxktqj
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+- name: node9_validator_address_5
+  type: local
+  address: baseledger1yu7u2g34u83vudfmh7dz3qm6dm0s9sxqp49jfm
+  pubkey: baseledgerpub1addwnpepqgnwggfhxyjp7ldq783c3xcy6pr5ml7wzcuwrx39eh80f3w76cq6vlan6v3
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+shaft sauce travel acoustic pupil exist pelican panda valley treat test recycle total light sport chimney iron theme half security coconut insect high similar

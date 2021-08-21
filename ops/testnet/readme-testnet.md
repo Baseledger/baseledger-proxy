@@ -49,7 +49,9 @@ NODE 1: docker exec baseledger-node_blockchain_app_1 baseledgerd start
 
 NODE 2: repeat first five steps or running the *setup-node-infrastructure-for-testnet.sh* on the machine
 NODE 2: copy *add-node-to-running-blokchain.sh* to the same folder on the machine
-NODE 2: make sure node1_id and node1_ip adress in the script are correct
+NODE 2: make sure node1_id and node1_ip adress in the script  are correct
+NODE 2: make sure to give a unique name for new node (nodexxx) in script:           
+      baseledgerd init node... and baseledgerd keys add nodexxxxx_replicator_address_1 
 NODE 2: copy genesis.json from node 1 to the same folder on the machine
 NODE 2: run *add-node-to-running-blokchain.sh*
 
@@ -77,7 +79,7 @@ NODE1: docker exec baseledger-node_blockchain_app_1 baseledgerd tx bank send nod
 
 Here baseledger1xax2e85vqn4n26wxk0qfcy9jgmwlgvnw750hzm is the receiver address obtained from baseledgerd keys list command
 
-### Node_To_become_Validator now take the minimal amount of STAKE tokens received and stakes them to make him a validator:
+### Node_To_become_Validator now takes the minimal amount of STAKE tokens received and stakes them to make him a validator:
 
 NODE 2: docker exec baseledger-node_blockchain_app_1 baseledgerd tx staking create-validator  --amount=1stake  --pubkey=baseledgervalconspub1zcjduepq0y6gpu79m6ltgjlxs2x0t0ygfdkhnjjxkdl75ejcslcpat3zytlqjp6sty --moniker="node55"  --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1" --from=node55_validator_address1 --yes 
 
