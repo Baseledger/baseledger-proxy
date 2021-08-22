@@ -342,3 +342,78 @@ dizzy emotion valid enroll curve bundle color flag warrior come captain father c
 It is the only way to recover your account if you ever forget your password.
 
 shaft sauce travel acoustic pupil exist pelican panda valley treat test recycle total light sport chimney iron theme half security coconut insect high similar
+
+
+
+*************** Node20 Validator ***************************
+
+
+- name: node20_balidator_address_1
+  type: local
+  address: baseledger1xql88w09w6vymfttf5mdv3z5tu7vn3q6qyup99
+  pubkey: baseledgerpub1addwnpepqf723snh2vsftjvh3jz9d9rz7r7vl2uwlqajzn20pa4xy96nwddjssmv484
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+begin neck wine timber snake cake thrive elder hammer gorilla first awful south ignore know coral else air garlic ritual initial honey grief crash
+- name: node20_validator_address_2
+  type: local
+  address: baseledger105t7q69akz6zjrvfwfjsmd5660hwgjug7u43ak
+  pubkey: baseledgerpub1addwnpepqg98qkjse0pt0ala306k39x74p8eq5538sxa40qp0luueya7e2k9vzu4d4d
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+average solution volume trial puzzle miracle odor worth spatial bag response decline auction wall omit fault trade ankle wrap license bind pipe bubble mansion
+
+- name: node20_validator_address_3
+  type: local
+  address: baseledger1f6ym48950esnr0kgpvyukmpt3f47lwxjtt68q2
+  pubkey: baseledgerpub1addwnpepqw00mukv07kwn3s36pzsggdk5zeqzss0fczc5dvrdtcycwqcqzt7w2u3wva
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+bronze square motor nurse garlic unusual spell treat bench island output upset dry frog canoe antenna slide unique galaxy island ethics weird roast adult
+
+- name: node20_validator_address_4
+  type: local
+  address: baseledger1uxdfedvwnlppxa4hvsnmc6hg4xvfyme6r560s8
+  pubkey: baseledgerpub1addwnpepqv8yqf6xhut09r6kjp55vx2w26y4yh844mwarm5yh5f8ynr30aprx660mdx
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+option orchard jelly note flash allow expire catch mesh nasty secret impact volcano hold rubber matter dream library wise garbage truly door advance strike
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+modify defense exchange tennis cluster divert enact furnace inner weekend chat deputy police grant bar wise mule fiber path senior erosion shrimp rude border
+- name: node20_validator_address_5
+  type: local
+  address: baseledger1xuf96q2z69vf7h6tzpt80f5y97ckyz9jqs4342
+  pubkey: baseledgerpub1addwnpepqd2vgez2yu2fkuhg4gsk3dklk6ev8wmkgtaj0df6e4zcd5kr45q35ufqjf2
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
