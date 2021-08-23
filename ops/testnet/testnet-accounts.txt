@@ -558,3 +558,73 @@ switch sunny fiction drastic dutch act around stay equip collect divorce elegant
   pubkeys: []
 
 
+************ NODE 16 *******************
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+pioneer letter jewel obvious frequent mixed inside shoe enrich captain vapor nature burger bracket salute detect pencil frame neglect shove credit acquire spike symptom
+- name: node16_replicator_address_1
+  type: local
+  address: baseledger1jy5nkpuqh0xa8zhgu33m478t0n87k9905gcvge
+  pubkey: baseledgerpub1addwnpepqgzh6xux4clh6znha7qng7eew0w4cv9fe60pa4w07qzzvpcz9mhqz3g58d7
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+young search wall hire trigger remind earth best animal hollow affair oyster minimum bird walk cost blouse reflect crouch tenant cancel autumn hip profit
+- name: node16_replicator_address_2
+  type: local
+  address: baseledger1c5duy3mjarpnycwrg23h3ymykhj66c9x2xrs29
+  pubkey: baseledgerpub1addwnpepqvjgrw8l9qvv5sxd9qzzd2ja4yqz7qsspycp6vulpamxxs8gjrzac2v0xvd
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+cheese prize brisk method poverty assist jungle rose defy milk tone reveal amateur depend cave oil fitness solve faith fork neck tray fluid mask
+- name: node16_replicator_address_3
+  type: local
+  address: baseledger13c4jw8rmzarnmc5hw02mux7wt7pj7twaunfy5p
+  pubkey: baseledgerpub1addwnpepqfvlht86dqphk89uprhugx7jrgemamqhd5qj3aut756w02dflk50vpgqraj
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+double hidden very female bronze camp eye tenant stock burst marble scatter green exchange program snake poverty hour spoon student together cousin mammal year
+- name: node16_replicator_address_4
+  type: local
+  address: baseledger13x2px2xt3khd89wjlfm26je5n988pvzmuwse7x
+  pubkey: baseledgerpub1addwnpepq0lj9fru978nr6fdlwr9ys85asuh7zutrysmzvql90saan7sj23fuenukqj
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+- name: node16_replicator_address_5
+  type: local
+  address: baseledger1e3g64eyn0mnc3kz03hp7p4pw2zjfjmx7pjjvm2
+  pubkey: baseledgerpub1addwnpepq0d86whqrgtg408e9g0xt8tvpsuh4ajq9vnwchhg6cl6dqvs20vv7tumz0g
+  mnemonic: ""
+  threshold: 0
+  pubkeys: []
+
+
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
+
+mind spy pact mansion arrow empower wet undo carbon before alley bubble tuition sheriff trap head magnet caution minimum void hover popular list subway
