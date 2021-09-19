@@ -21,11 +21,9 @@ type createSynchronizationFeedbackRequest struct {
 	Recipient                                  string `json:"recipient"`
 	Approved                                   bool   `json:"approved"`
 	BaseledgerBusinessObjectIdOfApprovedObject string `json:"baseledger_business_object_id_of_approved_object"`
-	HashOfObjectToApprove                      string `json:"hash_of_object_to_approve"`
 	OriginalBaseledgerTransactionId            string `json:"original_baseledger_transaction_id"`
 	OriginalOffchainProcessMessageId           string `json:"original_offchain_process_message_id"`
 	FeedbackMessage                            string `json:"feedback_message"`
-	BaseledgerProvenBusinessObjectJson         string `json:"baseledger_proven_business_object_json"`
 }
 
 func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
@@ -48,7 +46,21 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 			return
 		}
 
-		createFeedbackReq := newFeedbackRequest(*req)
+		feedbackOffchainMessageId, err := uuid.FromString(req.OriginalOffchainProcessMessageId)
+
+		if err != nil {
+			restutil.RenderError(err.Error(), 400, c)
+			return
+		}
+
+		feedbackOffchainMessage, err := types.GetOffchainMsgById(feedbackOffchainMessageId)
+
+		if err != nil {
+			restutil.RenderError(err.Error(), 400, c)
+			return
+		}
+
+		createFeedbackReq := newFeedbackRequest(*req, feedbackOffchainMessage)
 
 		transactionId := uuid.NewV4()
 		feedbackMsg := "Approve"
@@ -56,7 +68,7 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 			feedbackMsg = "Reject"
 		}
 
-		offchainMsg := createFeedbackOffchainMessage(*req, transactionId, feedbackMsg)
+		offchainMsg := createFeedbackOffchainMessage(*req, feedbackOffchainMessage, transactionId, feedbackMsg)
 
 		if !offchainMsg.Create() {
 			logger.Errorf("error when creating new offchain msg entry")
@@ -99,15 +111,20 @@ func getRandomFeedbackOpCode() int {
 	return rand.Intn(max-min+1) + min
 }
 
-func createFeedbackOffchainMessage(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
+func createFeedbackOffchainMessage(
+	req createSynchronizationFeedbackRequest,
+	feedbackOffchainMessage *types.OffchainProcessMessage,
+	transactionId uuid.UUID,
+	baseledgerTransactionType string,
+) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId,
 		WorkstepType:                         "Feedback",
 		ReferencedOffchainProcessMessageId:   uuid.FromStringOrNil(req.OriginalOffchainProcessMessageId),
-		BaseledgerSyncTreeJson:               req.BaseledgerProvenBusinessObjectJson,
-		BusinessObjectProof:                  req.HashOfObjectToApprove,
+		BaseledgerSyncTreeJson:               feedbackOffchainMessage.BaseledgerSyncTreeJson,
+		BusinessObjectProof:                  feedbackOffchainMessage.BusinessObjectProof,
 		BaseledgerBusinessObjectId:           uuid.FromStringOrNil(""),
 		ReferencedBaseledgerBusinessObjectId: uuid.FromStringOrNil(req.BaseledgerBusinessObjectIdOfApprovedObject),
 		StatusTextMessage:                    req.FeedbackMessage,
@@ -144,14 +161,14 @@ func createFeedbackSentTrustmeshEntry(req createSynchronizationFeedbackRequest, 
 	return trustmeshEntry
 }
 
-func newFeedbackRequest(req createSynchronizationFeedbackRequest) *types.SynchronizationFeedback {
+func newFeedbackRequest(req createSynchronizationFeedbackRequest, feedbackOffchainMessage *types.OffchainProcessMessage) *types.SynchronizationFeedback {
 	return &types.SynchronizationFeedback{
 		WorkgroupId:                        uuid.FromStringOrNil(req.WorkgroupId),
-		BaseledgerProvenBusinessObjectJson: req.BaseledgerProvenBusinessObjectJson,
+		BaseledgerProvenBusinessObjectJson: feedbackOffchainMessage.BaseledgerSyncTreeJson,
 		Recipient:                          req.Recipient,
 		Approved:                           req.Approved,
 		BaseledgerBusinessObjectIdOfApprovedObject: req.BaseledgerBusinessObjectIdOfApprovedObject,
-		HashOfObjectToApprove:                      req.HashOfObjectToApprove,
+		HashOfObjectToApprove:                      feedbackOffchainMessage.BusinessObjectProof,
 		OriginalBaseledgerTransactionId:            req.OriginalBaseledgerTransactionId,
 		OriginalOffchainProcessMessageId:           req.OriginalOffchainProcessMessageId,
 		FeedbackMessage:                            req.FeedbackMessage,
