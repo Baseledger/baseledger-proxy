@@ -2,6 +2,14 @@
 
 ## Setup a node infrastructure on a server
 
+*For windows server, make sure to enable linux containers*
+
+[Environment]::SetEnvironmentVariable("LCOW_SUPPORTED", "1", "Machine")
+
+C:\ProgramData\docker\config\daemon.json -> add { "experimental": true }
+
+Restart-Service docker
+
 1. Copy docker-compose.yml to the server
 2. Copy *setup-node-infrastructure-for-testnet.sh* to the same folder on the server
 3. Generate a new UUID for ORGANIZATION_ID and add it to the script. It will be used later to setup the organization and workgroups via rest endpoints
@@ -9,6 +17,8 @@
       This one sets up all components necessary for a node to function.
       Run it on as many servers as nodes are needed.
 4. Open all ports in the firewall that are necessary for external communication
+
+
 
 
 ## SETUP INITIAL VALIDATOR NODE

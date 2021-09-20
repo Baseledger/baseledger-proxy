@@ -12,6 +12,7 @@ var test_workgroup_id = "734276bc-4adc-4621-acf8-ac66dc91cb27";
 var alice_organization_id = "d45c9b93-3eef-4993-add6-aa1c84d17eea";
 var bob_organization_id = "969e989c-bb61-4180-928c-0d48afd8c6a3";
 
+const TEST_TIMEOUT = 30000;
 const BLOCK_TIME_SLEEP_DELAY = 6000;
 
 const sleep = (ms) => {
@@ -118,7 +119,7 @@ describe('Setup orgs and workgroup', function () {
 
 describe('Send Suggestion', function () {
   it('Given Alice and Bob stacks, When Alice proxy app is triggered with send suggestion, it returns Ok with transaction hash and Alice and Bob nodes have the baseledger transaction', async function () {
-    this.timeout(BLOCK_TIME_SLEEP_DELAY + 2000);
+    this.timeout(TEST_TIMEOUT + 20000);
     
     // Arrange
     const createSuggestionDto = {
@@ -179,5 +180,43 @@ describe('Send Suggestion', function () {
     var trustmesheshPayload = JSON.parse(getBobTrustmeshResponse.text);
     expect(trustmesheshPayload[0]["Entries"][0].EntryType).to.equal("SuggestionReceived");
     expect(trustmesheshPayload[0]["Entries"][0].CommitmentState).to.equal("COMMITTED");
+  });
+});
+
+describe('Send Feedback', function () {
+  it('Given Alice has sent a suggestion and Bob has received it , When bob send feedback approval, it returns Ok with transaction hash and Alice and Bob nodes have the baseledger transaction', async function () {
+    this.timeout(TEST_TIMEOUT + 20000);
+    
+    // Arrange
+    const createFeedbackDto = {
+      workgroup_id: test_workgroup_id,
+      recipient: alice_organization_id,
+      approved: true,
+      business_object_type: "PurchaseOrder",
+      baseledger_business_object_id_of_approved_object: "169f104f-980e-42bb-a128-73daf259bc39",
+      baseledger_proven_business_object_json: "",
+      original_baseledger_transaction_id: "",
+      original_offchain_process_message_id: "",
+      hash_of_object_to_approve: "883fbede2a40a93020730f0f9b39282c",
+      feedback_message: ""
+    }
+
+    // Act
+    var createFeedbackResponse = await request(bob_proxy_app_url)
+      .post('/feedback')
+      .send(createFeedbackDto)
+      .expect(200);
+
+    // Assert
+    expect(createFeedbackResponse.body).not.to.be.undefined;
+    expect(createFeedbackResponse.body).to.have.length(64);
+
+    console.log(`WAITING ${BLOCK_TIME_SLEEP_DELAY}ms FOR A NEW BLOCK`);
+    await sleep(BLOCK_TIME_SLEEP_DELAY);
+    
+    console.log(`WAITING SOME MORE FOR WORKER TO UPDATE TRUSTMESH STATUS`);
+    await sleep(BLOCK_TIME_SLEEP_DELAY);
+
+    // TODO: assert feedback processed
   });
 });

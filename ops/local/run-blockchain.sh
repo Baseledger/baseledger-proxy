@@ -42,10 +42,10 @@ node1_validator_address=$(docker exec first_node_blockchain_app_1 baseledgerd ke
 docker exec first_node_blockchain_app_1 baseledgerd add-genesis-account ${node1_validator_address} 100000000000stake,100000000000token
 
 # Set up faucet account
-docker exec -ti first_node_blockchain_app_1 sh
-baseledgerd keys add faucet --recover=true --keyring-backend test
-#enter mnemonic
-exit
+# docker exec -ti first_node_blockchain_app_1 sh
+# baseledgerd keys add faucet --recover=true --keyring-backend test
+# #enter mnemonic
+# exit
 
 # Add faucet account as genesis
 docker exec first_node_blockchain_app_1 baseledgerd add-genesis-account baseledger1ecskwhmn9l0j7zt98lfps3dtv4y4fuq8lh67ls 100000000000stake,100000000000token
