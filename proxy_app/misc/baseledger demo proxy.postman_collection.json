@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "d3005bf8-b355-410c-bb6d-f08d47150a73",
+		"name": "baseledger demo proxy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "node 1 suggestion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d45c9b93-3eef-4993-add6-aa1c84d17eea\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "http://137.184.72.13:8081/suggestion",
+					"protocol": "http",
+					"host": [
+						"137",
+						"184",
+						"72",
+						"13"
+					],
+					"port": "8081",
+					"path": [
+						"suggestion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "node 2 suggestion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d45c9b93-3eef-4993-add6-aa1c84d17eea\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "http://137.184.25.137:8081/suggestion",
+					"protocol": "http",
+					"host": [
+						"137",
+						"184",
+						"25",
+						"137"
+					],
+					"port": "8081",
+					"path": [
+						"suggestion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "node 1 feedback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d45c9b93-3eef-4993-add6-aa1c84d17eea\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"ca78e980-9dd1-4996-b31c-25ba9556ee4c\",\r\n    \"original_offchain_process_message_id\": \"1ce7857e-b878-423d-bb65-2a5a83931a3b\",\r\n    \"hash_of_object_to_approve\": \"883fbede2a40a93020730f0f9b39282c\",\r\n    \"feedback_message\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "http://137.184.72.13:8081/feedback",
+					"protocol": "http",
+					"host": [
+						"137",
+						"184",
+						"72",
+						"13"
+					],
+					"port": "8081",
+					"path": [
+						"feedback"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "node 2 feedback",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d45c9b93-3eef-4993-add6-aa1c84d17eea\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"ca78e980-9dd1-4996-b31c-25ba9556ee4c\",\r\n    \"original_offchain_process_message_id\": \"1ce7857e-b878-423d-bb65-2a5a83931a3b\",\r\n    \"hash_of_object_to_approve\": \"883fbede2a40a93020730f0f9b39282c\",\r\n    \"feedback_message\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "http://137.184.25.137:8081/feedback",
+					"protocol": "http",
+					"host": [
+						"137",
+						"184",
+						"25",
+						"137"
+					],
+					"port": "8081",
+					"path": [
+						"feedback"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
