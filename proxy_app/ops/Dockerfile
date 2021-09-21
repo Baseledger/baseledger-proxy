@@ -24,6 +24,8 @@ ENV NATS_URL=nats:4222
 ENV BLOCKCHAIN_APP_URL=blockchain_app:1317
 ENV TENDERMINT_API_URL=blockchain_app:26657
 ENV ORGANIZATION_ID=$ORGANIZATION_ID
+ENV API_UB_USER=unibright
+ENV API_UB_PWD=ub321
 
 RUN go build -o /proxy_app httpd/main.go
 

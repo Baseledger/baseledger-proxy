@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
@@ -27,23 +28,39 @@ func main() {
 
 	r := gin.Default()
 	r.Use(helpers.CORSMiddleware())
-	r.GET("/trustmeshes", handler.GetTrustmeshesHandler())
-	r.POST("/suggestion", handler.CreateInitialSuggestionRequestHandler())
-	r.POST("/feedback", handler.CreateSynchronizationFeedbackHandler())
-	r.GET("/sunburst/:txId", handler.GetSunburstHandler())
-	r.POST("send_offchain_message", handler.SendOffchainMessageHandler())
-	r.GET("/organization", handler.GetOrganizationsHandler())
-	r.POST("/organization", handler.CreateOrganizationHandler())
-	r.DELETE("/organization/:id", handler.DeleteOrganizationHandler())
-	r.GET("/workgroup", handler.GetWorkgroupsHandler())
-	r.POST("/workgroup", handler.CreateWorkgroupHandler())
-	r.DELETE("/workgroup/:id", handler.DeleteWorkgroupHandler())
-	r.GET("/participation", handler.GetWorkgroupMemberHandler())
-	r.POST("/participation", handler.CreateWorkgroupMemberHandler())
-	r.DELETE("/participation/:id", handler.DeleteWorkgroupMemberHandler())
+	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
+	r.POST("/suggestion", basicAuth, handler.CreateInitialSuggestionRequestHandler())
+	r.POST("/feedback", basicAuth, handler.CreateSynchronizationFeedbackHandler())
+	r.GET("/sunburst/:txId", basicAuth, handler.GetSunburstHandler())
+	r.POST("send_offchain_message", basicAuth, handler.SendOffchainMessageHandler())
+	r.GET("/organization", basicAuth, handler.GetOrganizationsHandler())
+	r.POST("/organization", basicAuth, handler.CreateOrganizationHandler())
+	r.DELETE("/organization/:id", basicAuth, handler.DeleteOrganizationHandler())
+	r.GET("/workgroup", basicAuth, handler.GetWorkgroupsHandler())
+	r.POST("/workgroup", basicAuth, handler.CreateWorkgroupHandler())
+	r.DELETE("/workgroup/:id", basicAuth, handler.DeleteWorkgroupHandler())
+	r.GET("/participation", basicAuth, handler.GetWorkgroupMemberHandler())
+	r.POST("/participation", basicAuth, handler.CreateWorkgroupMemberHandler())
+	r.DELETE("/participation/:id", basicAuth, handler.DeleteWorkgroupMemberHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+}
+
+func basicAuth(c *gin.Context) {
+	basicAuthUser, _ := viper.Get("API_UB_USER").(string)
+	basicAuthPwd, _ := viper.Get("API_UB_PWD").(string)
+	// Get the Basic Authentication credentials
+	user, password, hasAuth := c.Request.BasicAuth()
+	if hasAuth && user == basicAuthUser && password == basicAuthPwd {
+		logger.Info("Basic auth successful")
+	} else {
+		logger.Error("Basic auth failed")
+		c.Abort()
+		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+		c.JSON(http.StatusForbidden, map[string]interface{}{"error": "auth failed"})
+		return
+	}
 }
 
 // discuss if we should use config struct or this is enough
