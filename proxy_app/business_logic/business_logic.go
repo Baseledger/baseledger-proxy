@@ -121,10 +121,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		natsMessage.ProcessMessage = *offchainMessage
 		natsMessage.TxHash = trustmeshEntry.TransactionHash
 
-		// TODO: status success
 		var payload, _ = json.Marshal(natsMessage)
 
-		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.SenderOrgId.String())
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
 		systemofrecord.PutStatusUpdate(
 			trustmeshEntry.BaseledgerBusinessObjectId.String(),
