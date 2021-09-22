@@ -31,7 +31,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		logger.Warnf("Transaction %v is invalid with code %v and log %v", trustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
 
 		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
 			"Error",
@@ -45,7 +45,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	if err != nil {
 		logger.Error("Offchain process msg not found")
 		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
 			"Error",
@@ -66,7 +66,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
 		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
 			"Success",
@@ -102,7 +102,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			logger.Infof("Business object sync tree json", boJson)
 
 			systemofrecord.PostBusinessObject(
-				trustmeshEntry.BaseledgerBusinessObjectId.String(),
+				trustmeshEntry.BaseledgerBusinessObjectId,
 				trustmeshEntry.BusinessObjectType,
 				trustmeshEntry.ReceiverOrgId.String(),
 				trustmeshEntry.OffchainProcessMessageId.String(),
@@ -126,7 +126,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
 		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
 			"Success",

@@ -23,8 +23,8 @@ type TrustmeshEntry struct {
 	BaseledgerTransactionId              uuid.UUID
 	ReferencedBaseledgerTransactionId    uuid.UUID
 	BusinessObjectType                   string
-	BaseledgerBusinessObjectId           uuid.UUID
-	ReferencedBaseledgerBusinessObjectId uuid.UUID
+	BaseledgerBusinessObjectId           string
+	ReferencedBaseledgerBusinessObjectId string
 	OffchainProcessMessageId             uuid.UUID
 	ReferencedProcessMessageId           uuid.UUID
 	CommitmentState                      string

@@ -104,8 +104,8 @@ func CreateBaseledgerTransactionFeedbackPayload(
 		ReferencedBaseledgerTransactionId:    synchronizationFeedback.OriginalBaseledgerTransactionId,
 		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof.String(),
 		Proof:                                offchainProcessMessage.BusinessObjectProof,
-		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId.String(),
-		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId.String(),
+		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
 	}
 
 	logger.Infof("\n payload %v \n", *payload)

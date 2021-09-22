@@ -23,8 +23,8 @@ type OffchainProcessMessage struct {
 	BusinessObjectType                   string
 	TendermintTransactionIdOfStoredProof uuid.UUID
 	BaseledgerTransactionIdOfStoredProof uuid.UUID
-	BaseledgerBusinessObjectId           uuid.UUID
-	ReferencedBaseledgerBusinessObjectId uuid.UUID
+	BaseledgerBusinessObjectId           string
+	ReferencedBaseledgerBusinessObjectId string
 	StatusTextMessage                    string
 	BaseledgerTransactionType            string
 	ReferencedBaseledgerTransactionId    uuid.UUID

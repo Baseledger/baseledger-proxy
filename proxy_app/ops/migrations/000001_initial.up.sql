@@ -103,8 +103,8 @@ CREATE TABLE public.offchain_process_messages (
 	business_object_proof text,
 	tendermint_transaction_id_of_stored_proof uuid,
 	baseledger_transaction_id_of_stored_proof uuid,
-  baseledger_business_object_id uuid,
-	referenced_baseledger_business_object_id uuid,
+  baseledger_business_object_id text,
+	referenced_baseledger_business_object_id text,
 	status_text_message text,
   business_object_type text,
 	baseledger_transaction_type text,
@@ -135,8 +135,8 @@ CREATE TABLE public.trustmesh_entries (
   referenced_baseledger_transaction_id uuid,
 
   business_object_type text,
-  baseledger_business_object_id uuid,
-  referenced_baseledger_business_object_id uuid,
+  baseledger_business_object_id text,
+  referenced_baseledger_business_object_id text,
 
   offchain_process_message_id uuid,
   referenced_process_message_id uuid,
