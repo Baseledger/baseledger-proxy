@@ -143,7 +143,8 @@ CREATE TABLE public.trustmesh_entries (
 
   commitment_state text,
   transaction_hash text,
-  trustmesh_id uuid NOT NULL
+  trustmesh_id uuid NOT NULL,
+  sor_business_object_id text
 );
 
 ALTER TABLE public.trustmesh_entries OWNER TO baseledger;

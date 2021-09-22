@@ -30,6 +30,7 @@ type TrustmeshEntry struct {
 	CommitmentState                      string
 	TransactionHash                      string
 	TrustmeshId                          uuid.UUID
+	SorBusinessObjectId                  string
 }
 
 type Trustmesh struct {

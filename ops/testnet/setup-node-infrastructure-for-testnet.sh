@@ -5,6 +5,7 @@ export BLOCKCHAIN_APP_API_PORT=1317 &&
 export TENDERMINT_NODE_GRPC_PORT=26657 && 
 export TENDERMINT_NODE_PORT=26655 && 
 export PROXY_APP_PORT=8081 &&
-export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea # unique identifier of the organization, generate a uuid and later add it as org through postman
+export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea # unique identifier of the organization
+export API_CONCIRCLE_URL=s4h.rp.concircle.com # SOR endpoint
 
 docker-compose -p baseledger-node up -d

@@ -10,6 +10,7 @@ import (
 
 	uuid "github.com/kthomas/go.uuid"
 	common "github.com/unibrightio/proxy-api/common"
+	systemofrecord "github.com/unibrightio/proxy-api/concircle"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
@@ -19,34 +20,58 @@ import (
 )
 
 func ExecuteBusinessLogic(txResult proxytypes.Result) {
+	systemofrecord.InitClient()
+	var trustmeshEntry = txResult.Job.TrustmeshEntry
+
 	if txResult.TxInfo.TxHeight == "" || txResult.TxInfo.TxTimestamp == "" {
-		logger.Infof("Transaction %v not yet committed", txResult.Job.TrustmeshEntry.TransactionHash)
+		logger.Infof("Transaction %v not yet committed", trustmeshEntry.TransactionHash)
 		return
 	}
 	if !txResult.TxInfo.TxValid {
-		logger.Warnf("Transaction %v is invalid with code %v and log %v", txResult.Job.TrustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
+		logger.Warnf("Transaction %v is invalid with code %v and log %v", trustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
+
+		systemofrecord.PutStatusUpdate(
+			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BusinessObjectType,
+			trustmeshEntry.SorBusinessObjectId,
+			"Error",
+			trustmeshEntry.BaseledgerTransactionId.String())
+
 		setTxStatus(txResult, common.InvalidCommitmentState)
 		return
 	}
 	logger.Infof("Execute business logic for result %v\n", txResult)
-	offchainMessage, err := proxytypes.GetOffchainMsgById(txResult.Job.TrustmeshEntry.OffchainProcessMessageId)
+	offchainMessage, err := proxytypes.GetOffchainMsgById(trustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
-		// TODO: logging
 		logger.Error("Offchain process msg not found")
+		systemofrecord.PutStatusUpdate(
+			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BusinessObjectType,
+			trustmeshEntry.SorBusinessObjectId,
+			"Error",
+			trustmeshEntry.BaseledgerTransactionId.String())
 		return
 	}
-	switch txResult.Job.TrustmeshEntry.EntryType {
+	switch trustmeshEntry.EntryType {
 	case common.SuggestionSentTrustmeshEntryType:
 		logger.Info(common.SuggestionSentTrustmeshEntryType)
 
 		// TODO: bellow lines should be moved to send offchain message
 		var natsMessage proxytypes.NatsMessage
-
 		natsMessage.ProcessMessage = *offchainMessage
-		natsMessage.TxHash = txResult.Job.TrustmeshEntry.TransactionHash
+		natsMessage.TxHash = trustmeshEntry.TransactionHash
 
 		var payload, _ = json.Marshal(natsMessage)
-		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.ReceiverOrgId.String())
+
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
+
+		systemofrecord.PutStatusUpdate(
+			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BusinessObjectType,
+			trustmeshEntry.SorBusinessObjectId,
+			"Success",
+			trustmeshEntry.BaseledgerTransactionId.String())
+
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
@@ -55,7 +80,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 		baseledgerTransactionPayload := proxytypes.BaseledgerTransactionPayload{}
-		deprivitizedPayload := proxyutil.DeprivatizeBaseledgerTransactionPayload(baseledgerTransaction.Payload, txResult.Job.TrustmeshEntry.WorkgroupId)
+		deprivitizedPayload := proxyutil.DeprivatizeBaseledgerTransactionPayload(baseledgerTransaction.Payload, trustmeshEntry.WorkgroupId)
 		err = json.Unmarshal(([]byte)(deprivitizedPayload), &baseledgerTransactionPayload)
 		if err != nil {
 			logger.Error("Failed to unmarshal baseledger transaction payload")
@@ -64,25 +89,55 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		if synctree.VerifyHashMatch(baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson) {
 			logger.Info("Hashes match, processing feedback")
-			// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
+
+			syncTree := &synctree.BaseledgerSyncTree{}
+			err = json.Unmarshal([]byte(offchainMessage.BaseledgerSyncTreeJson), &syncTree)
+			if err != nil {
+				logger.Errorf("Error unmarshalling sync tree", err.Error())
+				return
+			}
+			logger.Infof("Sync tree unmarshalled", syncTree)
+
+			boJson := synctree.GetBusinessObjectJson(*syncTree)
+			logger.Infof("Business object sync tree json", boJson)
+
+			systemofrecord.PostBusinessObject(
+				trustmeshEntry.BaseledgerBusinessObjectId.String(),
+				trustmeshEntry.BusinessObjectType,
+				trustmeshEntry.ReceiverOrgId.String(),
+				trustmeshEntry.OffchainProcessMessageId.String(),
+				trustmeshEntry.BaseledgerTransactionId.String(),
+				boJson,
+			)
 			break
 		}
 		logger.Warnf("Hashes don't match, rejecting feedback %v %v %v", baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson)
-		restutil.SendRejectFeedback(offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId.String())
+		restutil.SendRejectFeedback(offchainMessage, trustmeshEntry.WorkgroupId.String())
 	case common.FeedbackSentTrustmeshEntryType:
 		logger.Info(common.FeedbackSentTrustmeshEntryType)
+
 		// TODO: bellow lines should be moved to send offchain message
 		var natsMessage proxytypes.NatsMessage
-
 		natsMessage.ProcessMessage = *offchainMessage
-		natsMessage.TxHash = txResult.Job.TrustmeshEntry.TransactionHash
+		natsMessage.TxHash = trustmeshEntry.TransactionHash
 
+		// TODO: status success
 		var payload, _ = json.Marshal(natsMessage)
-		proxyutil.SendOffchainMessage(payload, txResult.Job.TrustmeshEntry.WorkgroupId.String(), txResult.Job.TrustmeshEntry.SenderOrgId.String())
+
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.SenderOrgId.String())
+
+		systemofrecord.PutStatusUpdate(
+			trustmeshEntry.BaseledgerBusinessObjectId.String(),
+			trustmeshEntry.BusinessObjectType,
+			trustmeshEntry.SorBusinessObjectId,
+			"Success",
+			trustmeshEntry.BaseledgerTransactionId.String())
+
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
 		baseledgerTransaction := getCommittedBaseledgerTransaction(offchainMessage.BaseledgerTransactionIdOfStoredProof)
 		if baseledgerTransaction == nil {
+			logger.Error("Failed to get committed baseledger transaction")
 			return
 		}
 
@@ -104,10 +159,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 		logger.Infof("Business object unmarshalled", bo)
-
-		// sor.ProcessFeedback(*offchainMessage, txResult.Job.TrustmeshEntry.WorkgroupId, baseledgerTransaction.Payload)
+		// TODO: DEMO - Do we want to send anything to SOR here?
 	default:
-		logger.Errorf("unknown business process %v\n", txResult.Job.TrustmeshEntry.EntryType)
+		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
 

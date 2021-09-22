@@ -17,7 +17,7 @@ export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port &&
 export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8081 &&
 export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea && # unique identifier of the organization, currently hardcoded in seed data
-
+export API_CONCIRCLE_URL=s4h.rp.concircle.com
 docker-compose -p first_node up -d
 
 # Sets up environment for second node and runs it
@@ -27,7 +27,8 @@ export BLOCKCHAIN_APP_API_PORT=1318 &&
 export TENDERMINT_NODE_GRPC_PORT=$second_node_tendermint_grpc_port && 
 export TENDERMINT_NODE_PORT=$second_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8082 &&
-export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a3 # unique identifier of the organization, currently hardcoded in seed data
+export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a3 && # unique identifier of the organization, currently hardcoded in seed data
+export API_CONCIRCLE_URL=s4p.rp.concircle.com
 
 docker-compose -p second_node up -d
 
