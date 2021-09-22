@@ -102,7 +102,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d9c102eb-b173-45ac-b640-24d28a3c9f0c\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"purchase_order\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"ca78e980-9dd1-4996-b31c-25ba9556ee4c\",\r\n    \"original_offchain_process_message_id\": \"1ce7857e-b878-423d-bb65-2a5a83931a3b\",\r\n    \"feedback_message\": \"\"\r\n}"
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d9c102eb-b173-45ac-b640-24d28a3c9f0c\",\r\n    \"approved\": true,\r\n    \"business_object_type\": \"purchase_order\",\r\n    \"baseledger_business_object_id_of_approved_object\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"original_baseledger_transaction_id\": \"05a16c47-65c5-4d22-adc7-61bf492e8b04\",\r\n    \"original_offchain_process_message_id\": \"2699253c-f4b0-402e-b57e-a0a371a471e1\",\r\n    \"feedback_message\": \"\"\r\n}"
 				},
 				"url": {
 					"raw": "http://unibright:ub321@137.184.25.137:8081/feedback",
@@ -131,7 +131,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://unibright:ub321@137.184.72.13:8081/trustmeshes",
+					"raw": "http://unibright:ub321@137.184.72.13:8081/trustmeshes?rpp=100",
 					"protocol": "http",
 					"auth": {
 						"user": "unibright",
@@ -146,6 +146,12 @@
 					"port": "8081",
 					"path": [
 						"trustmeshes"
+					],
+					"query": [
+						{
+							"key": "rpp",
+							"value": "100"
+						}
 					]
 				}
 			},
@@ -157,7 +163,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://unibright:ub321@137.184.25.137:8081/trustmeshes",
+					"raw": "http://unibright:ub321@137.184.25.137:8081/trustmeshes?rpp=100",
 					"protocol": "http",
 					"auth": {
 						"user": "unibright",
@@ -172,6 +178,12 @@
 					"port": "8081",
 					"path": [
 						"trustmeshes"
+					],
+					"query": [
+						{
+							"key": "rpp",
+							"value": "100"
+						}
 					]
 				}
 			},
