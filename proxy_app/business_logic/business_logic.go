@@ -126,7 +126,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
 		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId,
+			trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
 			"Success",
