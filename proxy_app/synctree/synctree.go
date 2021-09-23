@@ -96,7 +96,7 @@ func GetBusinessObjectJson(syncTree BaseledgerSyncTree) string {
 	jsonelements := make(map[string]interface{})
 	for _, v := range syncTree.Nodes {
 		if v.IsLeaf && v.Value != "" {
-			var substrings []string = strings.Split(v.Value, ":")
+			var substrings []string = strings.SplitN(v.Value, ":", 2)
 			if len(substrings) > 1 {
 				jsonelements[substrings[0]] = substrings[1]
 			}
