@@ -28,6 +28,7 @@ type PostStatusUpdateDto struct {
 	Status             string        `json:"status"`
 	Errors             []interface{} `json:"errors"`
 	ObjectConnectionID string        `json:"object_connection_id"`
+	OrganizationId     string        `json:"organization_id"`
 }
 
 // not sure if this is ok approach, should store auth state in package and i keep refreshing it below if this is not defined
@@ -129,7 +130,14 @@ func PostBusinessObject(
 	logger.Infof("BO RESP BODY %v\n", resp.Body)
 }
 
-func PutStatusUpdate(baseledgerObjectId string, businessObjectType string, sorBusinessObjectId string, status string, baseledgerTransactionId string) {
+func PutStatusUpdate(
+	baseledgerObjectId string,
+	businessObjectType string,
+	sorBusinessObjectId string,
+	status string,
+	baseledgerTransactionId string,
+	organizationId string,
+) {
 	Auth()
 
 	var resourceUrl = "ubc/ubc/business_objects/" + baseledgerObjectId + "/status"
@@ -140,6 +148,7 @@ func PutStatusUpdate(baseledgerObjectId string, businessObjectType string, sorBu
 		MessageId:          sorBusinessObjectId,
 		Status:             status,
 		ObjectConnectionID: baseledgerTransactionId,
+		OrganizationId:     organizationId,
 	}
 
 	bodyBytes, _ := json.Marshal(postStatusUpdateDto)
