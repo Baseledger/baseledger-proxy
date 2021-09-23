@@ -34,8 +34,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
-			"Error",
-			trustmeshEntry.BaseledgerTransactionId.String())
+			"error",
+			trustmeshEntry.BaseledgerTransactionId.String(),
+			trustmeshEntry.SenderOrgId.String())
 
 		setTxStatus(txResult, common.InvalidCommitmentState)
 		return
@@ -48,8 +49,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
-			"Error",
-			trustmeshEntry.BaseledgerTransactionId.String())
+			"error",
+			trustmeshEntry.BaseledgerTransactionId.String(),
+			trustmeshEntry.SenderOrgId.String())
 		return
 	}
 	switch trustmeshEntry.EntryType {
@@ -69,8 +71,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			trustmeshEntry.BaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
-			"Success",
-			trustmeshEntry.BaseledgerTransactionId.String())
+			"success",
+			trustmeshEntry.BaseledgerTransactionId.String(),
+			trustmeshEntry.SenderOrgId.String())
 
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
@@ -129,8 +132,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
 			trustmeshEntry.BusinessObjectType,
 			trustmeshEntry.SorBusinessObjectId,
-			"Success",
-			trustmeshEntry.BaseledgerTransactionId.String())
+			"success",
+			trustmeshEntry.BaseledgerTransactionId.String(),
+			trustmeshEntry.SenderOrgId.String())
 
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)

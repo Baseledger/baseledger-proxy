@@ -25,7 +25,7 @@ type createInitialSuggestionRequest struct {
 	BusinessObjectJson                   string   `json:"business_object_json"`
 	ReferencedBaseledgerBusinessObjectId string   `json:"referenced_baseledger_business_object_id"`
 	ReferencedBaseledgerTransactionId    string   `json:"referenced_baseledger_transaction_id"`
-	SorBusinessObjectId                  string   `json:"sor_business_object_id"`
+	SorBusinessObjectId                  string   `json:"sor_message_id"`
 	KnowledgeLimiters                    []string `json:"knowledge_limiters"`
 }
 
