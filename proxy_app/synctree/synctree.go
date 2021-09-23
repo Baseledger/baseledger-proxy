@@ -102,7 +102,7 @@ func GetBusinessObjectJson(syncTree BaseledgerSyncTree) string {
 			}
 		}
 	}
-	unflattenedOut, err := unflatten2(jsonelements)
+	unflattenedOut, err := unflatten3(jsonelements)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -343,7 +343,9 @@ func flatten(prefix string, depth int, nested interface{}, opts *Options) (flatm
 		for i, v := range nested {
 			newKey := strconv.Itoa(i)
 			if prefix != "" {
-				newKey = prefix + opts.Delimiter + newKey
+				// newKey = prefix + opts.Delimiter + newKey
+				// we need to differentiate array indexes in key path
+				newKey = prefix + "[" + newKey + "]"
 			}
 			fm1, fe := flatten(newKey, depth+1, v, opts)
 			if fe != nil {
@@ -383,7 +385,6 @@ func Unflatten(flat map[string]interface{}, opts *Options) (nested map[string]in
 
 func unflatten(flat map[string]interface{}, opts *Options) (nested map[string]interface{}, err error) {
 	nested = make(map[string]interface{})
-
 	for k, v := range flat {
 		temp := uf(k, v, opts).(map[string]interface{})
 		err = mergo.Merge(&nested, temp)
@@ -438,6 +439,99 @@ func unflatten2(flat map[string]interface{}) (map[string]interface{}, error) {
 			return nil, fmt.Errorf("key=%v already exists", key)
 		}
 		m[keyParts[len(keyParts)-1]] = value
+	}
+
+	return unflat, nil
+}
+
+// checks key path to see if format is array (eg foo[i]) and return key name and index i
+func isArrayKeyPart(keyPart string) (bool, string, int) {
+	lastChar := keyPart[len(keyPart)-1:]
+	if lastChar != "]" {
+		return false, "", -1
+	}
+	indexArray := keyPart[len(keyPart)-2 : len(keyPart)-1]
+	arrayNum, _ := strconv.Atoi(indexArray)
+	keyName := keyPart[:len(keyPart)-3]
+	return true, keyName, arrayNum
+}
+
+func unflatten3(flat map[string]interface{}) (map[string]interface{}, error) {
+	unflat := map[string]interface{}{}
+	for key, value := range flat {
+		keyParts := strings.Split(key, ".")
+		// Walk the keys until we get to a leaf node.
+		m := unflat
+		for i, k := range keyParts[:len(keyParts)-1] {
+			kName := k
+			isArr, keyName, index := isArrayKeyPart(k)
+			if isArr {
+				kName = keyName
+			}
+			v, exists := m[kName]
+			if !exists {
+				newMap := map[string]interface{}{}
+				// same as unflatten2, this means that in next iteration
+				// newMap (empty map) will be used, but unflat[k] will be updated because of same ref
+				if !isArr {
+					m[k] = newMap
+					m = newMap
+					continue
+				}
+
+				// if its array key, we assing array full of empty maps, but keep reference to map at current index
+				// which will be updated after
+				var arr []interface{}
+				for i = 0; i <= index; i++ {
+					if i == index {
+						arr = append(arr, newMap)
+					} else {
+						arr = append(arr, map[string]interface{}{})
+					}
+				}
+				m[keyName] = arr
+				m = newMap
+				continue
+			}
+
+			if isArr {
+				innerArr, _ := v.([]interface{})
+				if index >= len(innerArr) {
+					newMap := map[string]interface{}{}
+
+					var arr []interface{}
+					// making sure that only map at index is stored at m
+					for i = 0; i <= index; i++ {
+						if i < len(innerArr) {
+							arr = append(arr, innerArr[i])
+						} else {
+							if i == index {
+								arr = append(arr, newMap)
+							} else {
+								arr = append(arr, map[string]interface{}{})
+							}
+						}
+					}
+					m[keyName] = arr
+					m = newMap
+
+				} else {
+					m = innerArr[index].(map[string]interface{})
+				}
+			} else {
+				innerMap, ok := v.(map[string]interface{})
+				if !ok {
+					return nil, fmt.Errorf("key=%v is not an object", strings.Join(keyParts[0:i+1], "."))
+				}
+				m = innerMap
+			}
+		}
+
+		leafKey := keyParts[len(keyParts)-1]
+		if _, exists := m[leafKey]; exists {
+			return nil, fmt.Errorf("key=%v already exists %v", leafKey, m)
+		}
+		m[leafKey] = value
 	}
 
 	return unflat, nil
