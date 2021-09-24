@@ -111,6 +111,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 				trustmeshEntry.OffchainProcessMessageId.String(),
 				trustmeshEntry.BaseledgerTransactionId.String(),
 				boJson,
+				trustmeshEntry.TrustmeshId.String(),
 			)
 			break
 		}

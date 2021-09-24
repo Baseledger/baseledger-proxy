@@ -19,6 +19,7 @@ type PostBusinessObjectDto struct {
 	OrganizationId     string          `json:"organization_id"`
 	ObjectConnectionId string          `json:"object_connection_id"`
 	MessageId          string          `json:"message_id"`
+	TransactionId      string          `json:"transaction_id"`
 	Payload            json.RawMessage `json:"payload"`
 }
 
@@ -80,7 +81,8 @@ func PostBusinessObject(
 	recipientOrgId string,
 	offchainMessageId string,
 	baseledgerTransactionId string,
-	businessObjectPayload string) {
+	businessObjectPayload string,
+	trustmeshId string) {
 
 	Auth()
 
@@ -92,7 +94,8 @@ func PostBusinessObject(
 		ID:                 baseledgerObjectId,
 		Type:               businessObjectType,
 		OrganizationId:     recipientOrgId,
-		ObjectConnectionId: baseledgerTransactionId,
+		ObjectConnectionId: trustmeshId,
+		TransactionId:      baseledgerTransactionId,
 		MessageId:          offchainMessageId,
 		Payload:            json.RawMessage(businessObjectPayload), // this avoids automatic escaptin of quotes by JSON marshaler
 	}
