@@ -62,3 +62,16 @@ func (t *TrustmeshEntry) Create() bool {
 
 	return false
 }
+
+func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
+	db := dbutil.Db.GetConn()
+	var trustmesh Trustmesh
+	res := db.First(&trustmesh, "id = ?", id.String())
+
+	if res.Error != nil {
+		logger.Errorf("error when getting offchain msg from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	return &trustmesh, nil
+}

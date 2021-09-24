@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/proxy-api/dbutil"
+	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/types"
 )
@@ -59,6 +60,29 @@ func GetTrustmeshesHandler() gin.HandlerFunc {
 		}
 
 		restutil.Render(trustmeshesDtos, 200, c)
+	}
+}
+
+func GetTrustmeshHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		trustmeshIdParam := c.Param("id")
+
+		trustmeshId, err := uuid.FromString(trustmeshIdParam)
+		if err != nil {
+			logger.Errorf("Trustmesh id param %v is in wrong format", trustmeshIdParam)
+			restutil.RenderError("trustmesh id in wrong format", 400, c)
+			return
+		}
+
+		trustmesh, err := types.GetTrustmeshById(trustmeshId)
+		if err != nil {
+			logger.Errorf("Trustmesh with id %v not found", trustmeshId)
+			restutil.RenderError("trustmesh not found", 400, c)
+			return
+		}
+
+		trustmeshDto := processTrustmesh(trustmesh)
+		restutil.Render(trustmeshDto, 200, c)
 	}
 }
 
