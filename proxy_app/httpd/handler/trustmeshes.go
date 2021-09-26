@@ -85,7 +85,7 @@ func GetTrustmeshHandler() gin.HandlerFunc {
 		trustmesh, err := types.GetTrustmeshById(trustmeshId)
 		if err != nil {
 			logger.Errorf("Trustmesh with id %v not found", trustmeshId)
-			restutil.RenderError("trustmesh not found", 400, c)
+			restutil.RenderError("trustmesh not found", 404, c)
 			return
 		}
 
