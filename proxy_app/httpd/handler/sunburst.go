@@ -64,6 +64,9 @@ func getSunburstChildren(nodes []synctree.SyncTreeNode, parentSyncTreeNode synct
 
 	for _, node := range nodes {
 		if node.ParentNodeID == parentSyncTreeNode.SyncTreeNodeID {
+			if len(node.Value) == 0 {
+				continue
+			}
 			sunburstItems = append(sunburstItems, sunburstItem{
 				Name:  node.Value,
 				Value: 50,
