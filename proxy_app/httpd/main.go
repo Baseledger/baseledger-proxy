@@ -29,6 +29,7 @@ func main() {
 	r := gin.Default()
 	r.Use(helpers.CORSMiddleware())
 	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
+	r.GET("/trustmeshes/:id", basicAuth, handler.GetTrustmeshHandler())
 	r.POST("/suggestion", basicAuth, handler.CreateInitialSuggestionRequestHandler())
 	r.POST("/feedback", basicAuth, handler.CreateSynchronizationFeedbackHandler())
 	r.GET("/sunburst/:txId", basicAuth, handler.GetSunburstHandler())

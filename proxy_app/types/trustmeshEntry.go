@@ -17,7 +17,10 @@ type TrustmeshEntry struct {
 	EntryType                            string
 	SenderOrgId                          uuid.UUID
 	ReceiverOrgId                        uuid.UUID
+	SenderOrg                            Organization
+	ReceiverOrg                          Organization
 	WorkgroupId                          uuid.UUID
+	Workgroup                            Workgroup
 	WorkstepType                         string
 	BaseledgerTransactionType            string
 	BaseledgerTransactionId              uuid.UUID
@@ -61,4 +64,21 @@ func (t *TrustmeshEntry) Create() bool {
 	}
 
 	return false
+}
+
+func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
+	db := dbutil.Db.GetConn()
+	var trustmesh Trustmesh
+	res := db.Preload("Entries").
+		Preload("Entries.SenderOrg").
+		Preload("Entries.ReceiverOrg").
+		Preload("Entries.Workgroup").
+		First(&trustmesh, "id = ?", id.String())
+
+	if res.Error != nil {
+		logger.Errorf("error when getting offchain msg from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	return &trustmesh, nil
 }

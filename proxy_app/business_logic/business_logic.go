@@ -30,13 +30,14 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	if !txResult.TxInfo.TxValid {
 		logger.Warnf("Transaction %v is invalid with code %v and log %v", trustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
 
-		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId,
-			trustmeshEntry.BusinessObjectType,
-			trustmeshEntry.SorBusinessObjectId,
-			"error",
-			trustmeshEntry.BaseledgerTransactionId.String(),
-			trustmeshEntry.SenderOrgId.String())
+		// commenting this just for demo so its not conflicted with feedback status update
+		// systemofrecord.PutStatusUpdate(
+		// 	trustmeshEntry.BaseledgerBusinessObjectId,
+		// 	trustmeshEntry.BusinessObjectType,
+		// 	trustmeshEntry.SorBusinessObjectId,
+		// 	"error",
+		// 	trustmeshEntry.BaseledgerTransactionId.String(),
+		// 	trustmeshEntry.SenderOrgId.String())
 
 		setTxStatus(txResult, common.InvalidCommitmentState)
 		return
@@ -45,13 +46,14 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	offchainMessage, err := proxytypes.GetOffchainMsgById(trustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
 		logger.Error("Offchain process msg not found")
-		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId,
-			trustmeshEntry.BusinessObjectType,
-			trustmeshEntry.SorBusinessObjectId,
-			"error",
-			trustmeshEntry.BaseledgerTransactionId.String(),
-			trustmeshEntry.SenderOrgId.String())
+		// commenting this just for demo so its not conflicted with feedback status update
+		// systemofrecord.PutStatusUpdate(
+		// 	trustmeshEntry.BaseledgerBusinessObjectId,
+		// 	trustmeshEntry.BusinessObjectType,
+		// 	trustmeshEntry.SorBusinessObjectId,
+		// 	"error",
+		// 	trustmeshEntry.BaseledgerTransactionId.String(),
+		// 	trustmeshEntry.SenderOrgId.String())
 		return
 	}
 	switch trustmeshEntry.EntryType {
@@ -67,13 +69,14 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
-		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.BaseledgerBusinessObjectId,
-			trustmeshEntry.BusinessObjectType,
-			trustmeshEntry.SorBusinessObjectId,
-			"success",
-			trustmeshEntry.BaseledgerTransactionId.String(),
-			trustmeshEntry.SenderOrgId.String())
+		// commenting this just for demo so its not conflicted with feedback status update
+		// systemofrecord.PutStatusUpdate(
+		// 	trustmeshEntry.BaseledgerBusinessObjectId,
+		// 	trustmeshEntry.BusinessObjectType,
+		// 	trustmeshEntry.SorBusinessObjectId,
+		// 	"success",
+		// 	trustmeshEntry.BaseledgerTransactionId.String(),
+		// 	trustmeshEntry.SenderOrgId.String())
 
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
@@ -111,6 +114,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 				trustmeshEntry.OffchainProcessMessageId.String(),
 				trustmeshEntry.BaseledgerTransactionId.String(),
 				boJson,
+				trustmeshEntry.TrustmeshId.String(),
 			)
 			break
 		}
@@ -128,13 +132,14 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
-		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
-			trustmeshEntry.BusinessObjectType,
-			trustmeshEntry.SorBusinessObjectId,
-			"success",
-			trustmeshEntry.BaseledgerTransactionId.String(),
-			trustmeshEntry.SenderOrgId.String())
+		// commenting this just for demo so its not conflicted with feedback status update
+		// systemofrecord.PutStatusUpdate(
+		// 	trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
+		// 	trustmeshEntry.BusinessObjectType,
+		// 	trustmeshEntry.SorBusinessObjectId,
+		// 	"success",
+		// 	trustmeshEntry.BaseledgerTransactionId.String(),
+		// 	trustmeshEntry.SenderOrgId.String())
 
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
@@ -162,7 +167,18 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 		logger.Infof("Business object unmarshalled", bo)
-		// TODO: DEMO - Do we want to send anything to SOR here?
+		status := "success"
+		if trustmeshEntry.BaseledgerTransactionType == "Reject" {
+			status = "error"
+		}
+		logger.Infof("Sending feedback received status update %v\n", status)
+		systemofrecord.PutStatusUpdate(
+			trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
+			trustmeshEntry.BusinessObjectType,
+			trustmeshEntry.SorBusinessObjectId,
+			status,
+			trustmeshEntry.BaseledgerTransactionId.String(),
+			trustmeshEntry.SenderOrgId.String())
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))

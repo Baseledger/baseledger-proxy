@@ -3,6 +3,8 @@ DROP INDEX idx_commitment_state;
 
 ALTER TABLE ONLY public.workgroup_members DROP CONSTRAINT workgroup_members_pkey;
 ALTER TABLE ONLY public.trustmesh_entries DROP CONSTRAINT trustmesh_entries_workgroup_workgroups_id_foreign;
+ALTER TABLE ONLY public.trustmesh_entries DROP CONSTRAINT trustmesh_entries_sender_org_organizations_id_foreign;
+ALTER TABLE ONLY public.trustmesh_entries DROP CONSTRAINT trustmesh_entries_receiver_org_organizations_id_foreign;
 ALTER TABLE ONLY public.workgroup_members DROP CONSTRAINT workgroup_members_organization_id_organizations_id_foreign;
 ALTER TABLE ONLY public.workgroup_members DROP CONSTRAINT workgroup_members_workgroup_id_workgroups_id_foreign;
 ALTER TABLE ONLY public.workgroups DROP CONSTRAINT workgroups_pkey;
