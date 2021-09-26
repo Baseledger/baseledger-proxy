@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"math"
 
 	"github.com/gin-gonic/gin"
 	"github.com/unibrightio/proxy-api/logger"
@@ -11,7 +12,8 @@ import (
 )
 
 type syncTreeSunburst struct {
-	Items []sunburstItem
+	Items  []sunburstItem
+	Levels float64
 }
 
 type sunburstItem struct {
@@ -55,7 +57,8 @@ func getSyncTreeSunburst(syncTree synctree.BaseledgerSyncTree) syncTreeSunburst 
 
 	children := getSunburstChildren(syncTree.Nodes, rootNode)
 	return syncTreeSunburst{
-		Items: children,
+		Items:  children,
+		Levels: 1 + math.Floor(math.Log2(float64(len(syncTree.Nodes)))),
 	}
 }
 
