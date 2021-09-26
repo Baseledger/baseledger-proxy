@@ -160,6 +160,12 @@ ALTER TABLE ONLY public.trustmesh_entries
   ADD CONSTRAINT trustmesh_entries_workgroup_workgroups_id_foreign FOREIGN KEY (workgroup_id) REFERENCES public.workgroups(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.trustmesh_entries
+  ADD CONSTRAINT trustmesh_entries_sender_org_organizations_id_foreign FOREIGN KEY (sender_org_id) REFERENCES public.organizations(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.trustmesh_entries
+  ADD CONSTRAINT trustmesh_entries_receiver_org_organizations_id_foreign FOREIGN KEY (receiver_org_id) REFERENCES public.organizations(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.trustmesh_entries
   ADD CONSTRAINT trustmesh_entries_offchain_process_message_id_offchain_process_messages_id_foreign FOREIGN KEY (offchain_process_message_id) REFERENCES public.offchain_process_messages(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE OR REPLACE FUNCTION set_trustmesh_entry_group()

@@ -19,7 +19,10 @@ type trustmeshEntryDto struct {
 	EntryType                            string
 	SenderOrgId                          string
 	ReceiverOrgId                        string
+	SenderOrgName                        string
+	ReceiverOrgName                      string
 	WorkgroupId                          string
+	WorkgroupName                        string
 	WorkstepType                         string
 	BaseledgerTransactionType            string
 	BaseledgerTransactionId              string
@@ -51,7 +54,12 @@ func GetTrustmeshesHandler() gin.HandlerFunc {
 		var trustmeshes []types.Trustmesh
 		db := dbutil.Db.GetConn().Order("trustmeshes.created_at ASC")
 		// preload seems good enough for now, revisit if it turns out to be performance bottleneck
-		dbutil.Paginate(c, db, &types.Trustmesh{}).Preload("Entries").Find(&trustmeshes)
+		dbutil.Paginate(c, db, &types.Trustmesh{}).
+			Preload("Entries").
+			Preload("Entries.SenderOrg").
+			Preload("Entries.ReceiverOrg").
+			Preload("Entries.Workgroup").
+			Find(&trustmeshes)
 
 		var trustmeshesDtos []trustmeshDto
 
@@ -95,10 +103,8 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 
 	startTime := trustmesh.Entries[0].TendermintTransactionTimestamp
 	endTime := trustmesh.Entries[0].TendermintTransactionTimestamp
-	senders := ""
-	sendersMap := make(map[string]int)
-	receivers := ""
-	receiversMap := make(map[string]int)
+	participants := ""
+	participantsMap := make(map[string]int)
 	businessObjectTypes := ""
 	businessObjectTypesMap := make(map[string]int)
 	finalized := false
@@ -108,8 +114,8 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 		startTime = getBeforeTime(startTime, entry.TendermintTransactionTimestamp)
 		endTime = getAfterTime(endTime, entry.TendermintTransactionTimestamp)
 
-		appendDistinct(sendersMap, entry.SenderOrgId.String(), &senders)
-		appendDistinct(receiversMap, entry.ReceiverOrgId.String(), &receivers)
+		appendDistinct(participantsMap, entry.SenderOrg.OrganizationName, &participants)
+		appendDistinct(participantsMap, entry.ReceiverOrg.OrganizationName, &participants)
 		appendDistinct(businessObjectTypesMap, entry.BusinessObjectType, &businessObjectTypes)
 
 		if entry.WorkstepType == "FinalWorkstep" && !finalized {
@@ -128,7 +134,7 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 	trustmeshDto.CreatedAt = trustmesh.CreatedAt
 	trustmeshDto.StartTime = startTime.Time
 	trustmeshDto.EndTime = endTime.Time
-	trustmeshDto.Participants = senders + ", " + receivers
+	trustmeshDto.Participants = participants
 	trustmeshDto.BusinessObjectTypes = businessObjectTypes
 	trustmeshDto.Finalized = finalized
 	trustmeshDto.ContainsRejections = containsRejection
@@ -144,8 +150,11 @@ func processTrustmeshEntry(trustmeshEntry types.TrustmeshEntry) *trustmeshEntryD
 		TendermintTransactionTimestamp:       trustmeshEntry.TendermintTransactionTimestamp.Time,
 		EntryType:                            trustmeshEntry.EntryType,
 		SenderOrgId:                          uuidToString(trustmeshEntry.SenderOrgId),
+		SenderOrgName:                        trustmeshEntry.SenderOrg.OrganizationName,
+		ReceiverOrgName:                      trustmeshEntry.ReceiverOrg.OrganizationName,
 		ReceiverOrgId:                        uuidToString(trustmeshEntry.ReceiverOrgId),
 		WorkgroupId:                          uuidToString(trustmeshEntry.WorkgroupId),
+		WorkgroupName:                        trustmeshEntry.Workgroup.WorkgroupName,
 		WorkstepType:                         trustmeshEntry.WorkstepType,
 		BaseledgerTransactionType:            trustmeshEntry.BaseledgerTransactionType,
 		BaseledgerTransactionId:              uuidToString(trustmeshEntry.BaseledgerTransactionId),
