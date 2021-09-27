@@ -139,6 +139,7 @@ func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcess
 		ReferencedProcessMessageId:           offchainProcessMessage.ReferencedOffchainProcessMessageId,
 		TransactionHash:                      txHash,
 		EntryType:                            entryType,
+		SorBusinessObjectId:                  offchainProcessMessage.SorBusinessObjectId,
 	}
 
 	if !trustmeshEntry.Create() {

@@ -134,6 +134,7 @@ func createFeedbackOffchainMessage(
 		BaseledgerTransactionType:            baseledgerTransactionType,
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
+		SorBusinessObjectId:                  feedbackOffchainMessage.SorBusinessObjectId,
 	}
 
 	return offchainMessage
@@ -156,6 +157,7 @@ func createFeedbackSentTrustmeshEntry(req createSynchronizationFeedbackRequest, 
 		ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
 		TransactionHash:                      txHash,
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
+		SorBusinessObjectId:                  offchainMsg.SorBusinessObjectId,
 	}
 
 	return trustmeshEntry

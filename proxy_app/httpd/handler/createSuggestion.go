@@ -158,6 +158,7 @@ func createSuggestOffchainMessage(req createInitialSuggestionRequest, transactio
 		BaseledgerTransactionType:            "Suggest",
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
 		EntryType:                            common.SuggestionSentTrustmeshEntryType,
+		SorBusinessObjectId:                  req.SorBusinessObjectId,
 	}
 
 	return offchainMessage

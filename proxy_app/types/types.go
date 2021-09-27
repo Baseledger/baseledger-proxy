@@ -29,6 +29,7 @@ type OffchainProcessMessage struct {
 	BaseledgerTransactionType            string
 	ReferencedBaseledgerTransactionId    uuid.UUID
 	EntryType                            string
+	SorBusinessObjectId                  string
 }
 
 type NatsMessage struct {
