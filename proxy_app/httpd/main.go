@@ -129,6 +129,7 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 		BaseledgerBusinessObjectId:           natsMessage.ProcessMessage.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: natsMessage.ProcessMessage.ReferencedBaseledgerBusinessObjectId,
 		ReferencedProcessMessageId:           natsMessage.ProcessMessage.ReferencedOffchainProcessMessageId,
+		SorBusinessObjectId:                  natsMessage.ProcessMessage.SorBusinessObjectId,
 		TransactionHash:                      natsMessage.TxHash,
 		EntryType:                            entryType,
 	}

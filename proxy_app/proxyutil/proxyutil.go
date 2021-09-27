@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/viper"
 
 	// "github.com/cosmos/cosmos-sdk/client/tx"
-	common "github.com/unibrightio/proxy-api/common"
+
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/messaging"
 	"github.com/unibrightio/proxy-api/types"
@@ -115,36 +115,6 @@ func CreateBaseledgerTransactionFeedbackPayload(
 	logger.Infof("dec %s\n", dec)
 
 	return enc
-}
-
-func OffchainProcessMessageReceived(offchainProcessMessage types.OffchainProcessMessage, txHash string) {
-	logger.Info("OffchainProcessMessageReceived")
-	entryType := common.SuggestionReceivedTrustmeshEntryType
-	if offchainProcessMessage.EntryType == common.FeedbackSentTrustmeshEntryType {
-		entryType = common.FeedbackReceivedTrustmeshEntryType
-	}
-	trustmeshEntry := &types.TrustmeshEntry{
-		TendermintTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		OffchainProcessMessageId:             offchainProcessMessage.Id,
-		SenderOrgId:                          offchainProcessMessage.SenderId,
-		ReceiverOrgId:                        offchainProcessMessage.ReceiverId,
-		WorkgroupId:                          uuid.FromStringOrNil(offchainProcessMessage.Topic),
-		WorkstepType:                         offchainProcessMessage.WorkstepType,
-		BaseledgerTransactionType:            offchainProcessMessage.BaseledgerTransactionType,
-		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof,
-		ReferencedBaseledgerTransactionId:    offchainProcessMessage.ReferencedBaseledgerTransactionId,
-		BusinessObjectType:                   offchainProcessMessage.BusinessObjectType,
-		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: offchainProcessMessage.ReferencedBaseledgerBusinessObjectId,
-		ReferencedProcessMessageId:           offchainProcessMessage.ReferencedOffchainProcessMessageId,
-		TransactionHash:                      txHash,
-		EntryType:                            entryType,
-		SorBusinessObjectId:                  offchainProcessMessage.SorBusinessObjectId,
-	}
-
-	if !trustmeshEntry.Create() {
-		logger.Error("error when creating new trustmesh entry")
-	}
 }
 
 func SendOffchainMessage(payload []byte, workgroupId string, recipientId string) (err error) {
