@@ -109,7 +109,8 @@ CREATE TABLE public.offchain_process_messages (
   business_object_type text,
 	baseledger_transaction_type text,
 	referenced_baseledger_transaction_id uuid,
-	entry_type text
+	entry_type text,
+  sor_business_object_id text
 );
 
 ALTER TABLE public.offchain_process_messages OWNER TO baseledger;
