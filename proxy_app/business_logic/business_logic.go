@@ -178,7 +178,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			trustmeshEntry.SorBusinessObjectId,
 			status,
 			trustmeshEntry.BaseledgerTransactionId.String(),
-			trustmeshEntry.SenderOrgId.String(),
+			trustmeshEntry.ReceiverOrgId.String(),
 			trustmeshEntry.TrustmeshId.String())
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
