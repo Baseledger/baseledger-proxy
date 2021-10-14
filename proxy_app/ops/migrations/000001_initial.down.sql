@@ -24,3 +24,5 @@ DROP TABLE public.trustmesh_entries;
 DROP TABLE public.offchain_process_messages;
 DROP TABLE public.organizations;
 DROP TABLE public.trustmeshes;
+
+DROP TABLE public.users;

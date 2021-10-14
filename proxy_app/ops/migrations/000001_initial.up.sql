@@ -191,6 +191,13 @@ CREATE TRIGGER trustmesh_entry_insert_trigger
   FOR EACH ROW
   EXECUTE PROCEDURE set_trustmesh_entry_group();
 
+CREATE TABLE public.users (
+  id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  email text NOT NULL,
+  password text
+);
+
 
 -- -- Add trustmeshes for visualization testing purposes
 -- DO $$
