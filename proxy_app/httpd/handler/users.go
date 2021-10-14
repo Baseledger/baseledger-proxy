@@ -25,11 +25,36 @@ func CreateUserHandler() gin.HandlerFunc {
 		}
 
 		if !user.Create() {
-			logger.Errorf("error when creating new user")
+			logger.Error("error when creating new user")
 			restutil.RenderError("error when creating new user", 500, c)
 			return
 		}
 
 		restutil.Render(user.Email, 200, c)
+	}
+}
+
+func LoginUserHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		buf, err := c.GetRawData()
+		if err != nil {
+			restutil.RenderError(err.Error(), 400, c)
+			return
+		}
+
+		user := &models.User{}
+		err = json.Unmarshal(buf, &user)
+		if err != nil {
+			restutil.RenderError(err.Error(), 422, c)
+			return
+		}
+
+		token, err := user.Login()
+		if err != nil {
+			restutil.RenderError(err.Error(), 400, c)
+			return
+		}
+
+		restutil.Render(token, 200, c)
 	}
 }

@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-co-op/gocron v1.6.2
 	github.com/go-playground/validator/v10 v10.7.0 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/imdario/mergo v0.3.12
 	github.com/jinzhu/gorm v1.9.16

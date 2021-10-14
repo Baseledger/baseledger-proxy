@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/badoux/checkmail"
@@ -28,8 +30,8 @@ func (u *User) Create() bool {
 		logger.Errorf("errors while creating new entry %v\n", err.Error())
 		return false
 	}
-	userExist := checkIfUserExists(u.Email)
-	if userExist {
+	existingUser := getUserByEmail(u.Email)
+	if existingUser != nil {
 		logger.Error("user already exists %v\n")
 		return false
 	}
@@ -48,15 +50,47 @@ func (u *User) Create() bool {
 	return false
 }
 
-func checkIfUserExists(email string) bool {
+func (u *User) Login() (string, error) {
+	existingUser := getUserByEmail(u.Email)
+	if existingUser == nil {
+		errorMsg := fmt.Sprintf("user with email %v is not registered", u.Email)
+		logger.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	passwordMatch := checkPasswordHash(u.Password, existingUser.Password)
+	if !passwordMatch {
+		errorMsg := fmt.Sprintf("passwords not matching for user %v", u.Email)
+		logger.Error(errorMsg)
+		return "", errors.New(errorMsg)
+	}
+
+	return GetToken(u.Email)
+}
+
+func getUserByEmail(email string) *User {
 	db := dbutil.Db.GetConn()
 	var user User
 	res := db.First(&user, "email = ?", email)
-	return res.RowsAffected > 0
+
+	if res.Error != nil {
+		logger.Infof("User with email %v not found", email)
+		return nil
+	}
+
+	return &user
 }
 
 func validateEmail(email string) error {
 	return checkmail.ValidateFormat(email)
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		logger.Errorf("passwords not matchin error %v\n", err.Error())
+	}
+	return err == nil
 }
 
 func generatePasswordHash(password string) (string, error) {
