@@ -28,6 +28,11 @@ func (u *User) Create() bool {
 		logger.Errorf("errors while creating new entry %v\n", err.Error())
 		return false
 	}
+	userExist := checkIfUserExists(u.Email)
+	if userExist {
+		logger.Error("user already exists %v\n")
+		return false
+	}
 	u.Password = pwdHash
 	if dbutil.Db.GetConn().NewRecord(u) {
 		result := dbutil.Db.GetConn().Create(&u)
@@ -41,6 +46,13 @@ func (u *User) Create() bool {
 	}
 
 	return false
+}
+
+func checkIfUserExists(email string) bool {
+	db := dbutil.Db.GetConn()
+	var user User
+	res := db.First(&user, "email = ?", email)
+	return res.RowsAffected > 0
 }
 
 func validateEmail(email string) error {
