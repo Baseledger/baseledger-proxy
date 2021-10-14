@@ -45,6 +45,7 @@ func main() {
 	r.DELETE("/participation/:id", basicAuth, handler.DeleteWorkgroupMemberHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
+	r.POST("/dev/users", handler.CreateUserHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
