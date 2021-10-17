@@ -84,6 +84,13 @@ func CreateTransactionHandler() gin.HandlerFunc {
 			return
 		}
 
+		// TODO: set proper size
+		maximumPayloadSize := 20
+		if len(req.Payload) > maximumPayloadSize {
+			restutil.RenderError("payload maximum size exceeded", 400, c)
+			return
+		}
+
 		transactionId := uuid.NewV4()
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
