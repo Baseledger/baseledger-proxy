@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/proxy-api/logger"
-	"github.com/unibrightio/proxy-api/models"
 	"github.com/unibrightio/proxy-api/restutil"
+	"github.com/unibrightio/proxy-api/types"
 )
 
 type createTxDto struct {
@@ -36,7 +36,7 @@ func CreateUserHandler() gin.HandlerFunc {
 			return
 		}
 
-		user := &models.User{}
+		user := &types.User{}
 		err = json.Unmarshal(buf, &user)
 		if err != nil {
 			restutil.RenderError(err.Error(), 422, c)
@@ -70,7 +70,7 @@ func LoginUserHandler() gin.HandlerFunc {
 			return
 		}
 
-		user := &models.User{}
+		user := &types.User{}
 		err = json.Unmarshal(buf, &user)
 		if err != nil {
 			restutil.RenderError(err.Error(), 422, c)

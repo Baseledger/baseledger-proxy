@@ -1,4 +1,4 @@
-package models
+package types
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
+	"github.com/unibrightio/proxy-api/token"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -65,7 +66,7 @@ func (u *User) Login() (string, error) {
 		return "", errors.New(errorMsg)
 	}
 
-	return GetToken(u.Email)
+	return token.GetToken(u.Email)
 }
 
 func getUserByEmail(email string) *User {

@@ -12,7 +12,6 @@ import (
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/cron"
 	"github.com/unibrightio/proxy-api/dbutil"
-	"github.com/unibrightio/proxy-api/helpers"
 	"github.com/unibrightio/proxy-api/httpd/handler"
 	"github.com/unibrightio/proxy-api/httpd/middleware"
 	"github.com/unibrightio/proxy-api/logger"
@@ -39,7 +38,7 @@ func main() {
 	subscribeToWorkgroupMessages()
 
 	r := gin.Default()
-	r.Use(helpers.CORSMiddleware())
+	r.Use(middleware.CORSMiddleware())
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
 	r.GET("/trustmeshes/:id", basicAuth, handler.GetTrustmeshHandler())
@@ -59,7 +58,7 @@ func main() {
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
-	r.Use(middleware.AuthorizeJWT()).POST("/dev/tx", handler.CreateTransactionHandler())
+	r.Use(middleware.AuthorizeJWTMiddleware()).POST("/dev/tx", handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 

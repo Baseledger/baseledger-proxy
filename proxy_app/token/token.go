@@ -1,4 +1,4 @@
-package models
+package token
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ func GetToken(email string) (string, error) {
 func ValidateToken(encodedToken string) (*jwt.Token, error) {
 	return jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
 		if _, isvalid := token.Method.(*jwt.SigningMethodHMAC); !isvalid {
-			return nil, fmt.Errorf("Invalid token", token.Header["alg"])
+			return nil, fmt.Errorf("Invalid token %v", token.Header["alg"])
 		}
 		// move to env
 		mySigningKey := []byte("AllYourBase")

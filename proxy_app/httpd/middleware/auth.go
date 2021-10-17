@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/unibrightio/proxy-api/logger"
-	"github.com/unibrightio/proxy-api/models"
+	"github.com/unibrightio/proxy-api/token"
 )
 
-func AuthorizeJWT() gin.HandlerFunc {
+func AuthorizeJWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const BEARER_SCHEMA = "Bearer"
 		authHeader := c.GetHeader("Authorization")
@@ -19,7 +19,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 			return
 		}
 		tokenString := authHeader[len(BEARER_SCHEMA)+1:]
-		token, err := models.ValidateToken(tokenString)
+		token, err := token.ValidateToken(tokenString)
 		if err != nil {
 			logger.Errorf("Auth error %v", err)
 			c.AbortWithStatus(http.StatusUnauthorized)
