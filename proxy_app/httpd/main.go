@@ -28,6 +28,9 @@ import (
 // @version 1.0.0
 // @host localhost:8081
 // @securityDefinitions.basic BasicAuth
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	setupViper()
 	logger.SetupLogger()

@@ -14,6 +14,20 @@ type createTxDto struct {
 	Payload string `json:"payload"`
 }
 
+type userDto struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+// Register user ... Register user
+// @Summary Register user
+// @Description register user
+// @Tags Dev
+// @Accept json
+// @Param user body userDto true "User data"
+// @Success 200 {string} email
+// @Failure 400,422,500 {string} errorMessage
+// @Router /dev/users [post]
 func CreateUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		buf, err := c.GetRawData()
@@ -39,6 +53,15 @@ func CreateUserHandler() gin.HandlerFunc {
 	}
 }
 
+// Login user ... Login user
+// @Summary Login user
+// @Description login user
+// @Tags Dev
+// @Accept json
+// @Param user body userDto true "User data"
+// @Success 200 {string} acessToken
+// @Failure 400,422,500 {string} errorMessage
+// @Router /dev/auth [post]
 func LoginUserHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		buf, err := c.GetRawData()
@@ -64,6 +87,16 @@ func LoginUserHandler() gin.HandlerFunc {
 	}
 }
 
+// @Security BearerAuth
+// Generate transaction with custom payload ... Generate transaction with custom payload
+// @Summary Generate transaction with custom payload
+// @Description generate transaction with custom payload
+// @Tags Dev
+// @Accept json
+// @Param user body createTxDto true "Transaction payload"
+// @Success 200 {string} txHash
+// @Failure 400,422,500 {string} errorMessage
+// @Router /dev/tx [post]
 func CreateTransactionHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if !restutil.HasEnoughBalance() {
