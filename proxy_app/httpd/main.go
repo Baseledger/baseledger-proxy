@@ -27,6 +27,8 @@ import (
 	"github.com/ulule/limiter/v3"
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
+
+	"github.com/unibrightio/proxy-api/eth"
 )
 
 // @title Baseledger Proxy API documentation
@@ -52,6 +54,8 @@ func main() {
 	instance := limiter.New(store, rate)
 	rateMiddleware := mgin.NewMiddleware(instance)
 
+	setupInfura()
+
 	r := gin.Default()
 	r.Use(proxyMiddleware.CORSMiddleware())
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -75,6 +79,12 @@ func main() {
 	r.POST("/dev/auth", handler.LoginUserHandler())
 	r.Use(proxyMiddleware.AuthorizeJWTMiddleware()).Use(rateMiddleware).POST("/dev/tx", handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+}
+
+func setupInfura() {
+	eth.GetClient()
+	// eth.AddNewProof("fe2446d9-164c-4e95-a3c9-c2cb469d31a6", "someRandomProof")
+	eth.GetProof("fe2446d9-164c-4e95-a3c9-c2cb469d31a6")
 }
 
 func basicAuth(c *gin.Context) {
