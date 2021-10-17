@@ -58,3 +58,8 @@ func LoginUserHandler() gin.HandlerFunc {
 		restutil.Render(token, 200, c)
 	}
 }
+
+func CreateTransactionHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+	}
+}

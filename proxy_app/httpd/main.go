@@ -14,6 +14,7 @@ import (
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/helpers"
 	"github.com/unibrightio/proxy-api/httpd/handler"
+	"github.com/unibrightio/proxy-api/httpd/middleware"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/messaging"
 	"github.com/unibrightio/proxy-api/types"
@@ -47,6 +48,7 @@ func main() {
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
+	r.Use(middleware.AuthorizeJWT()).POST("/dev/tx", handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
