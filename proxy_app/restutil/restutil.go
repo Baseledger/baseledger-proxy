@@ -121,6 +121,7 @@ func Render(obj interface{}, status int, c *gin.Context) {
 func RenderError(message string, status int, c *gin.Context) {
 	err := map[string]*string{}
 	err["message"] = &message
+	logger.Errorf("request error %v", err)
 	Render(err, status, c)
 }
 
