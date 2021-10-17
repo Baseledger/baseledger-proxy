@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
@@ -13,14 +14,19 @@ import (
 	"github.com/unibrightio/proxy-api/cron"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/httpd/handler"
-	"github.com/unibrightio/proxy-api/httpd/middleware"
+	proxyMiddleware "github.com/unibrightio/proxy-api/httpd/middleware"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/messaging"
+
 	"github.com/unibrightio/proxy-api/types"
 
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	_ "github.com/unibrightio/proxy-api/httpd/docs"
+
+	"github.com/ulule/limiter/v3"
+	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 // @title Baseledger Proxy API documentation
@@ -37,8 +43,17 @@ func main() {
 	cron.StartCron()
 	subscribeToWorkgroupMessages()
 
+	rate := limiter.Rate{
+		Period: 1 * time.Hour * 24,
+		Limit:  10,
+	}
+
+	store := memory.NewStore()
+	instance := limiter.New(store, rate)
+	rateMiddleware := mgin.NewMiddleware(instance)
+
 	r := gin.Default()
-	r.Use(middleware.CORSMiddleware())
+	r.Use(proxyMiddleware.CORSMiddleware())
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
 	r.GET("/trustmeshes/:id", basicAuth, handler.GetTrustmeshHandler())
@@ -58,7 +73,7 @@ func main() {
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
-	r.Use(middleware.AuthorizeJWTMiddleware()).POST("/dev/tx", handler.CreateTransactionHandler())
+	r.Use(proxyMiddleware.AuthorizeJWTMiddleware()).Use(rateMiddleware).POST("/dev/tx", handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 
