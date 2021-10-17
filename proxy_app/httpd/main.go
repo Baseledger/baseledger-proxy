@@ -18,8 +18,16 @@ import (
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/messaging"
 	"github.com/unibrightio/proxy-api/types"
+
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+	_ "github.com/unibrightio/proxy-api/httpd/docs"
 )
 
+// @title Baseledger Proxy API documentation
+// @version 1.0.0
+// @host localhost:8081
+// @securityDefinitions.basic BasicAuth
 func main() {
 	setupViper()
 	logger.SetupLogger()
@@ -29,21 +37,21 @@ func main() {
 
 	r := gin.Default()
 	r.Use(helpers.CORSMiddleware())
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
 	r.GET("/trustmeshes/:id", basicAuth, handler.GetTrustmeshHandler())
-	r.POST("/suggestion", basicAuth, handler.CreateInitialSuggestionRequestHandler())
+	r.POST("/suggestion", basicAuth, handler.CreateSuggestionRequestHandler())
 	r.POST("/feedback", basicAuth, handler.CreateSynchronizationFeedbackHandler())
 	r.GET("/sunburst/:txId", basicAuth, handler.GetSunburstHandler())
-	r.POST("send_offchain_message", basicAuth, handler.SendOffchainMessageHandler())
 	r.GET("/organization", basicAuth, handler.GetOrganizationsHandler())
 	r.POST("/organization", basicAuth, handler.CreateOrganizationHandler())
 	r.DELETE("/organization/:id", basicAuth, handler.DeleteOrganizationHandler())
 	r.GET("/workgroup", basicAuth, handler.GetWorkgroupsHandler())
 	r.POST("/workgroup", basicAuth, handler.CreateWorkgroupHandler())
 	r.DELETE("/workgroup/:id", basicAuth, handler.DeleteWorkgroupHandler())
-	r.GET("/participation", basicAuth, handler.GetWorkgroupMemberHandler())
-	r.POST("/participation", basicAuth, handler.CreateWorkgroupMemberHandler())
-	r.DELETE("/participation/:id", basicAuth, handler.DeleteWorkgroupMemberHandler())
+	r.GET("/workgroup/:id/participation", basicAuth, handler.GetWorkgroupMembersHandler())
+	r.POST("/workgroup/:id/participation", basicAuth, handler.CreateWorkgroupMemberHandler())
+	r.DELETE("/workgroup/:id/participation/:participationId", basicAuth, handler.DeleteWorkgroupMemberHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())

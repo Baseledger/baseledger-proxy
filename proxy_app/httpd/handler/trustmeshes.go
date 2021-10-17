@@ -49,6 +49,14 @@ type trustmeshDto struct {
 	Entries             []trustmeshEntryDto
 }
 
+// @Security BasicAuth
+// GetTrustmeshes ... Get all trustmeshes
+// @Summary Get all trustmeshes
+// @Description get all trustmeshes
+// @Tags Trustmeshes
+// @Produce json
+// @Success 200 {array} trustmeshDto
+// @Router /trustmeshes [get]
 func GetTrustmeshesHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var trustmeshes []types.Trustmesh
@@ -71,6 +79,16 @@ func GetTrustmeshesHandler() gin.HandlerFunc {
 	}
 }
 
+// @Security BasicAuth
+// GetTrustmesh ... Get single trustmesh
+// @Summary Get single trustmesh
+// @Description get single trustmesh
+// @Param id path string format "uuid" "id"
+// @Tags Trustmesh
+// @Produce json
+// @Success 200 {object} trustmeshDto
+// @Failure 400,404 {string} errorMessage
+// @Router /trustmeshes/{id} [get]
 func GetTrustmeshHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		trustmeshIdParam := c.Param("id")
