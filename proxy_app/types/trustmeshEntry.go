@@ -29,6 +29,7 @@ type TrustmeshEntry struct {
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
 	OffchainProcessMessageId             uuid.UUID
+	OffchainProcessMessage               OffchainProcessMessage
 	ReferencedProcessMessageId           uuid.UUID
 	CommitmentState                      string
 	TransactionHash                      string
@@ -73,6 +74,7 @@ func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
 		Preload("Entries.SenderOrg").
 		Preload("Entries.ReceiverOrg").
 		Preload("Entries.Workgroup").
+		Preload("Entries.OffchainProcessMessage").
 		First(&trustmesh, "id = ?", id.String())
 
 	if res.Error != nil {
