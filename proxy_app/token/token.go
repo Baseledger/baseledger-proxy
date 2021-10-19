@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/spf13/viper"
 )
 
 func GetToken(email string) (string, error) {
-	// move to env
-	mySigningKey := []byte("AllYourBase")
+	jwtSecret := []byte(viper.GetString("JWT_SECRET"))
 
 	// Create the Claims
 	proxyClaims := jwt.MapClaims{}
@@ -18,7 +18,7 @@ func GetToken(email string) (string, error) {
 	proxyClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, proxyClaims)
-	return token.SignedString(mySigningKey)
+	return token.SignedString(jwtSecret)
 }
 
 func ValidateToken(encodedToken string) (*jwt.Token, error) {
@@ -26,8 +26,7 @@ func ValidateToken(encodedToken string) (*jwt.Token, error) {
 		if _, isvalid := token.Method.(*jwt.SigningMethodHMAC); !isvalid {
 			return nil, fmt.Errorf("Invalid token %v", token.Header["alg"])
 		}
-		// move to env
-		mySigningKey := []byte("AllYourBase")
-		return []byte(mySigningKey), nil
+		jwtSecret := []byte(viper.GetString("JWT_SECRET"))
+		return []byte(jwtSecret), nil
 	})
 }

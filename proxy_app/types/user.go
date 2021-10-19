@@ -23,12 +23,12 @@ type User struct {
 func (u *User) Create() bool {
 	pwdHash, err := generatePasswordHash(u.Password)
 	if err != nil {
-		logger.Errorf("errors while creating new entry %v\n", err.Error())
+		logger.Errorf("error while generating password hash %v\n", err.Error())
 		return false
 	}
 	err = validateEmail(u.Email)
 	if err != nil {
-		logger.Errorf("errors while creating new entry %v\n", err.Error())
+		logger.Errorf("error while validating email hash %v\n", err.Error())
 		return false
 	}
 	existingUser := getUserByEmail(u.Email)
