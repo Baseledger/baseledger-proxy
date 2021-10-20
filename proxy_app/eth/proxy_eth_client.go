@@ -10,16 +10,17 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
 
-	testContract "github.com/unibrightio/proxy-api/contracts"
+	contracts "github.com/unibrightio/proxy-api/contracts"
 )
 
 var ethClient *ethclient.Client
 
 func GetClient() *ethclient.Client {
 	if ethClient == nil {
-		client, err := ethclient.Dial("https://ropsten.infura.io/v3/0f43a95e908e4114a72f4f9e7e3913a7")
+		client, err := ethclient.Dial(viper.GetString("INFURA_URL"))
 
 		if err != nil {
 			logger.Errorf("Error connecting to infure %v", err.Error())
@@ -45,7 +46,7 @@ func AddNewProof(txId string, proof string) {
 		logger.Error(err.Error())
 	}
 
-	logger.Infof("tx sent: %s", tx.Hash().Hex())
+	logger.Infof("eth tx sent: %s", tx.Hash().Hex())
 }
 
 func GetProof(txId string) {
@@ -63,15 +64,14 @@ func GetProof(txId string) {
 	logger.Infof("Proof for tx id %v is %v", txId, string(result[:]))
 }
 
-func getContractInstance() (*testContract.Testcontract, *bind.TransactOpts) {
+func getContractInstance() (*contracts.BaseledgerStoreContract, *bind.TransactOpts) {
 	client := GetClient()
 
 	if client == nil {
 		return nil, nil
 	}
 
-	// TODO: i just used test private key exported from metamask for ropsten account
-	privateKey, err := crypto.HexToECDSA("...")
+	privateKey, err := crypto.HexToECDSA(viper.GetString("ETH_PVT_KEY"))
 	if err != nil {
 		log.Fatal(err)
 		return nil, nil
@@ -103,9 +103,9 @@ func getContractInstance() (*testContract.Testcontract, *bind.TransactOpts) {
 	auth.GasLimit = uint64(300000) // in units
 	auth.GasPrice = gasPrice
 
-	address := common.HexToAddress("0x2964196Ea65E0Ad37B39C9D8c0dA92F578c00964")
+	address := common.HexToAddress("0xCa454D949A91e671b5E80C7cEb755E244eadb4Cd")
 
-	instance, err := testContract.NewTestcontract(address, client)
+	instance, err := contracts.NewBaseledgerStoreContract(address, client)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, nil
