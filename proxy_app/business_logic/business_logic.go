@@ -12,10 +12,12 @@ import (
 	common "github.com/unibrightio/proxy-api/common"
 	systemofrecord "github.com/unibrightio/proxy-api/concircle"
 	"github.com/unibrightio/proxy-api/dbutil"
+	"github.com/unibrightio/proxy-api/eth"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
 	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/synctree"
+	"github.com/unibrightio/proxy-api/types"
 	proxytypes "github.com/unibrightio/proxy-api/types"
 )
 
@@ -182,12 +184,43 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		// 	trustmeshEntry.BaseledgerTransactionId.String(),
 		// 	trustmeshEntry.ReceiverOrgId.String(),
 		// 	trustmeshEntry.TrustmeshId.String())
+		if offchainMessage.ShouldExit {
+			exitToEth(&trustmeshEntry)
+		}
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
 
 	setTxStatus(txResult, common.CommittedCommitmentState)
+}
+
+func exitToEth(trustmeshEntry *types.TrustmeshEntry) {
+	trustmesh, err := types.GetTrustmeshById(trustmeshEntry.TrustmeshId)
+
+	if err != nil {
+		logger.Errorf("Could not find trustmesh for exiting %v", trustmeshEntry.TrustmeshId)
+		return
+	}
+
+	trustmeshSyncTree := synctree.CreateFromTrustmesh(*trustmesh)
+	trustmeshSyncTreeJson, _ := json.Marshal(trustmeshSyncTree)
+	transactionId := uuid.NewV4()
+
+	payload := proxyutil.CreateExitBaseledgerTransactionPayload(trustmeshEntry, transactionId, string(trustmeshSyncTreeJson))
+	signAndBroadcastPayload := &restutil.SignAndBroadcastPayload{
+		OpCode:        0,
+		TransactionId: transactionId.String(),
+		Payload:       payload,
+	}
+
+	txHash := restutil.SignAndBroadcast(*signAndBroadcastPayload)
+	if txHash == nil {
+		logger.Error("Sign and broadcast exiting baseledger transaction failed")
+		return
+	}
+
+	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof)
 }
 
 func setTxStatus(txResult proxytypes.Result, commitmentState string) {

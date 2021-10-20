@@ -30,6 +30,8 @@ type OffchainProcessMessage struct {
 	ReferencedBaseledgerTransactionId    uuid.UUID
 	EntryType                            string
 	SorBusinessObjectId                  string
+	// TODO: probably not the best way to indicate this, discuss
+	ShouldExit bool
 }
 
 type NatsMessage struct {
@@ -73,6 +75,13 @@ type BaseledgerTransactionPayload struct {
 	Proof                                string
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
+}
+
+// TODO: should we add more info to this one?
+type BaseledgerTransactionExitPayload struct {
+	ReferencedBaseledgerTransactionId string
+	BaseledgerTransactionId           string
+	SyncTreeJson                      string
 }
 
 func (o *OffchainProcessMessage) Create() bool {

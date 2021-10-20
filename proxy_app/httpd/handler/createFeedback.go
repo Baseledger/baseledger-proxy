@@ -24,6 +24,7 @@ type createSynchronizationFeedbackRequest struct {
 	OriginalBaseledgerTransactionId            string `json:"original_baseledger_transaction_id"`
 	OriginalOffchainProcessMessageId           string `json:"original_offchain_process_message_id"`
 	FeedbackMessage                            string `json:"feedback_message"`
+	ShouldExit                                 bool   `json:"should_exit"`
 }
 
 // @Security BasicAuth
@@ -38,11 +39,6 @@ type createSynchronizationFeedbackRequest struct {
 // @Router /feedback [post]
 func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !restutil.HasEnoughBalance() {
-			restutil.RenderError("not enough token balance", 400, c)
-			return
-		}
-
 		buf, err := c.GetRawData()
 		if err != nil {
 			restutil.RenderError(err.Error(), 400, c)
@@ -127,6 +123,9 @@ func createFeedbackOffchainMessage(
 	transactionId uuid.UUID,
 	baseledgerTransactionType string,
 ) types.OffchainProcessMessage {
+	if baseledgerTransactionType == "Reject" {
+		req.ShouldExit = false
+	}
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
@@ -145,6 +144,7 @@ func createFeedbackOffchainMessage(
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
 		SorBusinessObjectId:                  feedbackOffchainMessage.SorBusinessObjectId,
+		ShouldExit:                           req.ShouldExit,
 	}
 
 	return offchainMessage

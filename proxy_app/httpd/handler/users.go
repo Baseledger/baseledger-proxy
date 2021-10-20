@@ -119,11 +119,6 @@ func CreateTransactionHandler() gin.HandlerFunc {
 			return
 		}
 
-		if !restutil.HasEnoughBalance() {
-			restutil.RenderError("not enough token balance", 400, c)
-			return
-		}
-
 		transactionId := uuid.NewV4()
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
