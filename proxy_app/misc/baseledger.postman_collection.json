@@ -14,12 +14,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/organization",
+							"raw": "http://unibright:ub123@localhost:8081/organization",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub123"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
 								"organization"
 							]
@@ -34,15 +38,19 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Another org\"\r\n}"
+							"raw": "{\r\n    \"name\": \"Ambex\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/organization",
+							"raw": "http://unibright:ub321@localhost:8081/organization",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub321"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
 								"organization"
 							]
@@ -56,14 +64,17 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/organization/ecacb5b7-269e-4194-9c85-b462ee49e00a",
+							"raw": "http://unibright:ub321@localhost:8081/ecacb5b7-269e-4194-9c85-b462ee49e00a",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub321"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
-								"organization",
 								"ecacb5b7-269e-4194-9c85-b462ee49e00a"
 							]
 						}
@@ -81,12 +92,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/workgroup",
+							"raw": "http://unibright:ub123@localhost:8081/workgroup",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub123"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
 								"workgroup"
 							]
@@ -101,15 +116,19 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Another org\"\r\n}"
+							"raw": "{\r\n    \"name\": \"Factoring Workgroup\",\r\n    \"privatize_key\": \"secretPrivatizationKey\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/workgroup",
+							"raw": "http://unibright:ub321@localhost:8081/workgroup",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub321"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
 								"workgroup"
 							]
@@ -123,15 +142,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/workgroup/f40628ee-cad5-4563-b653-a2ecf73bbc8f",
+							"raw": "http://unibright:ub321@localhost:8081/workgroup/584362d8-6590-4000-b478-9891f948c86b",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub321"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
 								"workgroup",
-								"f40628ee-cad5-4563-b653-a2ecf73bbc8f"
+								"584362d8-6590-4000-b478-9891f948c86b"
 							]
 						}
 					},
@@ -144,24 +167,23 @@
 			"item": [
 				{
 					"name": "participations",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\"\r\n}"
-						},
 						"url": {
-							"raw": "http://localhost:8080/participation",
+							"raw": "http://unibright:ub123@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub123"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
+								"workgroup",
+								"734276bc-4adc-4621-acf8-ac66dc91cb27",
 								"participation"
 							]
 						}
@@ -175,16 +197,22 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"organization_id\": \"7205c0d3-2c4b-41bf-b06b-35b7072cc826\",\r\n    \"organization_endpoint\": \"Test endpoint\",\r\n    \"organization_token\": \"Tokensecret\"\r\n}"
+							"raw": "{\r\n    \"organization_id\": \"4e227c7c-e73a-4e46-8907-786832cd87d3\",\r\n    \"organization_endpoint\": \"ambex2NatsServer:4222\",\r\n    \"organization_token\": \"ambex2NatsSecretToken\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/participation",
+							"raw": "http://unibright:ub123@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub123"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
+								"workgroup",
+								"734276bc-4adc-4621-acf8-ac66dc91cb27",
 								"participation"
 							]
 						}
@@ -197,15 +225,21 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/participation/7f77f014-9b73-40a9-8d70-f23040333c03",
+							"raw": "http://unibright:ub123@localhost:8081/workgroup/734276bc-4adc-4721-acf8-ac66dc91cb27/participation/83000976-d82c-409b-8b8e-72a84c455e36",
 							"protocol": "http",
+							"auth": {
+								"user": "unibright",
+								"password": "ub123"
+							},
 							"host": [
 								"localhost"
 							],
-							"port": "8080",
+							"port": "8081",
 							"path": [
+								"workgroup",
+								"734276bc-4adc-4721-acf8-ac66dc91cb27",
 								"participation",
-								"7f77f014-9b73-40a9-8d70-f23040333c03"
+								"83000976-d82c-409b-8b8e-72a84c455e36"
 							]
 						}
 					},
@@ -220,12 +254,16 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
+					"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"d45c9b93-3eef-4993-add6-aa1c84d17eea\",\r\n    \"workstep_type\": \"FinalWorkstep\",\r\n    \"business_object_type\": \"PurchaseOrder\",\r\n    \"baseledger_business_object_id\": \"169f104f-980e-42bb-a128-73daf259bc39\",\r\n    \"business_object_json\": \"{\\\"PurchaseOrderID\\\":\\\"PO123\\\",\\\"Currency\\\":\\\"EUR\\\",\\\"MaterialID\\\":\\\"4711\\\",\\\"Quantity\\\":3,\\\"SinglePrice\\\":2.5,\\\"TotalPrice\\\":7.5,\\\"OrderItems\\\":[{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]},{\\\"ItemID\\\":20,\\\"ItemMaterialID\\\":\\\"FRT45098\\\",\\\"ItemQuantity\\\":70,\\\"Texts\\\":[\\\"text569hngf3ei\\\",\\\"j908j9j9j\\\",\\\"2340rfjmn2roicvn\\\"]}]}\",\r\n    \"referenced_baseledger_business_object_id\": \"09d2f10a-dce8-4022-94d8-98c1010f8f60\",\r\n    \"referenced_baseledger_transaction_id\": \"\"\r\n}"
 				},
 				"url": {
-					"raw": "localhost:8081/suggestion",
+					"raw": "http://46.163.116.159:8081/suggestion",
+					"protocol": "http",
 					"host": [
-						"localhost"
+						"46",
+						"163",
+						"116",
+						"159"
 					],
 					"port": "8081",
 					"path": [
@@ -241,12 +279,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8082/trustmeshes",
+					"raw": "http://46.163.116.183:8081/trustmeshes",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"46",
+						"163",
+						"116",
+						"183"
 					],
-					"port": "8082",
+					"port": "8081",
 					"path": [
 						"trustmeshes"
 					]
