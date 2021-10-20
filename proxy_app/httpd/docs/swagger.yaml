@@ -48,6 +48,11 @@ definitions:
       workgroup_id:
         type: string
     type: object
+  handler.createTxDto:
+    properties:
+      payload:
+        type: string
+    type: object
   handler.createWorkgroupMemberRequest:
     properties:
       organization_endpoint:
@@ -161,6 +166,16 @@ definitions:
       workstepType:
         type: string
     type: object
+  handler.userDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   handler.workgroupDetailsDto:
     properties:
       id:
@@ -189,6 +204,104 @@ info:
   title: Baseledger Proxy API documentation
   version: 1.0.0
 paths:
+  /dev/auth:
+    post:
+      consumes:
+      - application/json
+      description: login user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.userDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login user
+      tags:
+      - Dev
+  /dev/tx:
+    post:
+      consumes:
+      - application/json
+      description: generate transaction with custom payload
+      parameters:
+      - description: Transaction payload
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createTxDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Generate transaction with custom payload
+      tags:
+      - Dev
+  /dev/users:
+    post:
+      consumes:
+      - application/json
+      description: register user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.userDto'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register user
+      tags:
+      - Dev
   /feedback:
     post:
       consumes:
@@ -566,4 +679,8 @@ paths:
 securityDefinitions:
   BasicAuth:
     type: basic
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
