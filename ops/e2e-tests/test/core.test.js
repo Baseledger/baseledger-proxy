@@ -2,11 +2,11 @@ var request = require('supertest');
 var uuid = require("uuid");
 var expect = require('chai').expect;
 
-var alice_proxy_app_url = 'http://unibright:ub321@localhost:8081';
-var alice_blockchain_app_url = 'http://unibright:ub321@localhost:1317';
+var alice_proxy_app_url = 'http://unibright:ub123@localhost:8081';
+var alice_blockchain_app_url = 'http://unibright:ub123@localhost:1317';
 
-var bob_proxy_app_url = 'http://unibright:ub321@localhost:8082';
-var bob_blockchain_app_url = 'http://unibright:ub321@localhost:1318';
+var bob_proxy_app_url = 'http://unibright:ub123@localhost:8082';
+var bob_blockchain_app_url = 'http://unibright:ub123@localhost:1318';
 
 var test_workgroup_id = "734276bc-4adc-4621-acf8-ac66dc91cb27";
 var alice_organization_id = "d45c9b93-3eef-4993-add6-aa1c84d17eea";
@@ -21,14 +21,10 @@ const sleep = (ms) => {
 
 describe('Setup orgs and workgroup', function () {
   it('Given Alice and Bob stacks, When both proxy apps triggered with organization and workgroup administration, it returns Ok', async function () {
-    const getParticipationDto = {
-      workgroup_id: test_workgroup_id
-    }
-
     // get existing alice participation
     var getAliceParticipationResponse = await request(alice_proxy_app_url)
-      .get('/participation')
-      .send(getParticipationDto)
+      .get(`/workgroup/${test_workgroup_id}/participation`)
+      .send()
       .expect(200);
     
     var aliceParticipationId = JSON.parse(getAliceParticipationResponse.text)[0].id;
@@ -36,12 +32,12 @@ describe('Setup orgs and workgroup', function () {
 
     // delete exisiting alice participation
     await request(alice_proxy_app_url)
-      .delete(`/participation/${aliceParticipationId}`)
-      .expect(200)
+      .delete(`/workgroup/${test_workgroup_id}/participation/${aliceParticipationId}`)
+      .expect(204)
 
     var getAliceParticipationResponse = await request(bob_proxy_app_url)
-      .get('/participation')
-      .send(getParticipationDto)
+      .get(`/workgroup/${test_workgroup_id}/participation`)
+      .send()
       .expect(200);
     
     var aliceParticipationId = JSON.parse(getAliceParticipationResponse.text)[0].id;
@@ -49,69 +45,67 @@ describe('Setup orgs and workgroup', function () {
 
     // delete exisiting alice participation
     await request(bob_proxy_app_url)
-      .delete(`/participation/${aliceParticipationId}`)
-      .expect(200)
+      .delete(`/workgroup/${test_workgroup_id}/participation/${aliceParticipationId}`)
+      .expect(204)
 
     // get existing bob participation
     var getBobParticipationResponse = await request(bob_proxy_app_url)
-      .get('/participation')
-      .send(getParticipationDto)
+      .get(`/workgroup/${test_workgroup_id}/participation`)
+      .send()
       .expect(200);
     
     var bobParticipationId = JSON.parse(getBobParticipationResponse.text)[0].id;
 
     // delete exisiting bob participation
     await request(bob_proxy_app_url)
-      .delete(`/participation/${bobParticipationId}`)
-      .expect(200)
+      .delete(`/workgroup/${test_workgroup_id}/participation/${bobParticipationId}`)
+      .expect(204)
     
     // get existing bob participation
     var getBobParticipationResponse = await request(alice_proxy_app_url)
-      .get('/participation')
-      .send(getParticipationDto)
+      .get(`/workgroup/${test_workgroup_id}/participation`)
+      .send()
       .expect(200);
     
     var bobParticipationId = JSON.parse(getBobParticipationResponse.text)[0].id;
 
     // delete exisiting bob participation
     await request(alice_proxy_app_url)
-      .delete(`/participation/${bobParticipationId}`)
-      .expect(200)
+      .delete(`/workgroup/${test_workgroup_id}/participation/${bobParticipationId}`)
+      .expect(204)
 
     // create new alice participation
     const createAliceParticipationDto = {
-      workgroup_id: test_workgroup_id,
       organization_id: alice_organization_id,
       organization_endpoint: "host.docker.internal:4222",
       organization_token: "testToken1"
     }
 
     await request(alice_proxy_app_url)
-      .post('/participation')
+      .post(`/workgroup/${test_workgroup_id}/participation`)
       .send(createAliceParticipationDto)
       .expect(200);
     
     await request(bob_proxy_app_url)
-      .post('/participation')
+      .post(`/workgroup/${test_workgroup_id}/participation`)
       .send(createAliceParticipationDto)
       .expect(200);
 
 
     // create new bob participation
     const createBobParticipationDto = {
-      workgroup_id: test_workgroup_id,
       organization_id: bob_organization_id,
       organization_endpoint: "host.docker.internal:4223",
       organization_token: "testToken1"
     }
   
     await request(bob_proxy_app_url)
-      .post('/participation')
+      .post(`/workgroup/${test_workgroup_id}/participation`)
       .send(createBobParticipationDto)
       .expect(200);
     
     await request(alice_proxy_app_url)
-      .post('/participation')
+      .post(`/workgroup/${test_workgroup_id}/participation`)
       .send(createBobParticipationDto)
       .expect(200);
   });
