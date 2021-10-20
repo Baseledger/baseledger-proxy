@@ -107,15 +107,16 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			boJson := synctree.GetBusinessObjectJson(*syncTree)
 			logger.Infof("Business object sync tree json", boJson)
 
-			systemofrecord.PostBusinessObject(
-				trustmeshEntry.BaseledgerBusinessObjectId,
-				trustmeshEntry.BusinessObjectType,
-				trustmeshEntry.ReceiverOrgId.String(),
-				trustmeshEntry.OffchainProcessMessageId.String(),
-				trustmeshEntry.BaseledgerTransactionId.String(),
-				boJson,
-				trustmeshEntry.TrustmeshId.String(),
-			)
+			// TODO: As part of generic webhook stories
+			// systemofrecord.PostBusinessObject(
+			// 	trustmeshEntry.BaseledgerBusinessObjectId,
+			// 	trustmeshEntry.BusinessObjectType,
+			// 	trustmeshEntry.ReceiverOrgId.String(),
+			// 	trustmeshEntry.OffchainProcessMessageId.String(),
+			// 	trustmeshEntry.BaseledgerTransactionId.String(),
+			// 	boJson,
+			// 	trustmeshEntry.TrustmeshId.String(),
+			// )
 			break
 		}
 		logger.Warnf("Hashes don't match, rejecting feedback %v %v %v", baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson)
@@ -172,14 +173,15 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			status = "error"
 		}
 		logger.Infof("Sending feedback received status update %v\n", status)
-		systemofrecord.PutStatusUpdate(
-			trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
-			trustmeshEntry.BusinessObjectType,
-			trustmeshEntry.SorBusinessObjectId,
-			status,
-			trustmeshEntry.BaseledgerTransactionId.String(),
-			trustmeshEntry.ReceiverOrgId.String(),
-			trustmeshEntry.TrustmeshId.String())
+		// TODO: As part of generic webhook stories
+		// systemofrecord.PutStatusUpdate(
+		// 	trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
+		// 	trustmeshEntry.BusinessObjectType,
+		// 	trustmeshEntry.SorBusinessObjectId,
+		// 	status,
+		// 	trustmeshEntry.BaseledgerTransactionId.String(),
+		// 	trustmeshEntry.ReceiverOrgId.String(),
+		// 	trustmeshEntry.TrustmeshId.String())
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))

@@ -16,7 +16,7 @@ export BLOCKCHAIN_APP_API_PORT=1317 &&
 export TENDERMINT_NODE_GRPC_PORT=$first_node_tendermint_grpc_port && 
 export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port && 
 export PROXY_APP_PORT=8081 &&
-export ORGANIZATION_ID=d9c102eb-b173-45ac-b640-24d28a3c9f0c && # unique identifier of the organization, currently hardcoded in seed data
+export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea && # unique identifier of the organization, currently hardcoded in seed data
 export API_CONCIRCLE_URL=s4h.rp.concircle.com
 docker-compose -p first_node up -d
 

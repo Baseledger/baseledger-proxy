@@ -99,11 +99,6 @@ func LoginUserHandler() gin.HandlerFunc {
 // @Router /dev/tx [post]
 func CreateTransactionHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !restutil.HasEnoughBalance() {
-			restutil.RenderError("not enough token balance", 400, c)
-			return
-		}
-
 		buf, err := c.GetRawData()
 		if err != nil {
 			restutil.RenderError(err.Error(), 400, c)
@@ -121,6 +116,11 @@ func CreateTransactionHandler() gin.HandlerFunc {
 		maximumPayloadSize := 20
 		if len(req.Payload) > maximumPayloadSize {
 			restutil.RenderError("payload maximum size exceeded", 400, c)
+			return
+		}
+
+		if !restutil.HasEnoughBalance() {
+			restutil.RenderError("not enough token balance", 400, c)
 			return
 		}
 
