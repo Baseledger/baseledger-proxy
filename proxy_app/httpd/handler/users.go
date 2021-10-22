@@ -12,6 +12,7 @@ import (
 
 type createTxDto struct {
 	Payload string `json:"payload"`
+	OpCode  uint   `json:"op_code"`
 }
 
 type userDto struct {
@@ -112,8 +113,13 @@ func CreateTransactionHandler() gin.HandlerFunc {
 			return
 		}
 
+		if req.OpCode != 9 {
+			restutil.RenderError("currently only op code 9 is supported", 400, c)
+			return
+		}
+
 		// TODO: set proper size
-		maximumPayloadSize := 20
+		maximumPayloadSize := 30
 		if len(req.Payload) > maximumPayloadSize {
 			restutil.RenderError("payload maximum size exceeded", 400, c)
 			return
@@ -128,7 +134,7 @@ func CreateTransactionHandler() gin.HandlerFunc {
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
 			Payload:       req.Payload,
-			OpCode:        9,
+			OpCode:        uint32(req.OpCode),
 		}
 
 		txHash := restutil.SignAndBroadcast(signAndBroadcastPayload)

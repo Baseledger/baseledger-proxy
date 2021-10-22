@@ -50,6 +50,8 @@ definitions:
     type: object
   handler.createTxDto:
     properties:
+      op_code:
+        type: integer
       payload:
         type: string
     type: object

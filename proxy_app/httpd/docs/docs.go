@@ -855,6 +855,9 @@ var doc = `{
         "handler.createTxDto": {
             "type": "object",
             "properties": {
+                "op_code": {
+                    "type": "integer"
+                },
                 "payload": {
                     "type": "string"
                 }
