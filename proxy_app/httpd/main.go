@@ -26,7 +26,7 @@ import (
 
 // @title Baseledger Proxy API documentation
 // @version 1.0.0
-// @host http://137.184.72.13:8081
+// @host 137.184.72.13:8081
 // @securityDefinitions.basic BasicAuth
 // @securityDefinitions.apikey BearerAuth
 // @in header

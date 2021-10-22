@@ -200,7 +200,7 @@ definitions:
       workgroup_id:
         type: string
     type: object
-host: http://137.184.72.13:8081
+host: 137.184.72.13:8081
 info:
   contact: {}
   title: Baseledger Proxy API documentation
