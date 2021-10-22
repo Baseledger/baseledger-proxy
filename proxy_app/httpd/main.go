@@ -66,8 +66,8 @@ func main() {
 	r.DELETE("/workgroup/:id/participation/:participationId", basicAuth, handler.DeleteWorkgroupMemberHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
-	r.POST("/users", handler.CreateUserHandler())
-	r.POST("/auth", handler.LoginUserHandler())
+	r.POST("/dev/users", handler.CreateUserHandler())
+	r.POST("/dev/auth", handler.LoginUserHandler())
 	r.POST("/dev/tx", handler.CreateTransactionHandler())
 	// r.Use(proxyMiddleware.AuthorizeJWTMiddleware()).Use(rateMiddleware).POST("/dev/tx", handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
