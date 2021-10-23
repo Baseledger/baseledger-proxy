@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/viper"
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/cron"
 	"github.com/unibrightio/proxy-api/dbutil"
@@ -22,6 +25,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	_ "github.com/unibrightio/proxy-api/httpd/docs"
+
+	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 )
 
 // @title Baseledger Proxy API documentation
@@ -38,14 +43,14 @@ func main() {
 	cron.StartCron()
 	subscribeToWorkgroupMessages()
 
-	// rate := limiter.Rate{
-	// 	Period: 1 * time.Hour * 24,
-	// 	Limit:  10,
-	// }
+	rate := limiter.Rate{
+		Period: 1 * time.Hour * 24,
+		Limit:  10,
+	}
 
-	// store := memory.NewStore()
-	// instance := limiter.New(store, rate)
-	// rateMiddleware := mgin.NewMiddleware(instance)
+	store := memory.NewStore()
+	instance := limiter.New(store, rate)
+	rateMiddleware := mgin.NewMiddleware(instance)
 
 	r := gin.Default()
 	r.Use(proxyMiddleware.CORSMiddleware())
@@ -68,8 +73,7 @@ func main() {
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
-	r.POST("/dev/tx", handler.CreateTransactionHandler())
-	// r.Use(proxyMiddleware.AuthorizeJWTMiddleware()).Use(rateMiddleware).POST("/dev/tx", handler.CreateTransactionHandler())
+	r.POST("/dev/tx", proxyMiddleware.AuthorizeJWTMiddleware(), rateMiddleware, handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 

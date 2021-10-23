@@ -1,7 +1,7 @@
 #local
 
 #navigate to repo root/proxy_app
-docker build -f ops\Dockerfile -t baseledger/proxy_app .
+docker build -f ops/Dockerfile -t baseledger/proxy_app .
 docker push baseledger/proxy_app
 
 # node 1	
