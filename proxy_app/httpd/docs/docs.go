@@ -855,6 +855,9 @@ var doc = `{
         "handler.createTxDto": {
             "type": "object",
             "properties": {
+                "op_code": {
+                    "type": "integer"
+                },
                 "payload": {
                     "type": "string"
                 }
@@ -1107,7 +1110,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0.0",
-	Host:        "localhost:8081",
+	Host:        "137.184.72.13:8081",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Baseledger Proxy API documentation",

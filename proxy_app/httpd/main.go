@@ -10,6 +10,8 @@ import (
 	uuid "github.com/kthomas/go.uuid"
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/viper"
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/cron"
 	"github.com/unibrightio/proxy-api/dbutil"
@@ -24,14 +26,12 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	_ "github.com/unibrightio/proxy-api/httpd/docs"
 
-	"github.com/ulule/limiter/v3"
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
-	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 // @title Baseledger Proxy API documentation
 // @version 1.0.0
-// @host localhost:8081
+// @host 137.184.72.13:8081
 // @securityDefinitions.basic BasicAuth
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -73,7 +73,7 @@ func main() {
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
-	r.Use(proxyMiddleware.AuthorizeJWTMiddleware()).Use(rateMiddleware).POST("/dev/tx", handler.CreateTransactionHandler())
+	r.POST("/dev/tx", proxyMiddleware.AuthorizeJWTMiddleware(), rateMiddleware, handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
 

@@ -50,6 +50,8 @@ definitions:
     type: object
   handler.createTxDto:
     properties:
+      op_code:
+        type: integer
       payload:
         type: string
     type: object
@@ -198,7 +200,7 @@ definitions:
       workgroup_id:
         type: string
     type: object
-host: localhost:8081
+host: 137.184.72.13:8081
 info:
   contact: {}
   title: Baseledger Proxy API documentation
