@@ -184,7 +184,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		// 	trustmeshEntry.BaseledgerTransactionId.String(),
 		// 	trustmeshEntry.ReceiverOrgId.String(),
 		// 	trustmeshEntry.TrustmeshId.String())
-		if offchainMessage.ShouldExit {
+		if offchainMessage.ReferencedWorkstepType == "FinalWorkstep" && status == "success" {
 			exitToEth(&trustmeshEntry)
 		}
 	default:

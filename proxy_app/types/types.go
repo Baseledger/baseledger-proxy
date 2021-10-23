@@ -19,6 +19,7 @@ type OffchainProcessMessage struct {
 	ReferencedOffchainProcessMessageId   uuid.UUID
 	BaseledgerSyncTreeJson               string
 	WorkstepType                         string
+	ReferencedWorkstepType               string
 	BusinessObjectProof                  string
 	BusinessObjectType                   string
 	TendermintTransactionIdOfStoredProof uuid.UUID
@@ -30,8 +31,6 @@ type OffchainProcessMessage struct {
 	ReferencedBaseledgerTransactionId    uuid.UUID
 	EntryType                            string
 	SorBusinessObjectId                  string
-	// TODO: probably not the best way to indicate this, discuss
-	ShouldExit bool
 }
 
 type NatsMessage struct {

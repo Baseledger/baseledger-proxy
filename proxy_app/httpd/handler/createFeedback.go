@@ -18,13 +18,13 @@ import (
 type createSynchronizationFeedbackRequest struct {
 	WorkgroupId                                string `json:"workgroup_id"`
 	BusinessObjectType                         string `json:"business_object_type"`
+	ReferencedWorkstepType                     string `json:"referenced_workstep_type"`
 	Recipient                                  string `json:"recipient"`
 	Approved                                   bool   `json:"approved"`
 	BaseledgerBusinessObjectIdOfApprovedObject string `json:"baseledger_business_object_id_of_approved_object"`
 	OriginalBaseledgerTransactionId            string `json:"original_baseledger_transaction_id"`
 	OriginalOffchainProcessMessageId           string `json:"original_offchain_process_message_id"`
 	FeedbackMessage                            string `json:"feedback_message"`
-	ShouldExit                                 bool   `json:"should_exit"`
 }
 
 // @Security BasicAuth
@@ -123,9 +123,6 @@ func createFeedbackOffchainMessage(
 	transactionId uuid.UUID,
 	baseledgerTransactionType string,
 ) types.OffchainProcessMessage {
-	if baseledgerTransactionType == "Reject" {
-		req.ShouldExit = false
-	}
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
@@ -144,7 +141,7 @@ func createFeedbackOffchainMessage(
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
 		SorBusinessObjectId:                  feedbackOffchainMessage.SorBusinessObjectId,
-		ShouldExit:                           req.ShouldExit,
+		ReferencedWorkstepType:               req.ReferencedWorkstepType,
 	}
 
 	return offchainMessage
