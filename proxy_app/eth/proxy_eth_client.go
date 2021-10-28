@@ -72,7 +72,7 @@ func getContractInstance() (*contracts.Contracts, *bind.TransactOpts) {
 		return nil, nil
 	}
 
-	privateKey, err := crypto.HexToECDSA(viper.GetString("ETH_PVT_KEY"))
+	privateKey, err := crypto.HexToECDSA(viper.GetString("ETHEREUM_PRIVATE_KEY"))
 	if err != nil {
 		log.Fatal(err)
 		return nil, nil
