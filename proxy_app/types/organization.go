@@ -34,7 +34,7 @@ func (t *Organization) Delete() bool {
 	errors := result.GetErrors()
 
 	if len(errors) > 0 {
-		logger.Errorf("errors while creating new entry %v\n", errors)
+		logger.Errorf("errors while deleting entry %v\n", errors)
 		return false
 	}
 

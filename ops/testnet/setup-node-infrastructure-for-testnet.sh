@@ -7,5 +7,11 @@ export TENDERMINT_NODE_PORT=26655 &&
 export PROXY_APP_PORT=8081 &&
 export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea # unique identifier of the organization
 export API_CONCIRCLE_URL=s4h.rp.concircle.com # SOR endpoint
+# - DB_UB_USER=${DB_UB_USER}
+# - DB_UB_PWD=${DB_UB_PWD}
+# - API_UB_USER=${API_UB_USER}
+# - API_UB_PWD=${API_UB_PWD}
+# - API_CONCIRCLE_USER
+# - API_CONCIRCLE_PWD
 
 docker-compose -p baseledger-node up -d

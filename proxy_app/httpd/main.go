@@ -69,6 +69,9 @@ func main() {
 	r.GET("/workgroup/:id/participation", basicAuth, handler.GetWorkgroupMembersHandler())
 	r.POST("/workgroup/:id/participation", basicAuth, handler.CreateWorkgroupMemberHandler())
 	r.DELETE("/workgroup/:id/participation/:participationId", basicAuth, handler.DeleteWorkgroupMemberHandler())
+	r.GET("/sorwebhook", basicAuth, handler.GetSorWebhooksHandler())
+	r.POST("/sorwebhook", basicAuth, handler.CreateSorWebhookHandler())
+	r.DELETE("/sorwebhook/:id", basicAuth, handler.DeleteSorWebhookHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
 	r.POST("/dev/users", handler.CreateUserHandler())

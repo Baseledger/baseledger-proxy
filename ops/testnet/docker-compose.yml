@@ -6,8 +6,8 @@ services:
     command: ["postgres", "-c", "log_statement=all"]
     environment:
       - POSTGRES_DB=ub
-      - POSTGRES_USER=ub
-      - POSTGRES_PASSWORD=ub123
+      - POSTGRES_USER=${DB_UB_USER}
+      - POSTGRES_PASSWORD=${DB_UB_PWD}
     volumes:
       - baseledger-db:/var/lib/postgresql/data
     networks:
@@ -40,8 +40,6 @@ services:
     image: baseledger/proxy_app
     environment:
       - DB_HOST=postgres-local-node
-      - ORGANIZATION_ID=${ORGANIZATION_ID}
-      - API_CONCIRCLE_URL=${API_CONCIRCLE_URL}
     networks:
       - baseledger
     ports:

@@ -24,13 +24,13 @@ require (
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/nats-io/nats-server/v2 v2.3.2 // indirect
 	github.com/nats-io/nats.go v1.11.1-0.20210623165838-4b75fc59ae30
+	github.com/oleiade/reflections v1.0.1
 	github.com/rs/zerolog v1.23.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/viper v1.8.1
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.7.3
 	github.com/ugorji/go v1.2.6 // indirect
-	github.com/ulule/limiter/v3 v3.8.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/net v0.0.0-20211004164453-cedda3a722dd // indirect
 	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
