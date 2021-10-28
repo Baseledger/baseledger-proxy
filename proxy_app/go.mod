@@ -31,6 +31,7 @@ require (
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.7.3
 	github.com/ugorji/go v1.2.6 // indirect
+	github.com/ulule/limiter/v3 v3.8.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/net v0.0.0-20211004164453-cedda3a722dd // indirect
 	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
