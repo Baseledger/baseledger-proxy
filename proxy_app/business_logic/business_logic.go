@@ -10,12 +10,13 @@ import (
 
 	uuid "github.com/kthomas/go.uuid"
 	common "github.com/unibrightio/proxy-api/common"
-	systemofrecord "github.com/unibrightio/proxy-api/concircle"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
 	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/synctree"
+	systemofrecord "github.com/unibrightio/proxy-api/systemofrecord"
+	"github.com/unibrightio/proxy-api/types"
 	proxytypes "github.com/unibrightio/proxy-api/types"
 )
 
@@ -31,13 +32,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		logger.Warnf("Transaction %v is invalid with code %v and log %v", trustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
 
 		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.PutStatusUpdate(
-		// 	trustmeshEntry.BaseledgerBusinessObjectId,
-		// 	trustmeshEntry.BusinessObjectType,
-		// 	trustmeshEntry.SorBusinessObjectId,
-		// 	"error",
-		// 	trustmeshEntry.BaseledgerTransactionId.String(),
-		// 	trustmeshEntry.SenderOrgId.String())
+		// systemofrecord.PutStatusUpdate(trustmeshEntry, "error")
 
 		setTxStatus(txResult, common.InvalidCommitmentState)
 		return
@@ -47,13 +42,10 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	if err != nil {
 		logger.Error("Offchain process msg not found")
 		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.PutStatusUpdate(
-		// 	trustmeshEntry.BaseledgerBusinessObjectId,
-		// 	trustmeshEntry.BusinessObjectType,
-		// 	trustmeshEntry.SorBusinessObjectId,
-		// 	"error",
-		// 	trustmeshEntry.BaseledgerTransactionId.String(),
-		// 	trustmeshEntry.SenderOrgId.String())
+		// systemofrecord.TriggerSorWebhook(
+		//	types.UpdateObject,
+		// 	trustmeshEntry,
+		// 	"error")
 		return
 	}
 	switch trustmeshEntry.EntryType {
@@ -70,13 +62,10 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
 		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.PutStatusUpdate(
-		// 	trustmeshEntry.BaseledgerBusinessObjectId,
-		// 	trustmeshEntry.BusinessObjectType,
-		// 	trustmeshEntry.SorBusinessObjectId,
-		// 	"success",
-		// 	trustmeshEntry.BaseledgerTransactionId.String(),
-		// 	trustmeshEntry.SenderOrgId.String())
+		// systemofrecord.TriggerSorWebhook(
+		//	types.UpdateObject,
+		// 	trustmeshEntry,
+		// 	"success")
 
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
@@ -107,16 +96,11 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			boJson := synctree.GetBusinessObjectJson(*syncTree)
 			logger.Infof("Business object sync tree json", boJson)
 
-			// TODO: As part of generic webhook stories
-			// systemofrecord.PostBusinessObject(
-			// 	trustmeshEntry.BaseledgerBusinessObjectId,
-			// 	trustmeshEntry.BusinessObjectType,
-			// 	trustmeshEntry.ReceiverOrgId.String(),
-			// 	trustmeshEntry.OffchainProcessMessageId.String(),
-			// 	trustmeshEntry.BaseledgerTransactionId.String(),
-			// 	boJson,
-			// 	trustmeshEntry.TrustmeshId.String(),
-			// )
+			systemofrecord.TriggerSorWebhook(
+				types.CreateObject,
+				&trustmeshEntry,
+				boJson,
+			)
 			break
 		}
 		logger.Warnf("Hashes don't match, rejecting feedback %v %v %v", baseledgerTransactionPayload.Proof, offchainMessage.BusinessObjectProof, offchainMessage.BaseledgerSyncTreeJson)
@@ -134,13 +118,10 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
 		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.PutStatusUpdate(
-		// 	trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
-		// 	trustmeshEntry.BusinessObjectType,
-		// 	trustmeshEntry.SorBusinessObjectId,
-		// 	"success",
-		// 	trustmeshEntry.BaseledgerTransactionId.String(),
-		// 	trustmeshEntry.SenderOrgId.String())
+		// systemofrecord.TriggerSorWebhook(
+		//	types.UpdateObject,
+		// 	trustmeshEntry,
+		// 	"success")
 
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
@@ -173,15 +154,11 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			status = "error"
 		}
 		logger.Infof("Sending feedback received status update %v\n", status)
-		// TODO: As part of generic webhook stories
-		// systemofrecord.PutStatusUpdate(
-		// 	trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
-		// 	trustmeshEntry.BusinessObjectType,
-		// 	trustmeshEntry.SorBusinessObjectId,
-		// 	status,
-		// 	trustmeshEntry.BaseledgerTransactionId.String(),
-		// 	trustmeshEntry.ReceiverOrgId.String(),
-		// 	trustmeshEntry.TrustmeshId.String())
+
+		systemofrecord.TriggerSorWebhook(
+			types.UpdateObject,
+			&trustmeshEntry,
+			status)
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))

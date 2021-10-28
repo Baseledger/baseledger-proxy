@@ -198,6 +198,21 @@ CREATE TABLE public.users (
   password text
 );
 
+CREATE TABLE public.sor_webhooks (
+  id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+  url text NOT NULL,
+  urlParams text,
+  HttpMethod text NOT NULL,
+  WebhookType smallint,
+  AuthType smallint,
+  AuthUsername text,
+  AuthPassword text,
+  XcsrfUrl text,
+  BodyContentType text,
+  Body text,
+  BodyParams text
+);
+
 
 -- -- Add trustmeshes for visualization testing purposes
 -- DO $$
