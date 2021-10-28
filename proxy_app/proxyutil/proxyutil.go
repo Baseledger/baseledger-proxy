@@ -86,16 +86,15 @@ func CreateBaseledgerTransactionPayload(
 }
 
 func CreateExitBaseledgerTransactionPayload(
-	trustmeshEntry *types.TrustmeshEntry,
+	workgroupId uuid.UUID,
 	baseledgerTransactionId uuid.UUID,
 	trustmeshSyncTreeJson string,
 ) string {
 	workgroupClient := &workgroups.PostgresWorkgroupClient{}
-	workgroup := workgroupClient.FindWorkgroup(trustmeshEntry.WorkgroupId.String())
+	workgroup := workgroupClient.FindWorkgroup(workgroupId.String())
 	payload := &types.BaseledgerTransactionExitPayload{
-		SyncTreeJson:                      trustmeshSyncTreeJson,
-		BaseledgerTransactionId:           baseledgerTransactionId.String(),
-		ReferencedBaseledgerTransactionId: trustmeshEntry.BaseledgerTransactionId.String(),
+		SyncTreeJson:            trustmeshSyncTreeJson,
+		BaseledgerTransactionId: baseledgerTransactionId.String(),
 	}
 
 	return privatizeExitPayload(payload, workgroup.PrivatizeKey)

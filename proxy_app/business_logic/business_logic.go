@@ -154,24 +154,17 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		if trustmeshEntry.BaseledgerTransactionType == "Reject" {
 			status = "error"
 		}
-		logger.Infof("Sending feedback received status update %v\n", status)
-		// TODO: As part of generic webhook stories
-		// systemofrecord.PutStatusUpdate(
-		// 	trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
-		// 	trustmeshEntry.BusinessObjectType,
-		// 	trustmeshEntry.SorBusinessObjectId,
-		// 	status,
-		// 	trustmeshEntry.BaseledgerTransactionId.String(),
-		// 	trustmeshEntry.ReceiverOrgId.String(),
-		// 	trustmeshEntry.TrustmeshId.String())
-		if offchainMessage.ReferencedWorkstepType == "FinalWorkstep" && status == "success" {
-			exitToEth(&trustmeshEntry)
-		}
 
+		logger.Infof("Sending feedback received status update %v\n", status)
 		systemofrecord.TriggerSorWebhook(
 			types.UpdateObject,
 			&trustmeshEntry,
 			status)
+
+		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == "FinalWorkstep" && status == "success"
+		if exitOnFinalWorkstep {
+			exitToEth(&trustmeshEntry)
+		}
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
@@ -192,7 +185,7 @@ func exitToEth(trustmeshEntry *types.TrustmeshEntry) {
 	trustmeshSyncTreeJson, _ := json.Marshal(trustmeshSyncTree)
 	transactionId := uuid.NewV4()
 
-	payload := proxyutil.CreateExitBaseledgerTransactionPayload(trustmeshEntry, transactionId, string(trustmeshSyncTreeJson))
+	payload := proxyutil.CreateExitBaseledgerTransactionPayload(trustmeshEntry.WorkgroupId, transactionId, string(trustmeshSyncTreeJson))
 	signAndBroadcastPayload := &restutil.SignAndBroadcastPayload{
 		OpCode:        0,
 		TransactionId: transactionId.String(),

@@ -7,13 +7,13 @@ import 'node_modules/@openzeppelin/contracts/access/Ownable.sol';
  * @dev Store & retrieve baseledger transaction id and proof
  */
 contract BaseledgerStorageContract is Ownable {
-    mapping(string => string) txHashes;
+    mapping(string => string) exitProofs;
 
     function add(string memory key, string memory value) public onlyOwner {
-        txHashes[key] = value;
+        exitProofs[key] = value;
     }
     
     function get(string memory key) public view returns (string memory) {
-        return txHashes[key];
+        return exitProofs[key];
     }
 }

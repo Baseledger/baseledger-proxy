@@ -78,9 +78,8 @@ type BaseledgerTransactionPayload struct {
 
 // TODO: should we add more info to this one?
 type BaseledgerTransactionExitPayload struct {
-	ReferencedBaseledgerTransactionId string
-	BaseledgerTransactionId           string
-	SyncTreeJson                      string
+	BaseledgerTransactionId string
+	SyncTreeJson            string
 }
 
 func (o *OffchainProcessMessage) Create() bool {

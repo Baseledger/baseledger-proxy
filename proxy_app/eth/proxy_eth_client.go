@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
 
+	proxyCommon "github.com/unibrightio/proxy-api/common"
 	contracts "github.com/unibrightio/proxy-api/contracts"
 )
 
@@ -20,7 +21,7 @@ var ethClient *ethclient.Client
 
 func GetClient() *ethclient.Client {
 	if ethClient == nil {
-		client, err := ethclient.Dial(viper.GetString("INFURA_URL"))
+		client, err := ethclient.Dial(viper.GetString("ETHEREUM_API_URL"))
 
 		if err != nil {
 			logger.Errorf("Error connecting to infure %v", err.Error())
@@ -64,7 +65,7 @@ func GetProof(txId string) {
 	logger.Infof("Proof for tx id %v is %v", txId, string(result[:]))
 }
 
-func getContractInstance() (*contracts.BaseledgerStoreContract, *bind.TransactOpts) {
+func getContractInstance() (*contracts.Contracts, *bind.TransactOpts) {
 	client := GetClient()
 
 	if client == nil {
@@ -103,9 +104,9 @@ func getContractInstance() (*contracts.BaseledgerStoreContract, *bind.TransactOp
 	auth.GasLimit = uint64(300000) // in units
 	auth.GasPrice = gasPrice
 
-	address := common.HexToAddress("0xCa454D949A91e671b5E80C7cEb755E244eadb4Cd")
+	address := common.HexToAddress(proxyCommon.EthProofsSmartContractAddress)
 
-	instance, err := contracts.NewBaseledgerStoreContract(address, client)
+	instance, err := contracts.NewContracts(address, client)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, nil
