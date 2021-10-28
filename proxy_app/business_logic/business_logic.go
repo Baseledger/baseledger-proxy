@@ -182,10 +182,9 @@ func exitToEth(trustmeshEntry *types.TrustmeshEntry) {
 	}
 
 	trustmeshSyncTree := synctree.CreateFromTrustmesh(*trustmesh)
-	trustmeshSyncTreeJson, _ := json.Marshal(trustmeshSyncTree)
 	transactionId := uuid.NewV4()
 
-	payload := proxyutil.CreateExitBaseledgerTransactionPayload(trustmeshEntry.WorkgroupId, transactionId, string(trustmeshSyncTreeJson))
+	payload := proxyutil.CreateExitBaseledgerTransactionPayload(trustmeshEntry.WorkgroupId, transactionId, trustmeshSyncTree.RootProof)
 	signAndBroadcastPayload := &restutil.SignAndBroadcastPayload{
 		OpCode:        0,
 		TransactionId: transactionId.String(),

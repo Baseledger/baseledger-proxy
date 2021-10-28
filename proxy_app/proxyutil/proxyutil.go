@@ -88,12 +88,12 @@ func CreateBaseledgerTransactionPayload(
 func CreateExitBaseledgerTransactionPayload(
 	workgroupId uuid.UUID,
 	baseledgerTransactionId uuid.UUID,
-	trustmeshSyncTreeJson string,
+	rootProof string,
 ) string {
 	workgroupClient := &workgroups.PostgresWorkgroupClient{}
 	workgroup := workgroupClient.FindWorkgroup(workgroupId.String())
 	payload := &types.BaseledgerTransactionExitPayload{
-		SyncTreeJson:            trustmeshSyncTreeJson,
+		RootProof:               rootProof,
 		BaseledgerTransactionId: baseledgerTransactionId.String(),
 	}
 
