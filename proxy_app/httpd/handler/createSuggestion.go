@@ -41,11 +41,6 @@ type createSuggestionRequest struct {
 // @Router /suggestion [post]
 func CreateSuggestionRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !restutil.HasEnoughBalance() {
-			restutil.RenderError("not enough token balance", 400, c)
-			return
-		}
-
 		buf, err := c.GetRawData()
 		if err != nil {
 			restutil.RenderError(err.Error(), 400, c)

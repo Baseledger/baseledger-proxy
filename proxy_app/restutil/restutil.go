@@ -24,6 +24,11 @@ type SignAndBroadcastPayload struct {
 }
 
 func SignAndBroadcast(payload SignAndBroadcastPayload) *string {
+	if !HasEnoughBalance() {
+		logger.Error("Not enough token balance to broadcast transaction")
+		return nil
+	}
+
 	jsonValue, err := json.Marshal(payload)
 
 	if err != nil {

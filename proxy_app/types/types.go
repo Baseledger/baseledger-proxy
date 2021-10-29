@@ -19,6 +19,7 @@ type OffchainProcessMessage struct {
 	ReferencedOffchainProcessMessageId   uuid.UUID
 	BaseledgerSyncTreeJson               string
 	WorkstepType                         string
+	ReferencedWorkstepType               string
 	BusinessObjectProof                  string
 	BusinessObjectType                   string
 	TendermintTransactionIdOfStoredProof uuid.UUID
@@ -73,6 +74,12 @@ type BaseledgerTransactionPayload struct {
 	Proof                                string
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
+}
+
+// TODO: should we add more info to this one?
+type BaseledgerTransactionExitPayload struct {
+	BaseledgerTransactionId string
+	RootProof               string
 }
 
 func (o *OffchainProcessMessage) Create() bool {

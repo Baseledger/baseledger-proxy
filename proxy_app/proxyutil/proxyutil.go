@@ -85,6 +85,21 @@ func CreateBaseledgerTransactionPayload(
 	return enc
 }
 
+func CreateExitBaseledgerTransactionPayload(
+	workgroupId uuid.UUID,
+	baseledgerTransactionId uuid.UUID,
+	rootProof string,
+) string {
+	workgroupClient := &workgroups.PostgresWorkgroupClient{}
+	workgroup := workgroupClient.FindWorkgroup(workgroupId.String())
+	payload := &types.BaseledgerTransactionExitPayload{
+		RootProof:               rootProof,
+		BaseledgerTransactionId: baseledgerTransactionId.String(),
+	}
+
+	return privatizeExitPayload(payload, workgroup.PrivatizeKey)
+}
+
 func CreateBaseledgerTransactionFeedbackPayload(
 	synchronizationFeedback *types.SynchronizationFeedback,
 	offchainProcessMessage *types.OffchainProcessMessage,
@@ -147,6 +162,11 @@ func DeprivatizeBaseledgerTransactionPayload(payload string, workgroupId uuid.UU
 }
 
 func privatizePayload(payload *types.BaseledgerTransactionPayload, key string) string {
+	payloadJson, _ := json.Marshal(payload)
+	return encrypt(string(payloadJson), key)
+}
+
+func privatizeExitPayload(payload *types.BaseledgerTransactionExitPayload, key string) string {
 	payloadJson, _ := json.Marshal(payload)
 	return encrypt(string(payloadJson), key)
 }

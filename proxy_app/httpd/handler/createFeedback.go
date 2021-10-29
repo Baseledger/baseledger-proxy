@@ -18,6 +18,7 @@ import (
 type createSynchronizationFeedbackRequest struct {
 	WorkgroupId                                string `json:"workgroup_id"`
 	BusinessObjectType                         string `json:"business_object_type"`
+	ReferencedWorkstepType                     string `json:"referenced_workstep_type"`
 	Recipient                                  string `json:"recipient"`
 	Approved                                   bool   `json:"approved"`
 	BaseledgerBusinessObjectIdOfApprovedObject string `json:"baseledger_business_object_id_of_approved_object"`
@@ -38,11 +39,6 @@ type createSynchronizationFeedbackRequest struct {
 // @Router /feedback [post]
 func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !restutil.HasEnoughBalance() {
-			restutil.RenderError("not enough token balance", 400, c)
-			return
-		}
-
 		buf, err := c.GetRawData()
 		if err != nil {
 			restutil.RenderError(err.Error(), 400, c)
@@ -145,6 +141,7 @@ func createFeedbackOffchainMessage(
 		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
 		SorBusinessObjectId:                  feedbackOffchainMessage.SorBusinessObjectId,
+		ReferencedWorkstepType:               req.ReferencedWorkstepType,
 	}
 
 	return offchainMessage

@@ -13,6 +13,7 @@ import (
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/imdario/mergo"
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/unibrightio/proxy-api/types"
 )
 
 type SyncTreeNode struct {
@@ -32,6 +33,29 @@ type BaseledgerSyncTree struct {
 	Nodes     []SyncTreeNode
 }
 
+func CreateFromTrustmesh(trustmesh types.Trustmesh) BaseledgerSyncTree {
+	var LeafNodeSlice []SyncTreeNode
+	leafIndex := 0
+	for i := 0; i < len(trustmesh.Entries); i++ {
+		trustmeshEntry := trustmesh.Entries[i]
+		entryOffchainMessage := trustmeshEntry.OffchainProcessMessage
+
+		leaf := SyncTreeNode{}
+		leaf.SyncTreeNodeID = trustmeshEntry.BaseledgerTransactionId.String()
+		leaf.IsCovered = false
+		leaf.IsHash = false
+		leaf.IsLeaf = true
+		leaf.IsRoot = false
+		leaf.Value = entryOffchainMessage.BusinessObjectProof
+		leaf.Index = i
+		leaf.Level = leafIndex
+		LeafNodeSlice = append(LeafNodeSlice, leaf)
+		leafIndex++
+	}
+
+	return buildSyncTreeFromLeaves(LeafNodeSlice, leafIndex, []string{})
+}
+
 func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters []string) BaseledgerSyncTree {
 	var result map[string]interface{}
 	var leafIndex = 0
@@ -40,7 +64,6 @@ func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters [
 	FlattenOut, err := Flatten(result, nil)
 	if err != nil {
 		fmt.Println(err)
-
 	}
 
 	var LeafNodeSlice []SyncTreeNode
@@ -59,6 +82,10 @@ func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters [
 		leafIndex++
 	}
 
+	return buildSyncTreeFromLeaves(LeafNodeSlice, leafIndex, knowledgeLimiters)
+}
+
+func buildSyncTreeFromLeaves(LeafNodeSlice []SyncTreeNode, leafIndex int, knowledgeLimiters []string) BaseledgerSyncTree {
 	//Each entry will be a leaf. We need 2^x leafs. Determine x
 	var x = math.Max(1, math.Ceil(math.Log2(float64(len(LeafNodeSlice)))))
 	//Now "fill" the dictionary up to 2^x entries
@@ -79,7 +106,6 @@ func CreateFromBusinessObjectJson(businessObjectJson string, knowledgeLimiters [
 		}
 	}
 
-	//Limit knowledge
 	if len(knowledgeLimiters) > 0 {
 		for _, v := range syncTree.Nodes {
 			if v.IsLeaf && isNodeKnowledgeLimited(v.Value, knowledgeLimiters) {

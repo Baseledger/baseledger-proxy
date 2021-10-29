@@ -11,6 +11,7 @@ import (
 	uuid "github.com/kthomas/go.uuid"
 	common "github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/dbutil"
+	"github.com/unibrightio/proxy-api/eth"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
 	"github.com/unibrightio/proxy-api/restutil"
@@ -153,18 +154,50 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 		if trustmeshEntry.BaseledgerTransactionType == "Reject" {
 			status = "error"
 		}
-		logger.Infof("Sending feedback received status update %v\n", status)
 
+		logger.Infof("Sending feedback received status update %v\n", status)
 		systemofrecord.TriggerSorWebhook(
 			types.UpdateObject,
 			&trustmeshEntry,
 			status)
+
+		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == "FinalWorkstep" && status == "success"
+		if exitOnFinalWorkstep {
+			exitToEth(&trustmeshEntry)
+		}
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))
 	}
 
 	setTxStatus(txResult, common.CommittedCommitmentState)
+}
+
+func exitToEth(trustmeshEntry *types.TrustmeshEntry) {
+	trustmesh, err := types.GetTrustmeshById(trustmeshEntry.TrustmeshId)
+
+	if err != nil {
+		logger.Errorf("Could not find trustmesh for exiting %v", trustmeshEntry.TrustmeshId)
+		return
+	}
+
+	trustmeshSyncTree := synctree.CreateFromTrustmesh(*trustmesh)
+	transactionId := uuid.NewV4()
+
+	payload := proxyutil.CreateExitBaseledgerTransactionPayload(trustmeshEntry.WorkgroupId, transactionId, trustmeshSyncTree.RootProof)
+	signAndBroadcastPayload := &restutil.SignAndBroadcastPayload{
+		OpCode:        0,
+		TransactionId: transactionId.String(),
+		Payload:       payload,
+	}
+
+	txHash := restutil.SignAndBroadcast(*signAndBroadcastPayload)
+	if txHash == nil {
+		logger.Error("Sign and broadcast exiting baseledger transaction failed")
+		return
+	}
+
+	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof)
 }
 
 func setTxStatus(txResult proxytypes.Result, commitmentState string) {
