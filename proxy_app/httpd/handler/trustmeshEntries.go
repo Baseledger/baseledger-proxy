@@ -10,7 +10,7 @@ type pendingTrustmeshEntryDto struct {
 	TrustmeshEntryId string `json:"trustmesh_entry_id"`
 	WorkstepType     string `json:"workstep_type"`
 	// BusinessObjectJsonPayload string `json:"business_object_json_payload"`
-	NewObjectStatus string `json:"new_object_status"`
+	NewObjectStatus int    `json:"new_object_status"`
 	Message         string `json:"message"`
 }
 
@@ -18,7 +18,7 @@ type relatedTrustmeshEntryDto struct {
 	TrustmeshEntryId string `json:"trustmesh_entry_id"`
 	WorkstepType     string `json:"workstep_type"`
 	// BusinessObjectJsonPayload string `json:"business_object_json_payload"`
-	NewObjectStatus string `json:"new_object_status"`
+	NewObjectStatus int `json:"new_object_status"`
 	// Origin string `json:"origin"`
 	Message string `json:"message"`
 }
@@ -35,11 +35,15 @@ func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
 		dtos := []pendingTrustmeshEntryDto{}
 
 		for _, entry := range res {
+			status := 0
+			if entry.OffchainProcessMessage.BaseledgerTransactionType == "Approve" {
+				status = 1
+			}
 			dto := &pendingTrustmeshEntryDto{
 				TrustmeshEntryId: entry.Id.String(),
 				WorkstepType:     entry.WorkstepType,
 				Message:          entry.OffchainProcessMessage.StatusTextMessage,
-				NewObjectStatus:  entry.OffchainProcessMessage.BaseledgerTransactionType,
+				NewObjectStatus:  status,
 			}
 
 			dtos = append(dtos, *dto)
@@ -59,11 +63,15 @@ func GetRelatedTrustmesEntryHandler() gin.HandlerFunc {
 			return
 		}
 
+		status := 0
+		if res.OffchainProcessMessage.BaseledgerTransactionType == "Approve" {
+			status = 1
+		}
 		dto := &relatedTrustmeshEntryDto{
 			TrustmeshEntryId: res.Id.String(),
 			WorkstepType:     res.WorkstepType,
 			Message:          res.OffchainProcessMessage.StatusTextMessage,
-			NewObjectStatus:  res.OffchainProcessMessage.BaseledgerTransactionType,
+			NewObjectStatus:  status,
 		}
 
 		restutil.Render(dto, 200, c)
