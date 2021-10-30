@@ -11,6 +11,7 @@ import (
 )
 
 type TrustmeshEntry struct {
+	Id                                   uuid.UUID
 	TendermintBlockId                    sql.NullString
 	TendermintTransactionId              uuid.UUID
 	TendermintTransactionTimestamp       sql.NullTime
@@ -83,4 +84,19 @@ func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
 	}
 
 	return &trustmesh, nil
+}
+
+func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
+	db := dbutil.Db.GetConn()
+
+	entries := []*TrustmeshEntry{}
+
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries te1 where not exists (select * from trustmesh_entries te2 where te1.baseledger_transaction_id = te2.referenced_baseledger_transaction_id)").Find(&entries)
+
+	if res.Error != nil {
+		logger.Errorf("Error when getting pending entries %v", res.Error.Error())
+		return nil, res.Error
+	}
+
+	return entries, nil
 }
