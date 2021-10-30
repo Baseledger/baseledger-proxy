@@ -100,3 +100,28 @@ func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
 
 	return entries, nil
 }
+
+func GetFirstRelatedTrustmeshEntry(id string) (*TrustmeshEntry, error) {
+	db := dbutil.Db.GetConn()
+
+	entry := &TrustmeshEntry{}
+	res := db.Preload("OffchainProcessMessage").First(&entry, "id = ?", id)
+	if res.Error != nil {
+		logger.Errorf("error when getting trustmesh entry from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	relatedEntry := &TrustmeshEntry{}
+	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where referenced_baseledger_transaction_id = ? order by created_at desc limit 1", entry.BaseledgerTransactionId).Find(&relatedEntry)
+
+	if res.Error != nil {
+		logger.Errorf("error when getting related trustmesh entry from db %v\n", res.Error)
+		return entry, nil
+	}
+
+	if res.RowsAffected == 0 {
+		return entry, nil
+	}
+
+	return relatedEntry, nil
+}

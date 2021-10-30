@@ -14,6 +14,15 @@ type pendingTrustmeshEntryDto struct {
 	Message         string `json:"message"`
 }
 
+type relatedTrustmeshEntryDto struct {
+	TrustmeshEntryId string `json:"trustmesh_entry_id"`
+	WorkstepType     string `json:"workstep_type"`
+	// BusinessObjectJsonPayload string `json:"business_object_json_payload"`
+	NewObjectStatus string `json:"new_object_status"`
+	// Origin string `json:"origin"`
+	Message string `json:"message"`
+}
+
 func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		res, err := types.GetPendingTrustmeshEntries()
@@ -37,5 +46,26 @@ func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
 		}
 
 		restutil.Render(dtos, 200, c)
+	}
+}
+
+func GetRelatedTrustmesEntryHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		entryId := c.Param("id")
+		res, err := types.GetFirstRelatedTrustmeshEntry(entryId)
+
+		if err != nil {
+			restutil.RenderError("error when fetching related entries", 400, c)
+			return
+		}
+
+		dto := &relatedTrustmeshEntryDto{
+			TrustmeshEntryId: res.Id.String(),
+			WorkstepType:     res.WorkstepType,
+			Message:          res.OffchainProcessMessage.StatusTextMessage,
+			NewObjectStatus:  res.OffchainProcessMessage.BaseledgerTransactionType,
+		}
+
+		restutil.Render(dto, 200, c)
 	}
 }
