@@ -14,8 +14,6 @@ type pendingTrustmeshEntryDto struct {
 	TrustmeshEntryId          string `json:"trustmesh_entry_id"`
 	WorkstepType              string `json:"workstep_type"`
 	BusinessObjectJsonPayload string `json:"business_object_json_payload"`
-	NewObjectStatus           int    `json:"new_object_status"`
-	Message                   string `json:"message"`
 }
 
 type relatedTrustmeshEntryDto struct {
@@ -27,7 +25,7 @@ type relatedTrustmeshEntryDto struct {
 	Message                   string `json:"message"`
 }
 
-func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
+func FetchNewSuggestions() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		res, err := types.GetPendingTrustmeshEntries()
 
@@ -39,10 +37,6 @@ func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
 		dtos := []pendingTrustmeshEntryDto{}
 
 		for _, entry := range res {
-			status := 0
-			if entry.OffchainProcessMessage.BaseledgerTransactionType == "Approve" {
-				status = 1
-			}
 			syncTree := &synctree.BaseledgerSyncTree{}
 			json.Unmarshal([]byte(entry.OffchainProcessMessage.BaseledgerSyncTreeJson), &syncTree)
 
@@ -50,9 +44,7 @@ func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
 			dto := &pendingTrustmeshEntryDto{
 				TrustmeshEntryId:          entry.Id.String(),
 				WorkstepType:              entry.WorkstepType,
-				Message:                   entry.OffchainProcessMessage.StatusTextMessage,
 				BusinessObjectJsonPayload: boJson,
-				NewObjectStatus:           status,
 			}
 
 			dtos = append(dtos, *dto)
@@ -62,10 +54,10 @@ func GetPendingTrustmeshEntriesHandler() gin.HandlerFunc {
 	}
 }
 
-func GetRelatedTrustmesEntryHandler() gin.HandlerFunc {
+func FetchTrustmeshEntryUpdates() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		entryId := c.Param("id")
-		res, err := types.GetFirstRelatedTrustmeshEntry(entryId)
+		res, err := types.GetFirstSubsequentTrustmeshEntry(entryId)
 
 		if err != nil {
 			restutil.RenderError("error when fetching related entries", 400, c)
@@ -79,14 +71,6 @@ func GetRelatedTrustmesEntryHandler() gin.HandlerFunc {
 		syncTree := &synctree.BaseledgerSyncTree{}
 		json.Unmarshal([]byte(res.OffchainProcessMessage.BaseledgerSyncTreeJson), &syncTree)
 
-		origin := ""
-
-		if res.CommitmentState != common.InvalidCommitmentState {
-			if res.EntryType == common.SuggestionReceivedTrustmeshEntryType || res.EntryType == common.FeedbackReceivedTrustmeshEntryType {
-				origin = res.SenderOrgId.String()
-			}
-		}
-
 		boJson := synctree.GetBusinessObjectJson(*syncTree)
 		dto := &relatedTrustmeshEntryDto{
 			TrustmeshEntryId:          res.Id.String(),
@@ -94,9 +78,20 @@ func GetRelatedTrustmesEntryHandler() gin.HandlerFunc {
 			Message:                   res.OffchainProcessMessage.StatusTextMessage,
 			BusinessObjectJsonPayload: boJson,
 			NewObjectStatus:           status,
-			Origin:                    origin,
+			Origin:                    getEntryOrigin(res),
 		}
 
 		restutil.Render(dto, 200, c)
 	}
+}
+
+func getEntryOrigin(entry *types.TrustmeshEntry) string {
+	isInitiatorProxy := entry.CommitmentState == common.InvalidCommitmentState
+	isEntryComingFromOtherParty := entry.EntryType == common.SuggestionReceivedTrustmeshEntryType || entry.EntryType == common.FeedbackReceivedTrustmeshEntryType
+
+	if isInitiatorProxy || !isEntryComingFromOtherParty {
+		return ""
+	}
+
+	return entry.SenderOrgId.String()
 }

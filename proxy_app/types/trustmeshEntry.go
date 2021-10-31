@@ -91,7 +91,7 @@ func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
 
 	entries := []*TrustmeshEntry{}
 
-	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries te1 where not exists (select * from trustmesh_entries te2 where te1.baseledger_transaction_id = te2.referenced_baseledger_transaction_id)").Find(&entries)
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries te1 where entry_type = 'SuggestionReceived' and workstep_type <> 'FinalWorkstep' and not exists (select * from trustmesh_entries te2 where te1.baseledger_transaction_id = te2.referenced_baseledger_transaction_id)").Find(&entries)
 
 	if res.Error != nil {
 		logger.Errorf("Error when getting pending entries %v", res.Error.Error())
@@ -101,7 +101,7 @@ func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
 	return entries, nil
 }
 
-func GetFirstRelatedTrustmeshEntry(id string) (*TrustmeshEntry, error) {
+func GetFirstSubsequentTrustmeshEntry(id string) (*TrustmeshEntry, error) {
 	db := dbutil.Db.GetConn()
 
 	entry := &TrustmeshEntry{}
@@ -112,15 +112,16 @@ func GetFirstRelatedTrustmeshEntry(id string) (*TrustmeshEntry, error) {
 	}
 
 	relatedEntry := &TrustmeshEntry{}
-	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where referenced_baseledger_transaction_id = ? order by created_at desc limit 1", entry.BaseledgerTransactionId).Find(&relatedEntry)
+	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where trustmesh_id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&relatedEntry)
 
 	if res.Error != nil {
 		logger.Errorf("error when getting related trustmesh entry from db %v\n", res.Error)
-		return entry, nil
+		return nil, res.Error
 	}
 
 	if res.RowsAffected == 0 {
-		return entry, nil
+		logger.Infof("first subsequent entry not found")
+		return nil, nil
 	}
 
 	return relatedEntry, nil
