@@ -120,6 +120,7 @@ ALTER TABLE ONLY public.offchain_process_messages ADD CONSTRAINT offchain_proces
 
 CREATE TABLE public.trustmesh_entries (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
   tendermint_block_id text,
   tendermint_transaction_id uuid,
   tendermint_transaction_timestamp timestamp with time zone,

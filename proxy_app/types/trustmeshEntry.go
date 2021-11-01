@@ -11,6 +11,7 @@ import (
 )
 
 type TrustmeshEntry struct {
+	Id                                   uuid.UUID
 	TendermintBlockId                    sql.NullString
 	TendermintTransactionId              uuid.UUID
 	TendermintTransactionTimestamp       sql.NullTime
@@ -83,4 +84,45 @@ func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
 	}
 
 	return &trustmesh, nil
+}
+
+func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
+	db := dbutil.Db.GetConn()
+
+	entries := []*TrustmeshEntry{}
+
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries te1 where entry_type = 'SuggestionReceived' and workstep_type <> 'FinalWorkstep' and not exists (select * from trustmesh_entries te2 where te1.baseledger_transaction_id = te2.referenced_baseledger_transaction_id)").Find(&entries)
+
+	if res.Error != nil {
+		logger.Errorf("Error when getting pending entries %v", res.Error.Error())
+		return nil, res.Error
+	}
+
+	return entries, nil
+}
+
+func GetFirstSubsequentTrustmeshEntry(id string) (*TrustmeshEntry, error) {
+	db := dbutil.Db.GetConn()
+
+	entry := &TrustmeshEntry{}
+	res := db.Preload("OffchainProcessMessage").First(&entry, "id = ?", id)
+	if res.Error != nil {
+		logger.Errorf("error when getting trustmesh entry from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	relatedEntry := &TrustmeshEntry{}
+	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&relatedEntry)
+
+	if res.Error != nil {
+		logger.Errorf("error when getting related trustmesh entry from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		logger.Infof("first subsequent entry not found")
+		return nil, nil
+	}
+
+	return relatedEntry, nil
 }
