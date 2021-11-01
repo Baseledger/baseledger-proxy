@@ -112,7 +112,7 @@ func GetFirstSubsequentTrustmeshEntry(id string) (*TrustmeshEntry, error) {
 	}
 
 	relatedEntry := &TrustmeshEntry{}
-	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where trustmesh_id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&relatedEntry)
+	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&relatedEntry)
 
 	if res.Error != nil {
 		logger.Errorf("error when getting related trustmesh entry from db %v\n", res.Error)
