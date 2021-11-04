@@ -81,7 +81,7 @@ func GetSorWebhooksHandler() gin.HandlerFunc {
 // @Description Create new SOR webhook
 // @Tags SOR Webhook
 // @Accept json
-// @Param body createSorWebhookRequest true "SOR Webhook Request"
+// @Param sorWebhook body createSuggestionRequest true "Suggestion Request"
 // @Success 200 {string} types.SorWebhook
 // @Failure 400,422,500 {string} errorMessage
 // @Router /sorwebhook [post]

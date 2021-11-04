@@ -193,7 +193,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Feedback Request",
-                        "name": "user",
+                        "name": "feedback",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -273,7 +273,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Organization Request",
-                        "name": "user",
+                        "name": "organization",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -348,6 +348,136 @@ var doc = `{
                 }
             }
         },
+        "/sorwebhook": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get sor webhooks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SOR Webhooks"
+                ],
+                "summary": "Get sor webhooks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.workgroupMemberDetailsDto"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Create new SOR webhook",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SOR Webhook"
+                ],
+                "summary": "Create new SOR webhook based on parameters",
+                "parameters": [
+                    {
+                        "description": "Suggestion Request",
+                        "name": "sorWebhook",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createSuggestionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/sorwebhook/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Delete sorWebhook member",
+                "tags": [
+                    "SorWebhook Members"
+                ],
+                "summary": "Delete sorWebhook member",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/suggestion": {
             "post": {
                 "security": [
@@ -366,7 +496,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Suggestion Request",
-                        "name": "user",
+                        "name": "suggestion",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -558,7 +688,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Workgroup Request",
-                        "name": "user",
+                        "name": "workgroup",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -694,7 +824,7 @@ var doc = `{
                     },
                     {
                         "description": "Workgroup Member Request",
-                        "name": "user",
+                        "name": "workgroupMember",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -845,6 +975,9 @@ var doc = `{
                     "type": "string"
                 },
                 "recipient": {
+                    "type": "string"
+                },
+                "referenced_workstep_type": {
                     "type": "string"
                 },
                 "workgroup_id": {
