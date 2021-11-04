@@ -74,8 +74,8 @@ func main() {
 	r.DELETE("/sorwebhook/:id", basicAuth, handler.DeleteSorWebhookHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
-	r.GET("/trustmeshentry", basicAuth, handler.FetchNewSuggestions())
-	r.GET("/trustmeshentry/:id", basicAuth, handler.FetchTrustmeshEntryUpdates())
+	r.GET("/workflow/new", basicAuth, handler.GetNewWorkflowHandler())
+	r.GET("/workflow/latestState/:bo_id", basicAuth, handler.GetLatestWorkflowStateHandler())
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
 	r.POST("/dev/tx", proxyMiddleware.AuthorizeJWTMiddleware(), rateMiddleware, handler.CreateTransactionHandler())

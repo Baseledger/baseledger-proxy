@@ -101,28 +101,29 @@ func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
 	return entries, nil
 }
 
-func GetFirstSubsequentTrustmeshEntry(id string) (*TrustmeshEntry, error) {
+func GetLatestTrustmeshEntryBasedOnBusinessObjectId(boId string) (*TrustmeshEntry, error) {
 	db := dbutil.Db.GetConn()
 
+	// getting trustmesh entry first to get it's trustmesh
 	entry := &TrustmeshEntry{}
-	res := db.Preload("OffchainProcessMessage").First(&entry, "id = ?", id)
+	res := db.First(&entry, "baseledger_business_object_id = ?", boId)
 	if res.Error != nil {
 		logger.Errorf("error when getting trustmesh entry from db %v\n", res.Error)
 		return nil, res.Error
 	}
 
-	relatedEntry := &TrustmeshEntry{}
-	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&relatedEntry)
+	latestEntry := &TrustmeshEntry{}
+	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where trustmesh_id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&latestEntry)
 
 	if res.Error != nil {
-		logger.Errorf("error when getting related trustmesh entry from db %v\n", res.Error)
+		logger.Errorf("error when getting latest trustmesh entry from db %v\n", res.Error)
 		return nil, res.Error
 	}
 
 	if res.RowsAffected == 0 {
-		logger.Infof("first subsequent entry not found")
+		logger.Infof("latest workflow entry not found")
 		return nil, nil
 	}
 
-	return relatedEntry, nil
+	return latestEntry, nil
 }
