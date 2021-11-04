@@ -27,6 +27,15 @@ type latestTrustmeshEntryDto struct {
 	Approved                   bool   `json:"approved"`
 }
 
+// @Security BasicAuth
+// GetNewWorkflowHandler ... Get trustmesh entries where suggestion received is the latest state
+// @Summary Get trustmesh entries where suggestion received is the latest state
+// @Description get trustmesh entries where suggestion received is the latest state
+// @Tags Workflow
+// @Produce json
+// @Success 200 {array} newWorkflowDto
+// @Failure 400 {string} errorMessage
+// @Router /workflow/new [get]
 func GetNewWorkflowHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		res, err := types.GetPendingTrustmeshEntries()
@@ -58,6 +67,16 @@ func GetNewWorkflowHandler() gin.HandlerFunc {
 	}
 }
 
+// @Security BasicAuth
+// GetLatestWorkflowStateHandler ... Get latest trustmesh entry for a specific baseledger_business_object_id
+// @Summary Get latest trustmesh entry for a specific baseledger_business_object_id
+// @Description get latest trustmesh entry for a specific baseledger_business_object_id
+// @Tags Workflow
+// @Produce json
+// @Param bo_id path string format "uuid" "bo_id"
+// @Success 200 {object} latestTrustmeshEntryDto
+// @Failure 400 {string} errorMessage
+// @Router /workflow/latestState/{bo_id} [get]
 func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		baseledgerBusinessObjectId := c.Param("bo_id")

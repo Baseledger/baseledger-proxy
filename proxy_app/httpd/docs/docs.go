@@ -644,6 +644,79 @@ var doc = `{
                 }
             }
         },
+        "/workflow/latestState/{bo_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get latest trustmesh entry for a specific baseledger_business_object_id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Get latest trustmesh entry for a specific baseledger_business_object_id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "bo_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.latestTrustmeshEntryDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/new": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get trustmesh entries where suggestion received is the latest state",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Get trustmesh entries where suggestion received is the latest state",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.newWorkflowDto"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/workgroup": {
             "get": {
                 "security": [
@@ -1021,6 +1094,53 @@ var doc = `{
                 }
             }
         },
+        "handler.latestTrustmeshEntryDto": {
+            "type": "object",
+            "properties": {
+                "approved": {
+                    "type": "boolean"
+                },
+                "baseledger_business_object_id": {
+                    "type": "string"
+                },
+                "business_object_json_payload": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "description": "Id of the trustmesh",
+                    "type": "string"
+                },
+                "workstep_id": {
+                    "description": "Id of the latest trustmesh entry id",
+                    "type": "string"
+                },
+                "workstep_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.newWorkflowDto": {
+            "type": "object",
+            "properties": {
+                "baseledger_business_object_id": {
+                    "type": "string"
+                },
+                "business_object_json_payload": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "description": "Id of the trustmesh",
+                    "type": "string"
+                },
+                "workstep_id": {
+                    "description": "Id of the latest trustmesh entry id",
+                    "type": "string"
+                },
+                "workstep_type": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.orgDetailsDto": {
             "type": "object",
             "properties": {
@@ -1243,7 +1363,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0.0",
-	Host:        "137.184.72.13:8081",
+	Host:        "localhost:8081",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Baseledger Proxy API documentation",
