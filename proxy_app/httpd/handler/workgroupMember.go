@@ -65,7 +65,7 @@ func GetWorkgroupMembersHandler() gin.HandlerFunc {
 // @Tags Workgroup Members
 // @Accept json
 // @Param id path string format "uuid" "id"
-// @Param user body createWorkgroupMemberRequest true "Workgroup Member Request"
+// @Param workgroupMember body createWorkgroupMemberRequest true "Workgroup Member Request"
 // @Success 200 {string} types.WorkgroupMember
 // @Failure 400,422,500 {string} errorMessage
 // @Router /workgroup/{id}/participation [post]

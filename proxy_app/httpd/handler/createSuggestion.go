@@ -35,7 +35,7 @@ type createSuggestionRequest struct {
 // @Description Create new suggestion
 // @Tags Suggestions
 // @Accept json
-// @Param user body createSuggestionRequest true "Suggestion Request"
+// @Param suggestion body createSuggestionRequest true "Suggestion Request"
 // @Success 200 {string} txHash
 // @Failure 400,422,500 {string} errorMessage
 // @Router /suggestion [post]

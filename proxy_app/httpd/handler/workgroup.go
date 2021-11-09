@@ -55,7 +55,7 @@ func GetWorkgroupsHandler() gin.HandlerFunc {
 // @Description Create new workgroup
 // @Tags Workgroups
 // @Accept json
-// @Param user body createWorkgroupRequest true "Workgroup Request"
+// @Param workgroup body createWorkgroupRequest true "Workgroup Request"
 // @Success 200 {string} types.Workgroup
 // @Failure 400,422,500 {string} errorMessage
 // @Router /workgroup [post]

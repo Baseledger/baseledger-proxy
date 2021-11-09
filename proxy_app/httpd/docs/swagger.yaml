@@ -45,6 +45,8 @@ definitions:
         type: string
       recipient:
         type: string
+      referenced_workstep_type:
+        type: string
       workgroup_id:
         type: string
     type: object
@@ -69,6 +71,38 @@ definitions:
       name:
         type: string
       privatize_key:
+        type: string
+    type: object
+  handler.latestTrustmeshEntryDto:
+    properties:
+      approved:
+        type: boolean
+      baseledger_business_object_id:
+        type: string
+      business_object_json_payload:
+        type: string
+      workflow_id:
+        description: Id of the trustmesh
+        type: string
+      workstep_id:
+        description: Id of the latest trustmesh entry id
+        type: string
+      workstep_type:
+        type: string
+    type: object
+  handler.newWorkflowDto:
+    properties:
+      baseledger_business_object_id:
+        type: string
+      business_object_json_payload:
+        type: string
+      workflow_id:
+        description: Id of the trustmesh
+        type: string
+      workstep_id:
+        description: Id of the latest trustmesh entry id
+        type: string
+      workstep_type:
         type: string
     type: object
   handler.orgDetailsDto:
@@ -200,7 +234,7 @@ definitions:
       workgroup_id:
         type: string
     type: object
-host: 137.184.72.13:8081
+host: localhost:8081
 info:
   contact: {}
   title: Baseledger Proxy API documentation
@@ -312,7 +346,7 @@ paths:
       parameters:
       - description: Feedback Request
         in: body
-        name: user
+        name: feedback
         required: true
         schema:
           $ref: '#/definitions/handler.createSynchronizationFeedbackRequest'
@@ -362,7 +396,7 @@ paths:
       parameters:
       - description: Organization Request
         in: body
-        name: user
+        name: organization
         required: true
         schema:
           $ref: '#/definitions/handler.createOrgRequest'
@@ -412,6 +446,87 @@ paths:
       summary: Delete organization
       tags:
       - Organizations
+  /sorwebhook:
+    get:
+      consumes:
+      - application/json
+      description: get sor webhooks
+      parameters:
+      - description: uuid
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.workgroupMemberDetailsDto'
+            type: array
+      security:
+      - BasicAuth: []
+      summary: Get sor webhooks
+      tags:
+      - SOR Webhooks
+    post:
+      consumes:
+      - application/json
+      description: Create new SOR webhook
+      parameters:
+      - description: Suggestion Request
+        in: body
+        name: sorWebhook
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createSuggestionRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Create new SOR webhook based on parameters
+      tags:
+      - SOR Webhook
+  /sorwebhook/{id}:
+    delete:
+      description: Delete sorWebhook member
+      parameters:
+      - description: uuid
+        in: path
+        name: id
+        type: string
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Delete sorWebhook member
+      tags:
+      - SorWebhook Members
   /suggestion:
     post:
       consumes:
@@ -420,7 +535,7 @@ paths:
       parameters:
       - description: Suggestion Request
         in: body
-        name: user
+        name: suggestion
         required: true
         schema:
           $ref: '#/definitions/handler.createSuggestionRequest'
@@ -515,6 +630,51 @@ paths:
       summary: Get single trustmesh
       tags:
       - Trustmesh
+  /workflow/latestState/{bo_id}:
+    get:
+      description: get latest trustmesh entry for a specific baseledger_business_object_id
+      parameters:
+      - description: uuid
+        in: path
+        name: bo_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.latestTrustmeshEntryDto'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get latest trustmesh entry for a specific baseledger_business_object_id
+      tags:
+      - Workflow
+  /workflow/new:
+    get:
+      description: get trustmesh entries where suggestion received is the latest state
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.newWorkflowDto'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Get trustmesh entries where suggestion received is the latest state
+      tags:
+      - Workflow
   /workgroup:
     get:
       description: get all workgroups
@@ -539,7 +699,7 @@ paths:
       parameters:
       - description: Workgroup Request
         in: body
-        name: user
+        name: workgroup
         required: true
         schema:
           $ref: '#/definitions/handler.createWorkgroupRequest'
@@ -624,7 +784,7 @@ paths:
         type: string
       - description: Workgroup Member Request
         in: body
-        name: user
+        name: workgroupMember
         required: true
         schema:
           $ref: '#/definitions/handler.createWorkgroupMemberRequest'

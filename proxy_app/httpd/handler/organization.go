@@ -52,7 +52,7 @@ func GetOrganizationsHandler() gin.HandlerFunc {
 // @Description Create new organization
 // @Tags Organizations
 // @Accept json
-// @Param user body createOrgRequest true "Organization Request"
+// @Param organization body createOrgRequest true "Organization Request"
 // @Success 200 {string} types.Organization
 // @Failure 400,422,500 {string} errorMessage
 // @Router /organization [post]

@@ -10,22 +10,33 @@ import (
 	"github.com/unibrightio/proxy-api/types"
 )
 
-type pendingTrustmeshEntryDto struct {
-	TrustmeshEntryId          string `json:"trustmesh_entry_id"`
-	WorkstepType              string `json:"workstep_type"`
-	BusinessObjectJsonPayload string `json:"business_object_json_payload"`
+type newWorkflowDto struct {
+	WorkflowId                 string `json:"workflow_id"` // Id of the trustmesh
+	WorkstepId                 string `json:"workstep_id"` // Id of the latest trustmesh entry id
+	WorkstepType               string `json:"workstep_type"`
+	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
+	BusinessObjectJsonPayload  string `json:"business_object_json_payload"`
 }
 
-type relatedTrustmeshEntryDto struct {
-	TrustmeshEntryId          string `json:"trustmesh_entry_id"`
-	WorkstepType              string `json:"workstep_type"`
-	BusinessObjectJsonPayload string `json:"business_object_json_payload"`
-	NewObjectStatus           int    `json:"new_object_status"`
-	Origin                    string `json:"origin"`
-	Message                   string `json:"message"`
+type latestTrustmeshEntryDto struct {
+	WorkflowId                 string `json:"workflow_id"` // Id of the trustmesh
+	WorkstepId                 string `json:"workstep_id"` // Id of the latest trustmesh entry id
+	WorkstepType               string `json:"workstep_type"`
+	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
+	BusinessObjectJsonPayload  string `json:"business_object_json_payload"`
+	Approved                   bool   `json:"approved"`
 }
 
-func FetchNewSuggestions() gin.HandlerFunc {
+// @Security BasicAuth
+// GetNewWorkflowHandler ... Get trustmesh entries where suggestion received is the latest state
+// @Summary Get trustmesh entries where suggestion received is the latest state
+// @Description get trustmesh entries where suggestion received is the latest state
+// @Tags Workflow
+// @Produce json
+// @Success 200 {array} newWorkflowDto
+// @Failure 400 {string} errorMessage
+// @Router /workflow/new [get]
+func GetNewWorkflowHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		res, err := types.GetPendingTrustmeshEntries()
 
@@ -34,17 +45,19 @@ func FetchNewSuggestions() gin.HandlerFunc {
 			return
 		}
 
-		dtos := []pendingTrustmeshEntryDto{}
+		dtos := []newWorkflowDto{}
 
 		for _, entry := range res {
 			syncTree := &synctree.BaseledgerSyncTree{}
 			json.Unmarshal([]byte(entry.OffchainProcessMessage.BaseledgerSyncTreeJson), &syncTree)
 
 			boJson := synctree.GetBusinessObjectJson(*syncTree)
-			dto := &pendingTrustmeshEntryDto{
-				TrustmeshEntryId:          entry.Id.String(),
-				WorkstepType:              entry.WorkstepType,
-				BusinessObjectJsonPayload: boJson,
+			dto := &newWorkflowDto{
+				WorkflowId:                 entry.TrustmeshId.String(),
+				WorkstepId:                 entry.Id.String(),
+				WorkstepType:               entry.WorkstepType,
+				BaseledgerBusinessObjectId: entry.BaseledgerBusinessObjectId,
+				BusinessObjectJsonPayload:  boJson,
 			}
 
 			dtos = append(dtos, *dto)
@@ -54,31 +67,42 @@ func FetchNewSuggestions() gin.HandlerFunc {
 	}
 }
 
-func FetchTrustmeshEntryUpdates() gin.HandlerFunc {
+// @Security BasicAuth
+// GetLatestWorkflowStateHandler ... Get latest trustmesh entry for a specific baseledger_business_object_id
+// @Summary Get latest trustmesh entry for a specific baseledger_business_object_id
+// @Description get latest trustmesh entry for a specific baseledger_business_object_id
+// @Tags Workflow
+// @Produce json
+// @Param bo_id path string format "uuid" "bo_id"
+// @Success 200 {object} latestTrustmeshEntryDto
+// @Failure 400 {string} errorMessage
+// @Router /workflow/latestState/{bo_id} [get]
+func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		entryId := c.Param("id")
-		res, err := types.GetFirstSubsequentTrustmeshEntry(entryId)
+		baseledgerBusinessObjectId := c.Param("bo_id")
+
+		entry, err := types.GetLatestTrustmeshEntryBasedOnBusinessObjectId(baseledgerBusinessObjectId)
 
 		if err != nil {
-			restutil.RenderError("error when fetching related entries", 400, c)
+			restutil.RenderError("error when fetching latest worfkflow entry", 400, c)
 			return
 		}
 
-		status := 0
-		if res.OffchainProcessMessage.BaseledgerTransactionType == "Approve" {
-			status = 1
+		approved := false
+		if entry.OffchainProcessMessage.BaseledgerTransactionType == "Approve" {
+			approved = true
 		}
 		syncTree := &synctree.BaseledgerSyncTree{}
-		json.Unmarshal([]byte(res.OffchainProcessMessage.BaseledgerSyncTreeJson), &syncTree)
+		json.Unmarshal([]byte(entry.OffchainProcessMessage.BaseledgerSyncTreeJson), &syncTree)
 
 		boJson := synctree.GetBusinessObjectJson(*syncTree)
-		dto := &relatedTrustmeshEntryDto{
-			TrustmeshEntryId:          res.Id.String(),
-			WorkstepType:              res.WorkstepType,
-			Message:                   res.OffchainProcessMessage.StatusTextMessage,
-			BusinessObjectJsonPayload: boJson,
-			NewObjectStatus:           status,
-			Origin:                    getEntryOrigin(res),
+		dto := &latestTrustmeshEntryDto{
+			WorkflowId:                 entry.TrustmeshId.String(),
+			WorkstepId:                 entry.Id.String(),
+			WorkstepType:               entry.WorkstepType,
+			BaseledgerBusinessObjectId: entry.BaseledgerBusinessObjectId,
+			BusinessObjectJsonPayload:  boJson,
+			Approved:                   approved,
 		}
 
 		restutil.Render(dto, 200, c)

@@ -193,7 +193,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Feedback Request",
-                        "name": "user",
+                        "name": "feedback",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -273,7 +273,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Organization Request",
-                        "name": "user",
+                        "name": "organization",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -348,6 +348,136 @@ var doc = `{
                 }
             }
         },
+        "/sorwebhook": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get sor webhooks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SOR Webhooks"
+                ],
+                "summary": "Get sor webhooks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.workgroupMemberDetailsDto"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Create new SOR webhook",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SOR Webhook"
+                ],
+                "summary": "Create new SOR webhook based on parameters",
+                "parameters": [
+                    {
+                        "description": "Suggestion Request",
+                        "name": "sorWebhook",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createSuggestionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/sorwebhook/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Delete sorWebhook member",
+                "tags": [
+                    "SorWebhook Members"
+                ],
+                "summary": "Delete sorWebhook member",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/suggestion": {
             "post": {
                 "security": [
@@ -366,7 +496,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Suggestion Request",
-                        "name": "user",
+                        "name": "suggestion",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -514,6 +644,79 @@ var doc = `{
                 }
             }
         },
+        "/workflow/latestState/{bo_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get latest trustmesh entry for a specific baseledger_business_object_id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Get latest trustmesh entry for a specific baseledger_business_object_id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid",
+                        "name": "bo_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.latestTrustmeshEntryDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/workflow/new": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get trustmesh entries where suggestion received is the latest state",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workflow"
+                ],
+                "summary": "Get trustmesh entries where suggestion received is the latest state",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.newWorkflowDto"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/workgroup": {
             "get": {
                 "security": [
@@ -558,7 +761,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Workgroup Request",
-                        "name": "user",
+                        "name": "workgroup",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -694,7 +897,7 @@ var doc = `{
                     },
                     {
                         "description": "Workgroup Member Request",
-                        "name": "user",
+                        "name": "workgroupMember",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -847,6 +1050,9 @@ var doc = `{
                 "recipient": {
                     "type": "string"
                 },
+                "referenced_workstep_type": {
+                    "type": "string"
+                },
                 "workgroup_id": {
                     "type": "string"
                 }
@@ -884,6 +1090,53 @@ var doc = `{
                     "type": "string"
                 },
                 "privatize_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.latestTrustmeshEntryDto": {
+            "type": "object",
+            "properties": {
+                "approved": {
+                    "type": "boolean"
+                },
+                "baseledger_business_object_id": {
+                    "type": "string"
+                },
+                "business_object_json_payload": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "description": "Id of the trustmesh",
+                    "type": "string"
+                },
+                "workstep_id": {
+                    "description": "Id of the latest trustmesh entry id",
+                    "type": "string"
+                },
+                "workstep_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.newWorkflowDto": {
+            "type": "object",
+            "properties": {
+                "baseledger_business_object_id": {
+                    "type": "string"
+                },
+                "business_object_json_payload": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "description": "Id of the trustmesh",
+                    "type": "string"
+                },
+                "workstep_id": {
+                    "description": "Id of the latest trustmesh entry id",
+                    "type": "string"
+                },
+                "workstep_type": {
                     "type": "string"
                 }
             }
@@ -1110,7 +1363,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0.0",
-	Host:        "137.184.72.13:8081",
+	Host:        "localhost:8081",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "Baseledger Proxy API documentation",

@@ -33,7 +33,7 @@ type createSynchronizationFeedbackRequest struct {
 // @Description Create new feedback
 // @Tags Feedbacks
 // @Accept json
-// @Param user body createSynchronizationFeedbackRequest true "Feedback Request"
+// @Param feedback body createSynchronizationFeedbackRequest true "Feedback Request"
 // @Success 200 {string} txHash
 // @Failure 400,422,500 {string} errorMessage
 // @Router /feedback [post]
