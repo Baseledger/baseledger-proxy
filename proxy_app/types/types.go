@@ -16,7 +16,6 @@ type OffchainProcessMessage struct {
 	SenderId                             uuid.UUID
 	ReceiverId                           uuid.UUID
 	Topic                                string
-	ReferencedOffchainProcessMessageId   uuid.UUID
 	BaseledgerSyncTreeJson               string
 	WorkstepType                         string
 	ReferencedWorkstepType               string
@@ -38,12 +37,12 @@ type NatsMessage struct {
 	TxHash         string
 }
 
-// TODO rename after clean up
-type SynchronizationRequest struct {
+type NewSuggestionRequest struct {
 	WorkgroupId                          uuid.UUID
 	Recipient                            string
 	WorkstepType                         string
 	BusinessObjectType                   string
+	BusinessObjectId                     string
 	BaseledgerBusinessObjectId           string
 	BusinessObjectJson                   string
 	ReferencedBaseledgerBusinessObjectId string
@@ -51,7 +50,7 @@ type SynchronizationRequest struct {
 	KnowledgeLimiters                    []string
 }
 
-type SynchronizationFeedback struct {
+type NewFeedbackRequest struct {
 	WorkgroupId                                uuid.UUID
 	BaseledgerProvenBusinessObjectJson         string
 	BusinessObjectType                         string
@@ -68,7 +67,6 @@ type BaseledgerTransactionPayload struct {
 	SenderId                             string
 	TransactionType                      string
 	OffchainMessageId                    string
-	ReferencedOffchainMessageId          string
 	ReferencedBaseledgerTransactionId    string
 	BaseledgerTransactionId              string
 	Proof                                string

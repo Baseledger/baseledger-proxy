@@ -29,7 +29,7 @@ type workgroupMock struct {
 }
 
 type IBaseledgerProxy interface {
-	CreateBaseledgerTransactionPayload(synchronizationRequest *types.SynchronizationRequest) (string, string)
+	CreateBaseledgerTransactionPayload(synchronizationRequest *types.NewSuggestionRequest) (string, string)
 	SendOffchainProcessMessage(message types.OffchainProcessMessage, txHash string)
 }
 
@@ -55,25 +55,22 @@ func NewBaseledgerProxy() BaseledgerProxy {
 	return proxy
 }
 
-func CreateBaseledgerTransactionPayload(
-	synchronizationRequest *types.SynchronizationRequest,
+func CreateNewSuggestionBaseledgerTransactionPayload(
+	newSuggestionRequest *types.NewSuggestionRequest,
 	offchainProcessMessage *types.OffchainProcessMessage,
 ) string {
 	// Do we need client anymore now when we split apps? Maybe just simple query util like for other entities?
 	// should we load workgroup at start and keep it in memory, we are querying it all the time and it won't change
 	workgroupClient := &workgroups.PostgresWorkgroupClient{}
-	workgroup := workgroupClient.FindWorkgroup(synchronizationRequest.WorkgroupId.String())
+	workgroup := workgroupClient.FindWorkgroup(newSuggestionRequest.WorkgroupId.String())
 
 	payload := &types.BaseledgerTransactionPayload{
-		SenderId:                             viper.Get("ORGANIZATION_ID").(string),
-		TransactionType:                      "Suggest",
-		OffchainMessageId:                    offchainProcessMessage.Id.String(),
-		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
-		ReferencedBaseledgerTransactionId:    synchronizationRequest.ReferencedBaseledgerTransactionId,
-		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof.String(),
-		Proof:                                offchainProcessMessage.BusinessObjectProof,
-		BaseledgerBusinessObjectId:           synchronizationRequest.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: synchronizationRequest.ReferencedBaseledgerBusinessObjectId,
+		SenderId:                   offchainProcessMessage.SenderId.String(),
+		TransactionType:            offchainProcessMessage.BaseledgerTransactionType,
+		OffchainMessageId:          offchainProcessMessage.Id.String(),
+		BaseledgerTransactionId:    offchainProcessMessage.BaseledgerTransactionIdOfStoredProof.String(),
+		Proof:                      offchainProcessMessage.BusinessObjectProof,
+		BaseledgerBusinessObjectId: newSuggestionRequest.BaseledgerBusinessObjectId,
 	}
 
 	logger.Infof("\n payload %v \n", *payload)
@@ -100,23 +97,18 @@ func CreateExitBaseledgerTransactionPayload(
 	return privatizeExitPayload(payload, workgroup.PrivatizeKey)
 }
 
-func CreateBaseledgerTransactionFeedbackPayload(
-	synchronizationFeedback *types.SynchronizationFeedback,
+func CreateNewFeedbackBaseledgerTransactionPayload(
+	newFeedbackRequest *types.NewFeedbackRequest,
 	offchainProcessMessage *types.OffchainProcessMessage,
 ) string {
 	workgroupClient := &workgroups.PostgresWorkgroupClient{}
-	workgroup := workgroupClient.FindWorkgroup(synchronizationFeedback.WorkgroupId.String())
+	workgroup := workgroupClient.FindWorkgroup(newFeedbackRequest.WorkgroupId.String())
 
-	feedbackMsg := "Approve"
-	if !synchronizationFeedback.Approved {
-		feedbackMsg = "Reject"
-	}
 	payload := &types.BaseledgerTransactionPayload{
 		SenderId:                             viper.Get("ORGANIZATION_ID").(string),
-		TransactionType:                      feedbackMsg,
+		TransactionType:                      offchainProcessMessage.BaseledgerTransactionType,
 		OffchainMessageId:                    offchainProcessMessage.Id.String(),
-		ReferencedOffchainMessageId:          offchainProcessMessage.ReferencedOffchainProcessMessageId.String(),
-		ReferencedBaseledgerTransactionId:    synchronizationFeedback.OriginalBaseledgerTransactionId,
+		ReferencedBaseledgerTransactionId:    newFeedbackRequest.OriginalBaseledgerTransactionId,
 		BaseledgerTransactionId:              offchainProcessMessage.BaseledgerTransactionIdOfStoredProof.String(),
 		Proof:                                offchainProcessMessage.BusinessObjectProof,
 		BaseledgerBusinessObjectId:           offchainProcessMessage.BaseledgerBusinessObjectId,

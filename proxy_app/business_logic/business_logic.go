@@ -101,6 +101,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 				types.CreateObject,
 				&trustmeshEntry,
 				boJson,
+				"",
+				offchainMessage.StatusTextMessage,
+				offchainMessage.SenderId.String(),
 			)
 			break
 		}
@@ -150,21 +153,26 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 		logger.Infof("Business object unmarshalled", bo)
-		status := "success"
-		if trustmeshEntry.BaseledgerTransactionType == "Reject" {
-			status = "error"
+		status := "1"
+		if trustmeshEntry.BaseledgerTransactionType == common.BaseledgerTransactionTypeReject {
+			status = "0"
 		}
 
 		logger.Infof("Sending feedback received status update %v\n", status)
+
 		systemofrecord.TriggerSorWebhook(
 			types.UpdateObject,
 			&trustmeshEntry,
-			status)
+			"",
+			status,
+			offchainMessage.StatusTextMessage,
+			offchainMessage.SenderId.String())
 
-		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == "FinalWorkstep" && status == "success"
+		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == common.WorkstepTypeFinal && status == "success"
 		if exitOnFinalWorkstep {
 			exitToEth(&trustmeshEntry)
 		}
+
 	default:
 		logger.Errorf("unknown business process %v\n", trustmeshEntry.EntryType)
 		panic(errors.New("uknown business process!"))

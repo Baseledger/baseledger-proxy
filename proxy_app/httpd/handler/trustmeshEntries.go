@@ -41,7 +41,7 @@ func GetNewWorkflowHandler() gin.HandlerFunc {
 		res, err := types.GetPendingTrustmeshEntries()
 
 		if err != nil {
-			restutil.RenderError("error when fetching pending entries", 400, c)
+			restutil.Render("error when fetching pending entries", 400, c)
 			return
 		}
 
@@ -81,7 +81,7 @@ func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		baseledgerBusinessObjectId := c.Param("bo_id")
 
-		entry, err := types.GetLatestTrustmeshEntryBasedOnBusinessObjectId(baseledgerBusinessObjectId)
+		entry, err := types.GetLatestTrustmeshEntryBasedOnBboid(baseledgerBusinessObjectId)
 
 		if err != nil {
 			restutil.RenderError("error when fetching latest worfkflow entry", 400, c)
@@ -89,7 +89,7 @@ func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 		}
 
 		approved := false
-		if entry.OffchainProcessMessage.BaseledgerTransactionType == "Approve" {
+		if entry.OffchainProcessMessage.BaseledgerTransactionType == common.BaseledgerTransactionTypeApprove {
 			approved = true
 		}
 		syncTree := &synctree.BaseledgerSyncTree{}

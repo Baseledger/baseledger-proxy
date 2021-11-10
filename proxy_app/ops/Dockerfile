@@ -1,4 +1,5 @@
 FROM golang:1.16-alpine
+RUN apk add build-base
 
 WORKDIR /apps
 
@@ -32,5 +33,7 @@ ENV ORGANIZATION_ID=$ORGANIZATION_ID
 ENV API_UB_USER=$API_UB_USER
 ENV API_UB_PWD=$API_UB_PWD
 ENV API_CONCIRCLE_USER=<user>
+
+RUN go build -o /proxy_app httpd/main.go
 
 CMD ["/proxy_app"]

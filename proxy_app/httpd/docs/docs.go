@@ -197,7 +197,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.createSynchronizationFeedbackRequest"
+                            "$ref": "#/definitions/handler.sendFeedbackDto"
                         }
                     }
                 ],
@@ -402,12 +402,12 @@ var doc = `{
                 "summary": "Create new SOR webhook based on parameters",
                 "parameters": [
                     {
-                        "description": "Suggestion Request",
+                        "description": "Create SOR webhook",
                         "name": "sorWebhook",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.createSuggestionRequest"
+                            "type": "object"
                         }
                     }
                 ],
@@ -500,7 +500,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.createSuggestionRequest"
+                            "$ref": "#/definitions/handler.sendSuggestionDto"
                         }
                     }
                 ],
@@ -988,76 +988,6 @@ var doc = `{
                 }
             }
         },
-        "handler.createSuggestionRequest": {
-            "type": "object",
-            "properties": {
-                "baseledger_business_object_id": {
-                    "type": "string"
-                },
-                "business_object_json": {
-                    "type": "string"
-                },
-                "business_object_type": {
-                    "type": "string"
-                },
-                "knowledge_limiters": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "recipient": {
-                    "type": "string"
-                },
-                "referenced_baseledger_business_object_id": {
-                    "type": "string"
-                },
-                "referenced_baseledger_transaction_id": {
-                    "type": "string"
-                },
-                "sor_message_id": {
-                    "type": "string"
-                },
-                "workgroup_id": {
-                    "type": "string"
-                },
-                "workstep_type": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.createSynchronizationFeedbackRequest": {
-            "type": "object",
-            "properties": {
-                "approved": {
-                    "type": "boolean"
-                },
-                "baseledger_business_object_id_of_approved_object": {
-                    "type": "string"
-                },
-                "business_object_type": {
-                    "type": "string"
-                },
-                "feedback_message": {
-                    "type": "string"
-                },
-                "original_baseledger_transaction_id": {
-                    "type": "string"
-                },
-                "original_offchain_process_message_id": {
-                    "type": "string"
-                },
-                "recipient": {
-                    "type": "string"
-                },
-                "referenced_workstep_type": {
-                    "type": "string"
-                },
-                "workgroup_id": {
-                    "type": "string"
-                }
-            }
-        },
         "handler.createTxDto": {
             "type": "object",
             "properties": {
@@ -1152,6 +1082,58 @@ var doc = `{
                 }
             }
         },
+        "handler.sendFeedbackDto": {
+            "type": "object",
+            "properties": {
+                "approved": {
+                    "type": "boolean"
+                },
+                "baseledger_business_object_id": {
+                    "type": "string"
+                },
+                "feedback_message": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.sendSuggestionDto": {
+            "type": "object",
+            "properties": {
+                "baseledger_business_object_id": {
+                    "type": "string"
+                },
+                "business_object_id": {
+                    "type": "string"
+                },
+                "business_object_json": {
+                    "type": "string"
+                },
+                "business_object_type": {
+                    "type": "string"
+                },
+                "knowledge_limiters": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "recipient": {
+                    "type": "string"
+                },
+                "workflow_id": {
+                    "type": "string"
+                },
+                "workgroup_id": {
+                    "type": "string"
+                },
+                "workstep_type": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.sunburstItem": {
             "type": "object",
             "properties": {
@@ -1239,6 +1221,9 @@ var doc = `{
                 "entryType": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "offchainProcessMessageId": {
                     "type": "string"
                 },
@@ -1252,9 +1237,6 @@ var doc = `{
                     "type": "string"
                 },
                 "referencedBaseledgerTransactionId": {
-                    "type": "string"
-                },
-                "referencedProcessMessageId": {
                     "type": "string"
                 },
                 "senderOrgId": {
@@ -1402,5 +1384,5 @@ func (s *s) ReadDoc() string {
 }
 
 func init() {
-	swag.Register(swag.Name, &s{})
+	swag.Register("swagger", &s{})
 }

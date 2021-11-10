@@ -38,3 +38,16 @@ func (client *PostgresWorkgroupClient) FindWorkgroupMember(workgroupId string, r
 
 	return &member
 }
+
+// valid only until we go with the assumtion 1 recipient == 1 workgroup
+func (client *PostgresWorkgroupClient) GetRecipientWorkgroupMember(recipientId string) *types.WorkgroupMember {
+	var member types.WorkgroupMember
+	dbError := dbutil.Db.GetConn().First(&member, "organization_id = ?", recipientId).Error
+
+	if dbError != nil {
+		logger.Errorf("error %s trying to fetch workgroup membership for organization with id %s\n", dbError, recipientId)
+		return nil
+	}
+
+	return &member
+}

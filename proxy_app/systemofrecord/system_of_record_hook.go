@@ -30,7 +30,10 @@ func InitClient() {
 func TriggerSorWebhook(
 	webhookType types.WebhookType,
 	trustmeshEntry *types.TrustmeshEntry,
-	specialParamPayload string, // This could be either business object json in Create object hook or Status in Update object hook
+	payload string,
+	approved string,
+	message string,
+	origin string,
 ) bool {
 
 	webhook := types.FetchWebhookByType(webhookType)
@@ -49,7 +52,15 @@ func TriggerSorWebhook(
 		targetUrl = handleBasicAuth(targetUrl, webhook.AuthUsername, webhook.AuthPassword)
 	}
 
-	requestBody := buildWebhookRequestBody(webhook.Body, webhook.BodyParams, webhook.WebhookType, trustmeshEntry, specialParamPayload)
+	requestBody := buildWebhookRequestBody(
+		webhook.Body,
+		webhook.BodyParams,
+		webhook.WebhookType,
+		trustmeshEntry,
+		payload,
+		approved,
+		message,
+		origin)
 
 	if requestBody == nil {
 		return false
@@ -93,7 +104,15 @@ func handleBasicAuth(targetUrl string, username string, password string) string 
 	return targetUrl
 }
 
-func buildWebhookRequestBody(bodyTemplate string, bodyParams string, webhookType types.WebhookType, trustmeshEntry *types.TrustmeshEntry, specialParamPayload string) *string {
+func buildWebhookRequestBody(
+	bodyTemplate string,
+	bodyParams string,
+	webhookType types.WebhookType,
+	trustmeshEntry *types.TrustmeshEntry,
+	payload string, // TODO: Move special params templating to a dedicated method
+	approved string,
+	message string,
+	origin string) *string {
 	logger.Infof("Building body..")
 
 	requestBody := bodyTemplate
@@ -107,10 +126,13 @@ func buildWebhookRequestBody(bodyTemplate string, bodyParams string, webhookType
 		}
 		requestBody = strings.Replace(requestBody, param.ParamName, fmt.Sprintf("%v", paramValue), 1)
 		if webhookType == types.CreateObject {
-			requestBody = strings.Replace(requestBody, "business_object_json_payload", specialParamPayload, 1) // TODO: Might be an issue with escaping quotes, look into concirlce_restutil line 101 for a fix
+			requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", payload, 1) // TODO: Might be an issue with escaping quotes, look into concirlce_restutil line 101 for a fix
 		} else {
-			requestBody = strings.Replace(requestBody, "new_object_status", specialParamPayload, 1)
+			requestBody = strings.Replace(requestBody, "{{approved}}", approved, 1)
+			requestBody = strings.Replace(requestBody, "{{message}}", message, 1)
 		}
+
+		requestBody = strings.Replace(requestBody, "{{origin}}", origin, 1)
 	}
 
 	logger.Infof("Body built %v\n", requestBody)

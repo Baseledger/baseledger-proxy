@@ -4,52 +4,6 @@ definitions:
       name:
         type: string
     type: object
-  handler.createSuggestionRequest:
-    properties:
-      baseledger_business_object_id:
-        type: string
-      business_object_json:
-        type: string
-      business_object_type:
-        type: string
-      knowledge_limiters:
-        items:
-          type: string
-        type: array
-      recipient:
-        type: string
-      referenced_baseledger_business_object_id:
-        type: string
-      referenced_baseledger_transaction_id:
-        type: string
-      sor_message_id:
-        type: string
-      workgroup_id:
-        type: string
-      workstep_type:
-        type: string
-    type: object
-  handler.createSynchronizationFeedbackRequest:
-    properties:
-      approved:
-        type: boolean
-      baseledger_business_object_id_of_approved_object:
-        type: string
-      business_object_type:
-        type: string
-      feedback_message:
-        type: string
-      original_baseledger_transaction_id:
-        type: string
-      original_offchain_process_message_id:
-        type: string
-      recipient:
-        type: string
-      referenced_workstep_type:
-        type: string
-      workgroup_id:
-        type: string
-    type: object
   handler.createTxDto:
     properties:
       op_code:
@@ -112,6 +66,40 @@ definitions:
       name:
         type: string
     type: object
+  handler.sendFeedbackDto:
+    properties:
+      approved:
+        type: boolean
+      baseledger_business_object_id:
+        type: string
+      feedback_message:
+        type: string
+      workflow_id:
+        type: string
+    type: object
+  handler.sendSuggestionDto:
+    properties:
+      baseledger_business_object_id:
+        type: string
+      business_object_id:
+        type: string
+      business_object_json:
+        type: string
+      business_object_type:
+        type: string
+      knowledge_limiters:
+        items:
+          type: string
+        type: array
+      recipient:
+        type: string
+      workflow_id:
+        type: string
+      workgroup_id:
+        type: string
+      workstep_type:
+        type: string
+    type: object
   handler.sunburstItem:
     properties:
       children:
@@ -169,6 +157,8 @@ definitions:
         type: string
       entryType:
         type: string
+      id:
+        type: string
       offchainProcessMessageId:
         type: string
       receiverOrgId:
@@ -178,8 +168,6 @@ definitions:
       referencedBaseledgerBusinessObjectId:
         type: string
       referencedBaseledgerTransactionId:
-        type: string
-      referencedProcessMessageId:
         type: string
       senderOrgId:
         type: string
@@ -349,7 +337,7 @@ paths:
         name: feedback
         required: true
         schema:
-          $ref: '#/definitions/handler.createSynchronizationFeedbackRequest'
+          $ref: '#/definitions/handler.sendFeedbackDto'
       responses:
         "200":
           description: OK
@@ -475,12 +463,12 @@ paths:
       - application/json
       description: Create new SOR webhook
       parameters:
-      - description: Suggestion Request
+      - description: Create SOR webhook
         in: body
         name: sorWebhook
         required: true
         schema:
-          $ref: '#/definitions/handler.createSuggestionRequest'
+          type: object
       responses:
         "200":
           description: OK
@@ -538,7 +526,7 @@ paths:
         name: suggestion
         required: true
         schema:
-          $ref: '#/definitions/handler.createSuggestionRequest'
+          $ref: '#/definitions/handler.sendSuggestionDto'
       responses:
         "200":
           description: OK

@@ -15,16 +15,19 @@ import (
 	"github.com/unibrightio/proxy-api/types"
 )
 
-type createSynchronizationFeedbackRequest struct {
-	WorkgroupId                                string `json:"workgroup_id"`
-	BusinessObjectType                         string `json:"business_object_type"`
-	ReferencedWorkstepType                     string `json:"referenced_workstep_type"`
-	Recipient                                  string `json:"recipient"`
-	Approved                                   bool   `json:"approved"`
-	BaseledgerBusinessObjectIdOfApprovedObject string `json:"baseledger_business_object_id_of_approved_object"`
-	OriginalBaseledgerTransactionId            string `json:"original_baseledger_transaction_id"`
-	OriginalOffchainProcessMessageId           string `json:"original_offchain_process_message_id"`
-	FeedbackMessage                            string `json:"feedback_message"`
+type sendFeedbackDto struct {
+	WorkflowId                 string `json:"workflow_id"`
+	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
+	Approved                   bool   `json:"approved"`
+	FeedbackMessage            string `json:"feedback_message"`
+}
+
+type sendFeedbackResponseDto struct {
+	WorkflowId                 string `json:"workflow_id"`
+	WorkstepId                 string `json:"workstep_id"`
+	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
+	TransactionHash            string `json:"transaction_hash"`
+	Error                      string `json:"error"`
 }
 
 // @Security BasicAuth
@@ -33,56 +36,87 @@ type createSynchronizationFeedbackRequest struct {
 // @Description Create new feedback
 // @Tags Feedbacks
 // @Accept json
-// @Param feedback body createSynchronizationFeedbackRequest true "Feedback Request"
+// @Param feedback body sendFeedbackDto true "Feedback Request"
 // @Success 200 {string} txHash
 // @Failure 400,422,500 {string} errorMessage
 // @Router /feedback [post]
 func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		responseDto := &sendFeedbackResponseDto{}
+
 		buf, err := c.GetRawData()
 		if err != nil {
-			restutil.RenderError(err.Error(), 400, c)
+			responseDto.Error = err.Error()
+			restutil.Render(responseDto, 400, c)
 			return
 		}
 
-		req := &createSynchronizationFeedbackRequest{}
-		err = json.Unmarshal(buf, &req)
+		dto := &sendFeedbackDto{}
+		err = json.Unmarshal(buf, &dto)
 		if err != nil {
-			restutil.RenderError(err.Error(), 422, c)
+			responseDto.Error = err.Error()
+			restutil.Render(responseDto, 422, c)
 			return
 		}
 
-		feedbackOffchainMessageId, err := uuid.FromString(req.OriginalOffchainProcessMessageId)
+		latestTrustmeshEntry := &types.TrustmeshEntry{}
+
+		if dto.BaseledgerBusinessObjectId != "" {
+			latestTrustmeshEntry, err = types.GetLatestTrustmeshEntryBasedOnBboid(dto.BaseledgerBusinessObjectId)
+
+			if err != nil {
+				responseDto.Error = err.Error()
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
+			if latestTrustmeshEntry.EntryType != common.SuggestionReceivedTrustmeshEntryType {
+				responseDto.Error = "Previous trustmesh entry is not of type Suggest"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+		} else if dto.WorkflowId != "" {
+			latestTrustmeshEntry, err = types.GetLatestTrustmeshEntryBasedOnTrustmeshId(dto.WorkflowId)
+
+			if err != nil {
+				responseDto.Error = err.Error()
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
+			if latestTrustmeshEntry.EntryType != common.SuggestionReceivedTrustmeshEntryType {
+				responseDto.Error = "Previous trustmesh entry is not of type Suggest"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+		} else {
+			responseDto.Error = "Both bboid and workflow id are missing. At least one must be provided"
+			restutil.Render(responseDto, 400, c)
+			return
+		}
+
+		suggestionReceivedOffchainMessage, err := types.GetOffchainMsgById(latestTrustmeshEntry.OffchainProcessMessageId)
 
 		if err != nil {
-			restutil.RenderError(err.Error(), 400, c)
+			responseDto.Error = err.Error()
+			restutil.Render(responseDto, 400, c)
 			return
 		}
 
-		feedbackOffchainMessage, err := types.GetOffchainMsgById(feedbackOffchainMessageId)
-
-		if err != nil {
-			restutil.RenderError(err.Error(), 400, c)
-			return
-		}
-
-		createFeedbackReq := newFeedbackRequest(*req, feedbackOffchainMessage)
+		newFeedbackRequest := newFeedbackRequest(*dto, *latestTrustmeshEntry, suggestionReceivedOffchainMessage)
 
 		transactionId := uuid.NewV4()
-		feedbackMsg := "Approve"
-		if !req.Approved {
-			feedbackMsg = "Reject"
-		}
 
-		offchainMsg := createFeedbackOffchainMessage(*req, feedbackOffchainMessage, transactionId, feedbackMsg)
+		feedbackOffchainMessage := createFeedbackOffchainMessage(*newFeedbackRequest, suggestionReceivedOffchainMessage, transactionId)
 
-		if !offchainMsg.Create() {
-			logger.Errorf("error when creating new offchain msg entry")
-			restutil.RenderError("error when creating new offchain msg entry", 500, c)
+		if !feedbackOffchainMessage.Create() {
+			responseDto.Error = "error when creating new offchain msg entry"
+			logger.Errorf(responseDto.Error)
+			restutil.Render(responseDto, 500, c)
 			return
 		}
 
-		payload := proxyutil.CreateBaseledgerTransactionFeedbackPayload(createFeedbackReq, &offchainMsg)
+		payload := proxyutil.CreateNewFeedbackBaseledgerTransactionPayload(newFeedbackRequest, &feedbackOffchainMessage)
 
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
@@ -93,19 +127,26 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload)
 
 		if transactionHash == nil {
-			restutil.RenderError("sign and broadcast transaction error", 500, c)
+			responseDto.Error = "sign and broadcast transaction error"
+			restutil.Render(responseDto, 500, c)
 			return
 		}
 
-		trustmeshEntry := createFeedbackSentTrustmeshEntry(*req, transactionId, offchainMsg, feedbackMsg, *transactionHash)
+		feedbackSentTrustmeshEntry := createFeedbackSentTrustmeshEntry(*newFeedbackRequest, feedbackOffchainMessage, *transactionHash)
 
-		if !trustmeshEntry.Create() {
-			logger.Errorf("error when creating new trustmesh entry")
-			restutil.RenderError("error when creating new trustmesh entry", 500, c)
+		if !feedbackSentTrustmeshEntry.Create() {
+			responseDto.Error = "error when creating new trustmesh entry"
+			logger.Errorf(responseDto.Error)
+			restutil.Render(responseDto, 500, c)
 			return
 		}
 
-		restutil.Render(transactionHash, 200, c)
+		responseDto.WorkflowId = feedbackSentTrustmeshEntry.TrustmeshId.String()
+		responseDto.WorkstepId = feedbackSentTrustmeshEntry.Id.String()
+		responseDto.BaseledgerBusinessObjectId = feedbackSentTrustmeshEntry.ReferencedBaseledgerBusinessObjectId
+		responseDto.TransactionHash = feedbackSentTrustmeshEntry.TransactionHash
+
+		restutil.Render(responseDto, 200, c)
 	}
 }
 
@@ -118,50 +159,53 @@ func getRandomFeedbackOpCode() int {
 }
 
 func createFeedbackOffchainMessage(
-	req createSynchronizationFeedbackRequest,
-	feedbackOffchainMessage *types.OffchainProcessMessage,
+	newFeedbackRequest types.NewFeedbackRequest,
+	suggestionReceivedOffchainMessage *types.OffchainProcessMessage,
 	transactionId uuid.UUID,
-	baseledgerTransactionType string,
 ) types.OffchainProcessMessage {
+	baseledgerTransactionType := common.BaseledgerTransactionTypeApprove
+
+	if !newFeedbackRequest.Approved {
+		baseledgerTransactionType = common.BaseledgerTransactionTypeReject
+	}
+
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
-		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
-		Topic:                                req.WorkgroupId,
-		WorkstepType:                         "Feedback",
-		ReferencedOffchainProcessMessageId:   uuid.FromStringOrNil(req.OriginalOffchainProcessMessageId),
-		BaseledgerSyncTreeJson:               feedbackOffchainMessage.BaseledgerSyncTreeJson,
-		BusinessObjectProof:                  feedbackOffchainMessage.BusinessObjectProof,
-		BaseledgerBusinessObjectId:           "",
-		ReferencedBaseledgerBusinessObjectId: req.BaseledgerBusinessObjectIdOfApprovedObject,
-		StatusTextMessage:                    req.FeedbackMessage,
+		ReceiverId:                           suggestionReceivedOffchainMessage.SenderId,
+		Topic:                                suggestionReceivedOffchainMessage.Topic,
+		WorkstepType:                         common.WorkstepTypeFeedback,
+		BaseledgerSyncTreeJson:               suggestionReceivedOffchainMessage.BaseledgerSyncTreeJson,
+		BusinessObjectProof:                  suggestionReceivedOffchainMessage.BusinessObjectProof,
+		BaseledgerBusinessObjectId:           "", // empty because we are giving feedback
+		ReferencedBaseledgerBusinessObjectId: suggestionReceivedOffchainMessage.BaseledgerBusinessObjectId,
+		StatusTextMessage:                    newFeedbackRequest.FeedbackMessage,
 		BaseledgerTransactionIdOfStoredProof: transactionId,
 		TendermintTransactionIdOfStoredProof: transactionId,
-		BusinessObjectType:                   req.BusinessObjectType,
+		BusinessObjectType:                   suggestionReceivedOffchainMessage.BusinessObjectType,
 		BaseledgerTransactionType:            baseledgerTransactionType,
-		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
+		ReferencedBaseledgerTransactionId:    suggestionReceivedOffchainMessage.BaseledgerTransactionIdOfStoredProof,
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
-		SorBusinessObjectId:                  feedbackOffchainMessage.SorBusinessObjectId,
-		ReferencedWorkstepType:               req.ReferencedWorkstepType,
+		SorBusinessObjectId:                  suggestionReceivedOffchainMessage.SorBusinessObjectId,
+		ReferencedWorkstepType:               suggestionReceivedOffchainMessage.WorkstepType,
 	}
 
 	return offchainMessage
 }
 
-func createFeedbackSentTrustmeshEntry(req createSynchronizationFeedbackRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, feedbackMsg string, txHash string) *types.TrustmeshEntry {
+func createFeedbackSentTrustmeshEntry(newFeedbackRequest types.NewFeedbackRequest, offchainMsg types.OffchainProcessMessage, txHash string) *types.TrustmeshEntry {
 	trustmeshEntry := &types.TrustmeshEntry{
-		TendermintTransactionId:              transactionId,
+		TendermintTransactionId:              offchainMsg.BaseledgerTransactionIdOfStoredProof,
 		OffchainProcessMessageId:             offchainMsg.Id,
 		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
-		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
-		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
+		ReceiverOrgId:                        uuid.FromStringOrNil(offchainMsg.ReceiverId.String()),
+		WorkgroupId:                          uuid.FromStringOrNil(offchainMsg.Topic),
 		WorkstepType:                         offchainMsg.WorkstepType,
-		BaseledgerTransactionType:            feedbackMsg,
-		BaseledgerTransactionId:              transactionId,
-		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.OriginalBaseledgerTransactionId),
-		BusinessObjectType:                   req.BusinessObjectType,
+		BaseledgerTransactionType:            offchainMsg.BaseledgerTransactionType,
+		BaseledgerTransactionId:              offchainMsg.BaseledgerTransactionIdOfStoredProof,
+		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(newFeedbackRequest.OriginalBaseledgerTransactionId),
+		BusinessObjectType:                   offchainMsg.BusinessObjectType,
 		BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
-		ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
 		TransactionHash:                      txHash,
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
 		SorBusinessObjectId:                  offchainMsg.SorBusinessObjectId,
@@ -170,17 +214,17 @@ func createFeedbackSentTrustmeshEntry(req createSynchronizationFeedbackRequest, 
 	return trustmeshEntry
 }
 
-func newFeedbackRequest(req createSynchronizationFeedbackRequest, feedbackOffchainMessage *types.OffchainProcessMessage) *types.SynchronizationFeedback {
-	return &types.SynchronizationFeedback{
-		WorkgroupId:                        uuid.FromStringOrNil(req.WorkgroupId),
-		BaseledgerProvenBusinessObjectJson: feedbackOffchainMessage.BaseledgerSyncTreeJson,
-		Recipient:                          req.Recipient,
-		Approved:                           req.Approved,
-		BaseledgerBusinessObjectIdOfApprovedObject: req.BaseledgerBusinessObjectIdOfApprovedObject,
-		HashOfObjectToApprove:                      feedbackOffchainMessage.BusinessObjectProof,
-		OriginalBaseledgerTransactionId:            req.OriginalBaseledgerTransactionId,
-		OriginalOffchainProcessMessageId:           req.OriginalOffchainProcessMessageId,
-		FeedbackMessage:                            req.FeedbackMessage,
-		BusinessObjectType:                         req.BusinessObjectType,
+func newFeedbackRequest(dto sendFeedbackDto, suggestionReceivedTrustmeshEntry types.TrustmeshEntry, suggestionReceivedOffchainMessage *types.OffchainProcessMessage) *types.NewFeedbackRequest {
+	return &types.NewFeedbackRequest{
+		WorkgroupId:        suggestionReceivedTrustmeshEntry.WorkgroupId,
+		Recipient:          suggestionReceivedTrustmeshEntry.SenderOrgId.String(),
+		BusinessObjectType: suggestionReceivedTrustmeshEntry.BusinessObjectType,
+		BaseledgerBusinessObjectIdOfApprovedObject: suggestionReceivedTrustmeshEntry.BaseledgerBusinessObjectId,
+		OriginalBaseledgerTransactionId:            suggestionReceivedTrustmeshEntry.BaseledgerTransactionId.String(), // TODO: BAS-79 is this correct?
+		Approved:                                   dto.Approved,
+		FeedbackMessage:                            dto.FeedbackMessage,
+		BaseledgerProvenBusinessObjectJson:         suggestionReceivedOffchainMessage.BaseledgerSyncTreeJson,
+		HashOfObjectToApprove:                      suggestionReceivedOffchainMessage.BusinessObjectProof,
+		OriginalOffchainProcessMessageId:           suggestionReceivedOffchainMessage.Id.String(), // TODO: BAS-79 is this correct?
 	}
 }

@@ -31,11 +31,10 @@ type TrustmeshEntry struct {
 	ReferencedBaseledgerBusinessObjectId string
 	OffchainProcessMessageId             uuid.UUID
 	OffchainProcessMessage               OffchainProcessMessage
-	ReferencedProcessMessageId           uuid.UUID
 	CommitmentState                      string
 	TransactionHash                      string
 	TrustmeshId                          uuid.UUID
-	SorBusinessObjectId                  string
+	SorBusinessObjectId                  string // TODO: rename to remove SOR
 }
 
 type Trustmesh struct {
@@ -79,11 +78,25 @@ func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
 		First(&trustmesh, "id = ?", id.String())
 
 	if res.Error != nil {
-		logger.Errorf("error when getting offchain msg from db %v\n", res.Error)
+		logger.Errorf("error when getting trustmesh from db %v\n", res.Error)
 		return nil, res.Error
 	}
 
 	return &trustmesh, nil
+}
+
+func GetTrustmeshEntryById(id uuid.UUID) (*TrustmeshEntry, error) {
+	db := dbutil.Db.GetConn()
+	var trustmeshEntry TrustmeshEntry
+	res := db.Preload("OffchainProcessMessage").
+		First(&trustmeshEntry, "id = ?", id.String())
+
+	if res.Error != nil {
+		logger.Errorf("error when getting trustmesh entry from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	return &trustmeshEntry, nil
 }
 
 func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
@@ -101,19 +114,11 @@ func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
 	return entries, nil
 }
 
-func GetLatestTrustmeshEntryBasedOnBusinessObjectId(boId string) (*TrustmeshEntry, error) {
+func GetLatestTrustmeshEntryBasedOnTrustmeshId(trustmeshId string) (*TrustmeshEntry, error) {
 	db := dbutil.Db.GetConn()
 
-	// getting trustmesh entry first to get it's trustmesh
-	entry := &TrustmeshEntry{}
-	res := db.First(&entry, "baseledger_business_object_id = ?", boId)
-	if res.Error != nil {
-		logger.Errorf("error when getting trustmesh entry from db %v\n", res.Error)
-		return nil, res.Error
-	}
-
 	latestEntry := &TrustmeshEntry{}
-	res = db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where trustmesh_id = ? order by created_at desc limit 1", entry.TrustmeshId).Find(&latestEntry)
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where trustmesh_id = ? order by created_at desc limit 1", trustmeshId).Find(&latestEntry)
 
 	if res.Error != nil {
 		logger.Errorf("error when getting latest trustmesh entry from db %v\n", res.Error)
@@ -121,7 +126,27 @@ func GetLatestTrustmeshEntryBasedOnBusinessObjectId(boId string) (*TrustmeshEntr
 	}
 
 	if res.RowsAffected == 0 {
-		logger.Infof("latest workflow entry not found")
+		logger.Errorf("no trustmesh entries found for trustmesh %s", trustmeshId)
+		return nil, nil
+	}
+
+	return latestEntry, nil
+}
+
+func GetLatestTrustmeshEntryBasedOnBboid(bboid string) (*TrustmeshEntry, error) {
+	db := dbutil.Db.GetConn()
+
+	latestEntry := &TrustmeshEntry{}
+	// TODO:  would we miss feedback trustmesh entry because only referenced bboid filled?
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where baseledger_business_object_id = ? order by created_at desc limit 1", bboid).Find(&latestEntry)
+
+	if res.Error != nil {
+		logger.Errorf("error when getting latest trustmesh entry from db %v\n", res.Error)
+		return nil, res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		logger.Errorf("no trustmesh entries found for bboid %s", bboid)
 		return nil, nil
 	}
 

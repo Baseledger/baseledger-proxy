@@ -14,19 +14,27 @@ import (
 	"github.com/unibrightio/proxy-api/restutil"
 	"github.com/unibrightio/proxy-api/synctree"
 	"github.com/unibrightio/proxy-api/types"
+	"github.com/unibrightio/proxy-api/workgroups"
 )
 
-type createSuggestionRequest struct {
-	WorkgroupId                          string   `json:"workgroup_id"`
-	Recipient                            string   `json:"recipient"`
-	WorkstepType                         string   `json:"workstep_type"`
-	BusinessObjectType                   string   `json:"business_object_type"`
-	BaseledgerBusinessObjectId           string   `json:"baseledger_business_object_id"`
-	BusinessObjectJson                   string   `json:"business_object_json"`
-	ReferencedBaseledgerBusinessObjectId string   `json:"referenced_baseledger_business_object_id"`
-	ReferencedBaseledgerTransactionId    string   `json:"referenced_baseledger_transaction_id"`
-	SorBusinessObjectId                  string   `json:"sor_message_id"`
-	KnowledgeLimiters                    []string `json:"knowledge_limiters"`
+type sendSuggestionDto struct {
+	WorkgroupId                string   `json:"workgroup_id"`
+	Recipient                  string   `json:"recipient"`
+	WorkstepType               string   `json:"workstep_type"`
+	WorkflowId                 string   `json:"workflow_id"`
+	BaseledgerBusinessObjectId string   `json:"baseledger_business_object_id"`
+	BusinessObjectType         string   `json:"business_object_type"`
+	BusinessObjectId           string   `json:"business_object_id"`
+	BusinessObjectJson         string   `json:"business_object_json"`
+	KnowledgeLimiters          []string `json:"knowledge_limiters"`
+}
+
+type sendSuggestionResponseDto struct {
+	WorkflowId                 string `json:"workflow_id"`
+	WorkstepId                 string `json:"workstep_id"`
+	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
+	TransactionHash            string `json:"transaction_hash"`
+	Error                      string `json:"error"`
 }
 
 // @Security BasicAuth
@@ -35,48 +43,119 @@ type createSuggestionRequest struct {
 // @Description Create new suggestion
 // @Tags Suggestions
 // @Accept json
-// @Param suggestion body createSuggestionRequest true "Suggestion Request"
+// @Param suggestion body sendSuggestionDto true "Suggestion Request"
 // @Success 200 {string} txHash
 // @Failure 400,422,500 {string} errorMessage
 // @Router /suggestion [post]
 func CreateSuggestionRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		responseDto := &sendSuggestionResponseDto{}
+
 		buf, err := c.GetRawData()
 		if err != nil {
-			restutil.RenderError(err.Error(), 400, c)
+			responseDto.Error = err.Error()
+			restutil.Render(responseDto, 400, c)
 			return
 		}
 
-		req := &createSuggestionRequest{}
-		err = json.Unmarshal(buf, &req)
+		dto := &sendSuggestionDto{}
+		err = json.Unmarshal(buf, &dto)
 		if err != nil {
-			restutil.RenderError(err.Error(), 422, c)
+			responseDto.Error = err.Error()
+			restutil.Render(responseDto, 422, c)
 			return
 		}
 
-		syncReq := newSynchronizationRequest(*req)
+		if dto.WorkgroupId == "" {
+			// valid only until we go with the assumtion 1 recipient == 1 workgroup
+			workgroupClient := &workgroups.PostgresWorkgroupClient{}
+			workgroupMembership := workgroupClient.GetRecipientWorkgroupMember(dto.Recipient)
 
-		syncTree := synctree.CreateFromBusinessObjectJson(syncReq.BusinessObjectJson, syncReq.KnowledgeLimiters)
+			if workgroupMembership == nil {
+				responseDto.Error = "failed to find a workgroup membership for recipient"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
+			dto.WorkgroupId = workgroupMembership.WorkgroupId
+		}
+
+		newSuggestionRequest := &types.NewSuggestionRequest{}
+
+		// there is no bboid and no trustmesh id that the suggestion references - we treat it as INITIAL
+		if dto.BaseledgerBusinessObjectId == "" && dto.WorkflowId == "" {
+			newSuggestionRequest = createNewInitialSuggestionRequest(*dto)
+		}
+
+		// bboid is provided, go with it first
+		if dto.BaseledgerBusinessObjectId != "" {
+			if dto.WorkstepType == common.WorkstepTypeNewVersion {
+				// TODO: Validate underlying trustmesh is in correct state
+				newSuggestionRequest = createNewVersionSuggestionRequestFromDto(*dto)
+			} else if dto.WorkstepType == common.WorkstepTypeNextWorkstep {
+				// TODO: Validate underlying trustmesh is in correct state
+				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromDto(*dto, common.WorkstepTypeNextWorkstep)
+			} else if dto.WorkstepType == common.WorkstepTypeFinal {
+				// TODO: Validate underlying trustmesh is in correct state
+				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromDto(*dto, common.WorkstepTypeFinal)
+			} else {
+				responseDto.Error = "Combination of bboid and workstep type is invalid"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+			// otherwise go with trustmesh id
+		} else if dto.WorkflowId != "" {
+			latestTrustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnTrustmeshId(dto.WorkflowId)
+
+			if err != nil {
+				responseDto.Error = err.Error()
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
+			// TODO: Verify dto workstep type in line with the fetched latest trustmesh entry
+			if dto.WorkstepType == common.WorkstepTypeNewVersion {
+				// TODO: Validate underlying trustmesh is in correct state
+				newSuggestionRequest = createNewVersionSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry)
+			} else if dto.WorkstepType == common.WorkstepTypeNextWorkstep {
+				// TODO: Validate underlying trustmesh is in correct state
+				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeNextWorkstep)
+			} else if dto.WorkstepType == common.WorkstepTypeFinal {
+				// TODO: Validate underlying trustmesh is in correct state
+				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeFinal)
+			} else {
+				responseDto.Error = "Workstep type is invalid for suggestion"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
+		}
+
+		syncTree := synctree.CreateFromBusinessObjectJson(newSuggestionRequest.BusinessObjectJson, newSuggestionRequest.KnowledgeLimiters)
 		logger.Infof("Sync tree %v", syncTree)
 
 		syncTreeJson, err := json.Marshal(syncTree)
 		if err != nil {
-			logger.Errorf("error marshaling sync tree", err.Error())
-			restutil.RenderError("error marshaling sync tree", 500, c)
+			responseDto.Error = "error marshaling sync tree"
+			logger.Errorf(responseDto.Error, err.Error())
+			restutil.Render(responseDto, 500, c)
 			return
 		}
+
 		logger.Infof("Sync tree json %v", string(syncTreeJson))
 
 		transactionId := uuid.NewV4()
-		offchainMsg := createSuggestOffchainMessage(*req, transactionId, string(syncTreeJson), syncTree.RootProof)
+
+		offchainMsg := createNewSuggestionOffchainMessage(*newSuggestionRequest, transactionId, string(syncTreeJson), syncTree.RootProof)
 
 		if !offchainMsg.Create() {
-			logger.Errorf("error when creating new offchain msg entry")
-			restutil.RenderError("error when creating new offchain msg entry", 500, c)
+			responseDto.Error = "error when creating new offchain msg entry"
+			logger.Errorf(responseDto.Error)
+			restutil.Render(responseDto, 500, c)
 			return
 		}
 
-		payload := proxyutil.CreateBaseledgerTransactionPayload(syncReq, &offchainMsg)
+		payload := proxyutil.CreateNewSuggestionBaseledgerTransactionPayload(newSuggestionRequest, &offchainMsg)
 
 		signAndBroadcastPayload := restutil.SignAndBroadcastPayload{
 			TransactionId: transactionId.String(),
@@ -87,19 +166,30 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 		transactionHash := restutil.SignAndBroadcast(signAndBroadcastPayload)
 
 		if transactionHash == nil {
-			restutil.RenderError("sign and broadcast transaction error", 500, c)
+			responseDto.Error = "sign and broadcast transaction error"
+			logger.Errorf(responseDto.Error)
+			restutil.Render(responseDto, 500, c)
 			return
 		}
 
-		trustmeshEntry := createSuggestionSentTrustmeshEntry(*req, transactionId, offchainMsg, *transactionHash)
+		trustmeshEntry := createSuggestionSentTrustmeshEntry(*newSuggestionRequest, transactionId, offchainMsg, *transactionHash)
 
 		if !trustmeshEntry.Create() {
-			logger.Errorf("error when creating new trustmesh entry")
-			restutil.RenderError("error when creating new trustmesh entry", 500, c)
+			responseDto.Error = "error when creating new trustmesh entry"
+			logger.Errorf(responseDto.Error)
+			restutil.Render(responseDto, 500, c)
 			return
 		}
 
-		restutil.Render(transactionHash, 200, c)
+		// quick fix to get trustmesh id, consider other options
+		createdTrustmesh, _ := types.GetTrustmeshEntryById(trustmeshEntry.Id)
+
+		responseDto.WorkflowId = createdTrustmesh.TrustmeshId.String()
+		responseDto.WorkstepId = createdTrustmesh.Id.String()
+		responseDto.BaseledgerBusinessObjectId = createdTrustmesh.BaseledgerBusinessObjectId
+		responseDto.TransactionHash = createdTrustmesh.TransactionHash
+
+		restutil.Render(responseDto, 200, c)
 	}
 }
 
@@ -111,60 +201,113 @@ func getRandomSuggestionOpCode() int {
 	return rand.Intn(max-min+1) + min
 }
 
-func newSynchronizationRequest(req createSuggestionRequest) *types.SynchronizationRequest {
-	return &types.SynchronizationRequest{
+func createNewInitialSuggestionRequest(req sendSuggestionDto) *types.NewSuggestionRequest {
+	return &types.NewSuggestionRequest{
+		WorkgroupId:                uuid.FromStringOrNil(req.WorkgroupId),
+		Recipient:                  req.Recipient,
+		WorkstepType:               common.WorkstepTypeInitial,
+		BusinessObjectType:         req.BusinessObjectType,
+		BusinessObjectId:           req.BusinessObjectId,
+		BaseledgerBusinessObjectId: uuid.NewV4().String(),
+		BusinessObjectJson:         req.BusinessObjectJson,
+		KnowledgeLimiters:          req.KnowledgeLimiters,
+	}
+}
+
+func createNewVersionSuggestionRequestFromDto(req sendSuggestionDto) *types.NewSuggestionRequest {
+	return &types.NewSuggestionRequest{
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
 		Recipient:                            req.Recipient,
-		WorkstepType:                         req.WorkstepType,
+		WorkstepType:                         common.WorkstepTypeNewVersion,
 		BusinessObjectType:                   req.BusinessObjectType,
+		BusinessObjectId:                     req.BusinessObjectId,
 		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: req.BaseledgerBusinessObjectId,
 		BusinessObjectJson:                   req.BusinessObjectJson,
-		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
 		KnowledgeLimiters:                    req.KnowledgeLimiters,
 	}
 }
 
-func createSuggestionSentTrustmeshEntry(req createSuggestionRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, txHash string) *types.TrustmeshEntry {
-	return &types.TrustmeshEntry{
-		TendermintTransactionId:              transactionId,
-		OffchainProcessMessageId:             offchainMsg.Id,
-		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
-		ReceiverOrgId:                        uuid.FromStringOrNil(req.Recipient),
+func createNextWorkstepOrFinalSuggestionRequestFromDto(req sendSuggestionDto, workstepType string) *types.NewSuggestionRequest {
+	return &types.NewSuggestionRequest{
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
-		WorkstepType:                         offchainMsg.WorkstepType,
-		BaseledgerTransactionType:            "Suggest",
-		BaseledgerTransactionId:              transactionId,
-		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
+		Recipient:                            req.Recipient,
+		WorkstepType:                         workstepType,
 		BusinessObjectType:                   req.BusinessObjectType,
-		BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
-		ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
-		TransactionHash:                      txHash,
-		EntryType:                            common.SuggestionSentTrustmeshEntryType,
-		SorBusinessObjectId:                  req.SorBusinessObjectId,
+		BusinessObjectId:                     req.BusinessObjectId,
+		BaseledgerBusinessObjectId:           uuid.NewV4().String(),
+		ReferencedBaseledgerBusinessObjectId: req.BaseledgerBusinessObjectId,
+		BusinessObjectJson:                   req.BusinessObjectJson,
+		KnowledgeLimiters:                    req.KnowledgeLimiters,
 	}
 }
 
-func createSuggestOffchainMessage(req createSuggestionRequest, transactionId uuid.UUID, syncTreeJson string, rootProof string) types.OffchainProcessMessage {
+func createNewVersionSuggestionRequestFromLatestTrustmeshEntry(req sendSuggestionDto, latestTrustmeshEntry types.TrustmeshEntry) *types.NewSuggestionRequest {
+	return &types.NewSuggestionRequest{
+		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
+		Recipient:                            latestTrustmeshEntry.ReceiverOrgId.String(),
+		WorkstepType:                         common.WorkstepTypeNewVersion,
+		BusinessObjectType:                   latestTrustmeshEntry.BusinessObjectType,
+		BusinessObjectId:                     latestTrustmeshEntry.SorBusinessObjectId,
+		BaseledgerBusinessObjectId:           latestTrustmeshEntry.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: latestTrustmeshEntry.BaseledgerBusinessObjectId,
+		BusinessObjectJson:                   req.BusinessObjectJson,
+		KnowledgeLimiters:                    req.KnowledgeLimiters,
+	}
+}
+
+func createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(req sendSuggestionDto, latestTrustmeshEntry types.TrustmeshEntry, workstepType string) *types.NewSuggestionRequest {
+	return &types.NewSuggestionRequest{
+		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
+		Recipient:                            latestTrustmeshEntry.ReceiverOrgId.String(),
+		WorkstepType:                         workstepType,
+		BusinessObjectType:                   req.BusinessObjectType,
+		BusinessObjectId:                     req.BusinessObjectId,
+		BaseledgerBusinessObjectId:           uuid.NewV4().String(),
+		ReferencedBaseledgerBusinessObjectId: latestTrustmeshEntry.BaseledgerBusinessObjectId,
+		BusinessObjectJson:                   req.BusinessObjectJson,
+		KnowledgeLimiters:                    req.KnowledgeLimiters,
+	}
+}
+
+func createNewSuggestionOffchainMessage(req types.NewSuggestionRequest, transactionId uuid.UUID, syncTreeJson string, rootProof string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
-		Topic:                                req.WorkgroupId,
+		Topic:                                req.WorkgroupId.String(), // TODO: BAS-79 why is this called topic? rename to workgroup id
 		WorkstepType:                         req.WorkstepType,
-		ReferencedOffchainProcessMessageId:   uuid.FromStringOrNil(""),
 		BaseledgerSyncTreeJson:               syncTreeJson,
 		BusinessObjectProof:                  rootProof,
+		BusinessObjectType:                   req.BusinessObjectType,
+		SorBusinessObjectId:                  req.BusinessObjectId,
 		BaseledgerBusinessObjectId:           req.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: req.ReferencedBaseledgerBusinessObjectId,
-		StatusTextMessage:                    req.WorkstepType + " suggested",
+		BaseledgerTransactionType:            common.BaseledgerTransactionTypeSuggest,
+		EntryType:                            common.SuggestionSentTrustmeshEntryType, // can we ditch this as we have one above that says that this is a suggestion
+		StatusTextMessage:                    req.WorkstepType + " " + common.BaseledgerTransactionTypeSuggest,
 		BaseledgerTransactionIdOfStoredProof: transactionId,
 		TendermintTransactionIdOfStoredProof: transactionId,
-		BusinessObjectType:                   req.BusinessObjectType,
-		BaseledgerTransactionType:            "Suggest",
-		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
-		EntryType:                            common.SuggestionSentTrustmeshEntryType,
-		SorBusinessObjectId:                  req.SorBusinessObjectId,
+		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(""), // same here
 	}
 
 	return offchainMessage
+}
+
+func createSuggestionSentTrustmeshEntry(req types.NewSuggestionRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, txHash string) *types.TrustmeshEntry {
+	return &types.TrustmeshEntry{
+		EntryType:                         common.SuggestionSentTrustmeshEntryType,
+		SenderOrgId:                       offchainMsg.SenderId,
+		ReceiverOrgId:                     uuid.FromStringOrNil(req.Recipient),
+		WorkgroupId:                       req.WorkgroupId,
+		WorkstepType:                      offchainMsg.WorkstepType,
+		BaseledgerTransactionType:         offchainMsg.BaseledgerTransactionType,
+		BusinessObjectType:                req.BusinessObjectType,
+		SorBusinessObjectId:               req.BusinessObjectId,
+		BaseledgerBusinessObjectId:        offchainMsg.BaseledgerBusinessObjectId,
+		OffchainProcessMessageId:          offchainMsg.Id,
+		TendermintTransactionId:           transactionId,
+		TransactionHash:                   txHash,
+		BaseledgerTransactionId:           transactionId,
+		ReferencedBaseledgerTransactionId: uuid.FromStringOrNil(req.ReferencedBaseledgerBusinessObjectId),
+	}
 }

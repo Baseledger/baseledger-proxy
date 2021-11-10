@@ -18,6 +18,7 @@ export TENDERMINT_NODE_PORT=$first_node_tendermint_p2p_port &&
 export PROXY_APP_PORT=8081 &&
 export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea && # unique identifier of the organization, currently hardcoded in seed data
 export API_CONCIRCLE_URL=s4h.rp.concircle.com
+
 docker-compose -p first_node up -d
 
 # Sets up environment for second node and runs it

@@ -65,7 +65,7 @@ func HasEnoughBalance() bool {
 }
 
 func SendRejectFeedback(offchainProcessMessage *types.OffchainProcessMessage, workgroupId string) {
-	var feedback = &types.SynchronizationFeedback{
+	var feedback = &types.NewFeedbackRequest{
 		WorkgroupId:        uuid.FromStringOrNil(workgroupId),
 		BusinessObjectType: offchainProcessMessage.BusinessObjectType,
 		Recipient:          offchainProcessMessage.ReceiverId.String(),
@@ -80,14 +80,14 @@ func SendRejectFeedback(offchainProcessMessage *types.OffchainProcessMessage, wo
 
 	transactionId := uuid.NewV4()
 
-	offchainMsg := createFeedbackOffchainMessage(*feedback, transactionId, "Reject")
+	offchainMsg := createFeedbackOffchainMessage(*feedback, transactionId, common.BaseledgerTransactionTypeReject)
 
 	if !offchainMsg.Create() {
 		logger.Errorf("error when creating new offchain msg entry")
 		return
 	}
 
-	payload := proxyutil.CreateBaseledgerTransactionFeedbackPayload(feedback, &offchainMsg)
+	payload := proxyutil.CreateNewFeedbackBaseledgerTransactionPayload(feedback, &offchainMsg)
 
 	signAndBroadcastPayload := SignAndBroadcastPayload{
 		TransactionId: transactionId.String(),
@@ -100,7 +100,7 @@ func SendRejectFeedback(offchainProcessMessage *types.OffchainProcessMessage, wo
 		return
 	}
 
-	trustmeshEntry := createFeedbackSentTrustmeshEntry(*feedback, transactionId, offchainMsg, "Reject", *transactionHash)
+	trustmeshEntry := createFeedbackSentTrustmeshEntry(*feedback, transactionId, offchainMsg, common.BaseledgerTransactionTypeReject, *transactionHash)
 
 	if !trustmeshEntry.Create() {
 		logger.Errorf("error when creating new trustmesh entry")
@@ -113,6 +113,7 @@ func Render(obj interface{}, status int, c *gin.Context) {
 	c.Header("content-type", defaultResponseContentType)
 	c.Writer.WriteHeader(status)
 	if &obj != nil && status != http.StatusNoContent {
+		logger.Infof("response object %v", &obj)
 		encoder := json.NewEncoder(c.Writer)
 		encoder.SetIndent("", "    ")
 		if err := encoder.Encode(obj); err != nil {
@@ -130,13 +131,12 @@ func RenderError(message string, status int, c *gin.Context) {
 	Render(err, status, c)
 }
 
-func createFeedbackOffchainMessage(req types.SynchronizationFeedback, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
+func createFeedbackOffchainMessage(req types.NewFeedbackRequest, transactionId uuid.UUID, baseledgerTransactionType string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
 		Topic:                                req.WorkgroupId.String(),
 		WorkstepType:                         "Feedback",
-		ReferencedOffchainProcessMessageId:   uuid.FromStringOrNil(req.OriginalOffchainProcessMessageId),
 		BaseledgerSyncTreeJson:               req.BaseledgerProvenBusinessObjectJson,
 		BusinessObjectProof:                  req.HashOfObjectToApprove,
 		BaseledgerBusinessObjectId:           "",
@@ -153,7 +153,7 @@ func createFeedbackOffchainMessage(req types.SynchronizationFeedback, transactio
 	return offchainMessage
 }
 
-func createFeedbackSentTrustmeshEntry(req types.SynchronizationFeedback, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, feedbackMsg string, txHash string) *types.TrustmeshEntry {
+func createFeedbackSentTrustmeshEntry(req types.NewFeedbackRequest, transactionId uuid.UUID, offchainMsg types.OffchainProcessMessage, feedbackMsg string, txHash string) *types.TrustmeshEntry {
 	trustmeshEntry := &types.TrustmeshEntry{
 		TendermintTransactionId:              transactionId,
 		OffchainProcessMessageId:             offchainMsg.Id,
@@ -167,7 +167,6 @@ func createFeedbackSentTrustmeshEntry(req types.SynchronizationFeedback, transac
 		BusinessObjectType:                   req.BusinessObjectType,
 		BaseledgerBusinessObjectId:           offchainMsg.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: offchainMsg.ReferencedBaseledgerBusinessObjectId,
-		ReferencedProcessMessageId:           offchainMsg.ReferencedOffchainProcessMessageId,
 		TransactionHash:                      txHash,
 		EntryType:                            common.FeedbackSentTrustmeshEntryType,
 	}

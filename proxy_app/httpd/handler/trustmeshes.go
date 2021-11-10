@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
+	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/dbutil"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/restutil"
@@ -13,6 +14,7 @@ import (
 )
 
 type trustmeshEntryDto struct {
+	Id                                   string
 	TendermintBlockId                    string
 	TendermintTransactionId              string
 	TendermintTransactionTimestamp       time.Time
@@ -31,7 +33,6 @@ type trustmeshEntryDto struct {
 	BaseledgerBusinessObjectId           string
 	ReferencedBaseledgerBusinessObjectId string
 	OffchainProcessMessageId             string
-	ReferencedProcessMessageId           string
 	CommitmentState                      string
 	TransactionHash                      string
 	TrustmeshId                          string
@@ -96,14 +97,14 @@ func GetTrustmeshHandler() gin.HandlerFunc {
 		trustmeshId, err := uuid.FromString(trustmeshIdParam)
 		if err != nil {
 			logger.Errorf("Trustmesh id param %v is in wrong format", trustmeshIdParam)
-			restutil.RenderError("trustmesh id in wrong format", 400, c)
+			restutil.Render("trustmesh id in wrong format", 400, c)
 			return
 		}
 
 		trustmesh, err := types.GetTrustmeshById(trustmeshId)
 		if err != nil {
 			logger.Errorf("Trustmesh with id %v not found", trustmeshId)
-			restutil.RenderError("trustmesh not found", 404, c)
+			restutil.Render("trustmesh not found", 404, c)
 			return
 		}
 
@@ -136,11 +137,11 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 		appendDistinct(participantsMap, entry.ReceiverOrg.OrganizationName, &participants)
 		appendDistinct(businessObjectTypesMap, entry.BusinessObjectType, &businessObjectTypes)
 
-		if entry.WorkstepType == "FinalWorkstep" && !finalized {
+		if entry.WorkstepType == common.WorkstepTypeFinal && !finalized {
 			finalized = true
 		}
 
-		if entry.BaseledgerTransactionType == "Reject" && !containsRejection {
+		if entry.BaseledgerTransactionType == common.BaseledgerTransactionTypeReject && !containsRejection {
 			containsRejection = true
 		}
 
@@ -163,6 +164,7 @@ func processTrustmesh(trustmesh *types.Trustmesh) *trustmeshDto {
 
 func processTrustmeshEntry(trustmeshEntry types.TrustmeshEntry) *trustmeshEntryDto {
 	return &trustmeshEntryDto{
+		Id:                                   trustmeshEntry.Id.String(),
 		TendermintBlockId:                    trustmeshEntry.TendermintBlockId.String,
 		TendermintTransactionId:              uuidToString(trustmeshEntry.TendermintTransactionId),
 		TendermintTransactionTimestamp:       trustmeshEntry.TendermintTransactionTimestamp.Time,
@@ -181,7 +183,6 @@ func processTrustmeshEntry(trustmeshEntry types.TrustmeshEntry) *trustmeshEntryD
 		BaseledgerBusinessObjectId:           trustmeshEntry.BaseledgerBusinessObjectId,
 		ReferencedBaseledgerBusinessObjectId: trustmeshEntry.ReferencedBaseledgerBusinessObjectId,
 		OffchainProcessMessageId:             uuidToString(trustmeshEntry.OffchainProcessMessageId),
-		ReferencedProcessMessageId:           uuidToString(trustmeshEntry.ReferencedProcessMessageId),
 		CommitmentState:                      trustmeshEntry.CommitmentState,
 		TransactionHash:                      trustmeshEntry.TransactionHash,
 		TrustmeshId:                          uuidToString(trustmeshEntry.TrustmeshId),

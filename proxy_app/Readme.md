@@ -9,4 +9,4 @@ To test
 To generate new swagger changes (make sure you have https://github.com/swaggo/swag installed)
 
 1. cd httpd
-2. swag init
+2. swag init --parseDependency --parseInternal --parseDepth 1

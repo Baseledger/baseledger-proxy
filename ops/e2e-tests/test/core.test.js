@@ -1,6 +1,7 @@
 var request = require('supertest');
-var uuid = require("uuid");
-var expect = require('chai').expect;
+const chai = require("chai");
+const expect = chai.expect;
+chai.use(require('chai-uuid'));
 
 var alice_proxy_app_url = 'http://unibright:ub123@localhost:8081';
 var alice_blockchain_app_url = 'http://unibright:ub123@localhost:1317';
@@ -122,10 +123,8 @@ describe('Send Suggestion and Feedback', function () {
       recipient: bob_organization_id,
       workstep_type: "FinalWorkstep",
       business_object_type: "PurchaseOrder",
-      baseledger_business_object_id: "169f104f-980e-42bb-a128-73daf259bc39",
-      business_object_json: "{\"PurchaseOrderID\":\"PO123\",\"Currency\":\"EUR\",\"Amount\":\"200\"}",
-      referenced_baseledger_business_object_id: "",
-      referenced_baseledger_transaction_id: ""
+      business_object_id: "169f104f-980e-42bb-a128-73daf259bc39",
+      business_object_json: "{\"PurchaseOrderID\":\"PO123\",\"Currency\":\"EUR\",\"Amount\":\"200\"}"
     }
 
     // Act
@@ -136,7 +135,29 @@ describe('Send Suggestion and Feedback', function () {
 
     // Assert
     expect(createSuggestionResponse.body).not.to.be.undefined;
-    expect(createSuggestionResponse.body).to.have.length(64);
+    console.log(createSuggestionResponse.body);
+    
+    var responseJSON = createSuggestionResponse.body
+    console.log(responseJSON);
+
+    const aliceSuggestionWorkflowId = responseJSON["workflow_id"];
+
+    expect(aliceSuggestionWorkflowId).not.to.be.undefined;
+    expect(aliceSuggestionWorkflowId).to.be.a.uuid();
+
+    expect(responseJSON["workstep_id"]).not.to.be.undefined;
+    expect(responseJSON["workstep_id"]).to.be.a.uuid();
+
+    const aliceSuggestionBboid = responseJSON["baseledger_business_object_id"];
+
+    expect(aliceSuggestionBboid).not.to.be.undefined;
+    expect(aliceSuggestionBboid).to.be.a.uuid();
+
+    expect(responseJSON["transaction_hash"]).not.to.be.undefined;
+    expect(responseJSON["transaction_hash"]).to.have.length(64);
+
+    expect(responseJSON["error"]).not.to.be.undefined;
+    expect(responseJSON["error"]).to.be.empty;
 
     console.log(`WAITING ${BLOCK_TIME_SLEEP_DELAY}ms FOR A NEW BLOCK`);
     await sleep(BLOCK_TIME_SLEEP_DELAY);
@@ -149,6 +170,7 @@ describe('Send Suggestion and Feedback', function () {
       .expect(200);
 
     var payload = JSON.parse(queryAliceTransactionsResponse.text);
+    console.log("queryAliceTransactionsResponse " + JSON.stringify(payload));
     expect(payload.BaseledgerTransaction).not.to.be.undefined;
     expect(payload.BaseledgerTransaction).to.have.length.above(0);
 
@@ -157,6 +179,8 @@ describe('Send Suggestion and Feedback', function () {
       .expect(200);
 
     var payload = JSON.parse(queryBobTransactionsResponse.text);
+    console.log("queryBobTransactionsResponse " + JSON.stringify(payload));
+
     expect(payload.BaseledgerTransaction).not.to.be.undefined;
     expect(payload.BaseledgerTransaction).to.have.length.above(0);
 
@@ -165,6 +189,8 @@ describe('Send Suggestion and Feedback', function () {
       .expect(200);
     
     var trustmesheshPayload = JSON.parse(getAliceTrustmeshResponse.text);
+    console.log("getAliceTrustmeshResponse " + JSON.stringify(trustmesheshPayload));
+
     expect(trustmesheshPayload[0]["Entries"][0].EntryType).to.equal("SuggestionSent");
     expect(trustmesheshPayload[0]["Entries"][0].CommitmentState).to.equal("COMMITTED");
 
@@ -173,19 +199,15 @@ describe('Send Suggestion and Feedback', function () {
       .expect(200);
   
     var trustmesheshPayload = JSON.parse(getBobTrustmeshResponse.text);
+    console.log("getBobTrustmeshResponse " + JSON.stringify(trustmesheshPayload));
     expect(trustmesheshPayload[0]["Entries"][0].EntryType).to.equal("SuggestionReceived");
     expect(trustmesheshPayload[0]["Entries"][0].CommitmentState).to.equal("COMMITTED");
 
     // FEEDBACK PART
     // Arrange
     const createFeedbackDto = {
-      workgroup_id: test_workgroup_id,
-      recipient: alice_organization_id,
+      baseledger_business_object_id: aliceSuggestionBboid,
       approved: true,
-      business_object_type: "PurchaseOrder",
-      baseledger_business_object_id_of_approved_object: "169f104f-980e-42bb-a128-73daf259bc39",
-      original_baseledger_transaction_id: trustmesheshPayload[0]["Entries"][0].BaseledgerTransactionId,
-      original_offchain_process_message_id: trustmesheshPayload[0]["Entries"][0].OffchainProcessMessageId,
       feedback_message: ""
     }
 
@@ -197,7 +219,28 @@ describe('Send Suggestion and Feedback', function () {
 
     // Assert
     expect(createFeedbackResponse.body).not.to.be.undefined;
-    expect(createFeedbackResponse.body).to.have.length(64);
+
+    var responseJSON = createFeedbackResponse.body
+    console.log(responseJSON);
+
+    const bobFeedbackWorkflowId = responseJSON["workflow_id"];
+
+    expect(bobFeedbackWorkflowId).not.to.be.undefined;
+    expect(bobFeedbackWorkflowId).to.be.a.uuid();
+
+    expect(responseJSON["workstep_id"]).not.to.be.undefined;
+    expect(responseJSON["workstep_id"]).to.be.a.uuid();
+
+    const bobFeedbackBboid = responseJSON["baseledger_business_object_id"];
+
+    expect(bobFeedbackBboid).not.to.be.undefined;
+    expect(bobFeedbackBboid).to.be.equal(aliceSuggestionBboid);
+
+    expect(responseJSON["transaction_hash"]).not.to.be.undefined;
+    expect(responseJSON["transaction_hash"]).to.have.length(64);
+
+    expect(responseJSON["error"]).not.to.be.undefined;
+    expect(responseJSON["error"]).to.be.empty;
 
     console.log(`WAITING ${BLOCK_TIME_SLEEP_DELAY}ms FOR A NEW BLOCK`);
     await sleep(BLOCK_TIME_SLEEP_DELAY);
@@ -226,6 +269,8 @@ describe('Send Suggestion and Feedback', function () {
       .expect(200);
 
     var trustmesheshPayload = JSON.parse(getAliceTrustmeshResponse.text);
+    console.log("getAliceTrustmeshResponse 2 " + JSON.stringify(trustmesheshPayload));
+
     expect(trustmesheshPayload[0]["Entries"][1].EntryType).to.equal("FeedbackReceived");
     expect(trustmesheshPayload[0]["Entries"][1].CommitmentState).to.equal("COMMITTED");
 
@@ -234,6 +279,7 @@ describe('Send Suggestion and Feedback', function () {
       .expect(200);
 
     var trustmesheshPayload = JSON.parse(getBobTrustmeshResponse.text);
+    console.log("getBobTrustmeshResponse 2 " + JSON.stringify(trustmesheshPayload));
     expect(trustmesheshPayload[0]["Entries"][1].EntryType).to.equal("FeedbackSent");
     expect(trustmesheshPayload[0]["Entries"][1].CommitmentState).to.equal("COMMITTED");
   });
