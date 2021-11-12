@@ -113,15 +113,20 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 				return
 			}
 
-			// TODO: Verify dto workstep type in line with the fetched latest trustmesh entry
+			// consider opening up for other previous worksteps.
+			// currently we are rigid that feedback has to be the step that came before this one
+			// in the scenario where workflow id is provided
+			if latestTrustmeshEntry.EntryType != common.FeedbackReceivedTrustmeshEntryType && latestTrustmeshEntry.EntryType != common.FeedbackSentTrustmeshEntryType {
+				responseDto.Error = "Previous workstep is not feedback sent/received"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
 			if dto.WorkstepType == common.WorkstepTypeNewVersion {
-				// TODO: Validate underlying trustmesh is in correct state
 				newSuggestionRequest = createNewVersionSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry)
 			} else if dto.WorkstepType == common.WorkstepTypeNextWorkstep {
-				// TODO: Validate underlying trustmesh is in correct state
 				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeNextWorkstep)
 			} else if dto.WorkstepType == common.WorkstepTypeFinal {
-				// TODO: Validate underlying trustmesh is in correct state
 				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeFinal)
 			} else {
 				responseDto.Error = "Workstep type is invalid for suggestion"
@@ -242,35 +247,43 @@ func createNextWorkstepOrFinalSuggestionRequestFromDto(req sendSuggestionDto, wo
 	}
 }
 
-func createNewVersionSuggestionRequestFromLatestTrustmeshEntry(req sendSuggestionDto, latestTrustmeshEntry types.TrustmeshEntry) *types.NewSuggestionRequest {
+func createNewVersionSuggestionRequestFromLatestTrustmeshEntry(
+	req sendSuggestionDto,
+	latestFeedbackTrustmeshEntry types.TrustmeshEntry) *types.NewSuggestionRequest {
 	return &types.NewSuggestionRequest{
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
-		Recipient:                            latestTrustmeshEntry.ReceiverOrgId.String(),
+		Recipient:                            latestFeedbackTrustmeshEntry.SenderOrgId.String(),
 		WorkstepType:                         common.WorkstepTypeNewVersion,
-		BusinessObjectType:                   latestTrustmeshEntry.BusinessObjectType,
-		BusinessObjectId:                     latestTrustmeshEntry.SorBusinessObjectId,
-		BaseledgerBusinessObjectId:           latestTrustmeshEntry.BaseledgerBusinessObjectId,
-		ReferencedBaseledgerBusinessObjectId: latestTrustmeshEntry.BaseledgerBusinessObjectId,
+		BusinessObjectType:                   latestFeedbackTrustmeshEntry.BusinessObjectType,
+		BusinessObjectId:                     latestFeedbackTrustmeshEntry.SorBusinessObjectId,
+		BaseledgerBusinessObjectId:           latestFeedbackTrustmeshEntry.ReferencedBaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: latestFeedbackTrustmeshEntry.ReferencedBaseledgerBusinessObjectId,
+		ReferencedBaseledgerTransactionId:    latestFeedbackTrustmeshEntry.BaseledgerTransactionId.String(),
 		BusinessObjectJson:                   req.BusinessObjectJson,
 		KnowledgeLimiters:                    req.KnowledgeLimiters,
 	}
 }
 
-func createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(req sendSuggestionDto, latestTrustmeshEntry types.TrustmeshEntry, workstepType string) *types.NewSuggestionRequest {
+func createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(
+	req sendSuggestionDto,
+	latestFeedbackTrustmeshEntry types.TrustmeshEntry,
+	workstepType string) *types.NewSuggestionRequest {
 	return &types.NewSuggestionRequest{
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
-		Recipient:                            latestTrustmeshEntry.ReceiverOrgId.String(),
+		Recipient:                            latestFeedbackTrustmeshEntry.SenderOrgId.String(),
 		WorkstepType:                         workstepType,
 		BusinessObjectType:                   req.BusinessObjectType,
 		BusinessObjectId:                     req.BusinessObjectId,
 		BaseledgerBusinessObjectId:           uuid.NewV4().String(),
-		ReferencedBaseledgerBusinessObjectId: latestTrustmeshEntry.BaseledgerBusinessObjectId,
+		ReferencedBaseledgerBusinessObjectId: latestFeedbackTrustmeshEntry.ReferencedBaseledgerBusinessObjectId,
+		ReferencedBaseledgerTransactionId:    latestFeedbackTrustmeshEntry.BaseledgerTransactionId.String(),
 		BusinessObjectJson:                   req.BusinessObjectJson,
 		KnowledgeLimiters:                    req.KnowledgeLimiters,
 	}
 }
 
-func createNewSuggestionOffchainMessage(req types.NewSuggestionRequest, transactionId uuid.UUID, syncTreeJson string, rootProof string) types.OffchainProcessMessage {
+func createNewSuggestionOffchainMessage(
+	req types.NewSuggestionRequest, transactionId uuid.UUID, syncTreeJson string, rootProof string) types.OffchainProcessMessage {
 	offchainMessage := types.OffchainProcessMessage{
 		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
 		ReceiverId:                           uuid.FromStringOrNil(req.Recipient),
@@ -286,8 +299,8 @@ func createNewSuggestionOffchainMessage(req types.NewSuggestionRequest, transact
 		EntryType:                            common.SuggestionSentTrustmeshEntryType, // can we ditch this as we have one above that says that this is a suggestion
 		StatusTextMessage:                    req.WorkstepType + " " + common.BaseledgerTransactionTypeSuggest,
 		BaseledgerTransactionIdOfStoredProof: transactionId,
+		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
 		TendermintTransactionIdOfStoredProof: transactionId,
-		ReferencedBaseledgerTransactionId:    uuid.FromStringOrNil(""), // same here
 	}
 
 	return offchainMessage
@@ -308,6 +321,6 @@ func createSuggestionSentTrustmeshEntry(req types.NewSuggestionRequest, transact
 		TendermintTransactionId:           transactionId,
 		TransactionHash:                   txHash,
 		BaseledgerTransactionId:           transactionId,
-		ReferencedBaseledgerTransactionId: uuid.FromStringOrNil(req.ReferencedBaseledgerBusinessObjectId),
+		ReferencedBaseledgerTransactionId: uuid.FromStringOrNil(req.ReferencedBaseledgerTransactionId),
 	}
 }

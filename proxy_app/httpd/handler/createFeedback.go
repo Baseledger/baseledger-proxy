@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/kthomas/go.uuid"
-	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/common"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/proxyutil"
@@ -141,7 +140,7 @@ func CreateSynchronizationFeedbackHandler() gin.HandlerFunc {
 			return
 		}
 
-		responseDto.WorkflowId = feedbackSentTrustmeshEntry.TrustmeshId.String()
+		responseDto.WorkflowId = latestTrustmeshEntry.TrustmeshId.String() // need to pick it up from this latestTrustmeshEntry cause db trigger
 		responseDto.WorkstepId = feedbackSentTrustmeshEntry.Id.String()
 		responseDto.BaseledgerBusinessObjectId = feedbackSentTrustmeshEntry.ReferencedBaseledgerBusinessObjectId
 		responseDto.TransactionHash = feedbackSentTrustmeshEntry.TransactionHash
@@ -170,7 +169,7 @@ func createFeedbackOffchainMessage(
 	}
 
 	offchainMessage := types.OffchainProcessMessage{
-		SenderId:                             uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
+		SenderId:                             suggestionReceivedOffchainMessage.ReceiverId, // TODO: there was a problem here reading viper organization id, it was reading first org id for some reason
 		ReceiverId:                           suggestionReceivedOffchainMessage.SenderId,
 		Topic:                                suggestionReceivedOffchainMessage.Topic,
 		WorkstepType:                         common.WorkstepTypeFeedback,
@@ -196,7 +195,7 @@ func createFeedbackSentTrustmeshEntry(newFeedbackRequest types.NewFeedbackReques
 	trustmeshEntry := &types.TrustmeshEntry{
 		TendermintTransactionId:              offchainMsg.BaseledgerTransactionIdOfStoredProof,
 		OffchainProcessMessageId:             offchainMsg.Id,
-		SenderOrgId:                          uuid.FromStringOrNil(viper.Get("ORGANIZATION_ID").(string)),
+		SenderOrgId:                          uuid.FromStringOrNil(offchainMsg.SenderId.String()),
 		ReceiverOrgId:                        uuid.FromStringOrNil(offchainMsg.ReceiverId.String()),
 		WorkgroupId:                          uuid.FromStringOrNil(offchainMsg.Topic),
 		WorkstepType:                         offchainMsg.WorkstepType,
