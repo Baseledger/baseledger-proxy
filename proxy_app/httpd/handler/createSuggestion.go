@@ -89,17 +89,31 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 
 		// bboid is provided, go with it first
 		if dto.BaseledgerBusinessObjectId != "" {
+			latestTrustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnBboid(dto.BaseledgerBusinessObjectId)
+
+			if err != nil {
+				responseDto.Error = err.Error()
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
+			// consider opening up for other previous worksteps.
+			// currently we are rigid that feedback has to be the step that came before this one
+			// in the scenario where workflow id is provided
+			if latestTrustmeshEntry.EntryType != common.FeedbackReceivedTrustmeshEntryType && latestTrustmeshEntry.EntryType != common.FeedbackSentTrustmeshEntryType {
+				responseDto.Error = "Previous workstep is not feedback sent/received"
+				restutil.Render(responseDto, 400, c)
+				return
+			}
+
 			if dto.WorkstepType == common.WorkstepTypeNewVersion {
-				// TODO: Validate underlying trustmesh is in correct state
-				newSuggestionRequest = createNewVersionSuggestionRequestFromDto(*dto)
+				newSuggestionRequest = createNewVersionSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry)
 			} else if dto.WorkstepType == common.WorkstepTypeNextWorkstep {
-				// TODO: Validate underlying trustmesh is in correct state
-				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromDto(*dto, common.WorkstepTypeNextWorkstep)
+				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeNextWorkstep)
 			} else if dto.WorkstepType == common.WorkstepTypeFinal {
-				// TODO: Validate underlying trustmesh is in correct state
-				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromDto(*dto, common.WorkstepTypeFinal)
+				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeFinal)
 			} else {
-				responseDto.Error = "Combination of bboid and workstep type is invalid"
+				responseDto.Error = "Workstep type is invalid for suggestion"
 				restutil.Render(responseDto, 400, c)
 				return
 			}
