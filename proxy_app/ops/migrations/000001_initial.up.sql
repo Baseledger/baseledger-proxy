@@ -201,16 +201,16 @@ CREATE TABLE public.users (
 CREATE TABLE public.sor_webhooks (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
   url text NOT NULL,
-  urlParams text,
-  HttpMethod text NOT NULL,
-  WebhookType smallint,
-  AuthType smallint,
-  AuthUsername text,
-  AuthPassword text,
-  XcsrfUrl text,
-  BodyContentType text,
-  Body text,
-  BodyParams text
+  url_params text,
+  http_method text NOT NULL,
+  webhook_type smallint,
+  auth_type smallint,
+  auth_username text,
+  auth_password text,
+  xcsrf_url text,
+  body_content_type text,
+  body text,
+  body_params text
 );
 
 
