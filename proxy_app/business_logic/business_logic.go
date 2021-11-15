@@ -168,9 +168,8 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			offchainMessage.StatusTextMessage,
 			offchainMessage.SenderId.String())
 
-		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == common.WorkstepTypeFinal && status == "1"
-		if exitOnFinalWorkstep {
-			exitToEth(&trustmeshEntry)
+		if status == "1" {
+			tryExitToEth(&trustmeshEntry)
 		}
 
 	default:
@@ -181,13 +180,28 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	setTxStatus(txResult, common.CommittedCommitmentState)
 }
 
-func exitToEth(trustmeshEntry *types.TrustmeshEntry) {
+func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 	trustmesh, err := types.GetTrustmeshById(trustmeshEntry.TrustmeshId)
 
 	if err != nil {
 		logger.Errorf("Could not find trustmesh for exiting %v", trustmeshEntry.TrustmeshId)
 		return
 	}
+
+	containsFinal := false
+	for _, entry := range trustmesh.Entries {
+		if entry.WorkstepType == common.WorkstepTypeFinal {
+			containsFinal = true
+			break
+		}
+	}
+
+	if !containsFinal {
+		logger.Infof("Current trustmesh %v does not contain final workstep, skipping exit", trustmeshEntry.TrustmeshId)
+		return
+	}
+
+	logger.Infof("Current trustmesh %v contains final workstep, exiting", trustmeshEntry.TrustmeshId)
 
 	trustmeshSyncTree := synctree.CreateFromTrustmesh(*trustmesh)
 	transactionId := uuid.NewV4()
