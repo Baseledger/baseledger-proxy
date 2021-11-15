@@ -85,32 +85,25 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 		// there is no bboid and no trustmesh id that the suggestion references - we treat it as INITIAL
 		if dto.BaseledgerBusinessObjectId == "" && dto.WorkflowId == "" {
 			newSuggestionRequest = createNewInitialSuggestionRequest(*dto)
-		}
+		} else {
+			// either go with bboid or workflow id
+			latestTrustmeshEntry := &types.TrustmeshEntry{}
+			if dto.BaseledgerBusinessObjectId != "" {
+				latestTrustmeshEntry, err = types.GetLatestTrustmeshEntryBasedOnBboid(dto.BaseledgerBusinessObjectId)
 
-		// bboid is provided, go with it first
-		if dto.BaseledgerBusinessObjectId != "" {
-			if dto.WorkstepType == common.WorkstepTypeNewVersion {
-				// TODO: Validate underlying trustmesh is in correct state
-				newSuggestionRequest = createNewVersionSuggestionRequestFromDto(*dto)
-			} else if dto.WorkstepType == common.WorkstepTypeNextWorkstep {
-				// TODO: Validate underlying trustmesh is in correct state
-				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromDto(*dto, common.WorkstepTypeNextWorkstep)
-			} else if dto.WorkstepType == common.WorkstepTypeFinal {
-				// TODO: Validate underlying trustmesh is in correct state
-				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromDto(*dto, common.WorkstepTypeFinal)
-			} else {
-				responseDto.Error = "Combination of bboid and workstep type is invalid"
-				restutil.Render(responseDto, 400, c)
-				return
-			}
-			// otherwise go with trustmesh id
-		} else if dto.WorkflowId != "" {
-			latestTrustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnTrustmeshId(dto.WorkflowId)
+				if err != nil {
+					responseDto.Error = err.Error()
+					restutil.Render(responseDto, 400, c)
+					return
+				}
+			} else if dto.WorkflowId != "" {
+				latestTrustmeshEntry, err = types.GetLatestTrustmeshEntryBasedOnTrustmeshId(dto.WorkflowId)
 
-			if err != nil {
-				responseDto.Error = err.Error()
-				restutil.Render(responseDto, 400, c)
-				return
+				if err != nil {
+					responseDto.Error = err.Error()
+					restutil.Render(responseDto, 400, c)
+					return
+				}
 			}
 
 			// consider opening up for other previous worksteps.
@@ -133,7 +126,6 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 				restutil.Render(responseDto, 400, c)
 				return
 			}
-
 		}
 
 		syncTree := synctree.CreateFromBusinessObjectJson(newSuggestionRequest.BusinessObjectJson, newSuggestionRequest.KnowledgeLimiters)

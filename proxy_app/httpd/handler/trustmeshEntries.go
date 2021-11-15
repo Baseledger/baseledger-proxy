@@ -16,6 +16,7 @@ type newWorkflowDto struct {
 	WorkstepType               string `json:"workstep_type"`
 	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
 	BusinessObjectJsonPayload  string `json:"business_object_json_payload"`
+	BusinessObjectId           string `json:"business_object_id"`
 }
 
 type latestTrustmeshEntryDto struct {
@@ -50,7 +51,6 @@ func GetNewWorkflowHandler() gin.HandlerFunc {
 		for _, entry := range res {
 			syncTree := &synctree.BaseledgerSyncTree{}
 			json.Unmarshal([]byte(entry.OffchainProcessMessage.BaseledgerSyncTreeJson), &syncTree)
-
 			boJson := synctree.GetBusinessObjectJson(*syncTree)
 			dto := &newWorkflowDto{
 				WorkflowId:                 entry.TrustmeshId.String(),
@@ -58,6 +58,7 @@ func GetNewWorkflowHandler() gin.HandlerFunc {
 				WorkstepType:               entry.WorkstepType,
 				BaseledgerBusinessObjectId: entry.BaseledgerBusinessObjectId,
 				BusinessObjectJsonPayload:  boJson,
+				BusinessObjectId:           entry.SorBusinessObjectId,
 			}
 
 			dtos = append(dtos, *dto)

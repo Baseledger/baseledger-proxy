@@ -137,8 +137,7 @@ func GetLatestTrustmeshEntryBasedOnBboid(bboid string) (*TrustmeshEntry, error) 
 	db := dbutil.Db.GetConn()
 
 	latestEntry := &TrustmeshEntry{}
-	// TODO:  would we miss feedback trustmesh entry because only referenced bboid filled?
-	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where baseledger_business_object_id = ? order by created_at desc limit 1", bboid).Find(&latestEntry)
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries where baseledger_transaction_type='SUGGEST' and baseledger_business_object_id = ? or workstep_type='FEEDBACK' and referenced_baseledger_business_object_id = ? order by created_at desc limit 1", bboid, bboid).Find(&latestEntry)
 
 	if res.Error != nil {
 		logger.Errorf("error when getting latest trustmesh entry from db %v\n", res.Error)
