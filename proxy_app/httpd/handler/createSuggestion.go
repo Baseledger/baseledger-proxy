@@ -85,16 +85,25 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 		// there is no bboid and no trustmesh id that the suggestion references - we treat it as INITIAL
 		if dto.BaseledgerBusinessObjectId == "" && dto.WorkflowId == "" {
 			newSuggestionRequest = createNewInitialSuggestionRequest(*dto)
-		}
+		} else {
+			// either go with bboid or workflow id
+			latestTrustmeshEntry := &types.TrustmeshEntry{}
+			if dto.BaseledgerBusinessObjectId != "" {
+				latestTrustmeshEntry, err = types.GetLatestTrustmeshEntryBasedOnBboid(dto.BaseledgerBusinessObjectId)
 
-		// bboid is provided, go with it first
-		if dto.BaseledgerBusinessObjectId != "" {
-			latestTrustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnBboid(dto.BaseledgerBusinessObjectId)
+				if err != nil {
+					responseDto.Error = err.Error()
+					restutil.Render(responseDto, 400, c)
+					return
+				}
+			} else if dto.WorkflowId != "" {
+				latestTrustmeshEntry, err = types.GetLatestTrustmeshEntryBasedOnTrustmeshId(dto.WorkflowId)
 
-			if err != nil {
-				responseDto.Error = err.Error()
-				restutil.Render(responseDto, 400, c)
-				return
+				if err != nil {
+					responseDto.Error = err.Error()
+					restutil.Render(responseDto, 400, c)
+					return
+				}
 			}
 
 			// consider opening up for other previous worksteps.
@@ -117,37 +126,6 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 				restutil.Render(responseDto, 400, c)
 				return
 			}
-			// otherwise go with trustmesh id
-		} else if dto.WorkflowId != "" {
-			latestTrustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnTrustmeshId(dto.WorkflowId)
-
-			if err != nil {
-				responseDto.Error = err.Error()
-				restutil.Render(responseDto, 400, c)
-				return
-			}
-
-			// consider opening up for other previous worksteps.
-			// currently we are rigid that feedback has to be the step that came before this one
-			// in the scenario where workflow id is provided
-			if latestTrustmeshEntry.EntryType != common.FeedbackReceivedTrustmeshEntryType && latestTrustmeshEntry.EntryType != common.FeedbackSentTrustmeshEntryType {
-				responseDto.Error = "Previous workstep is not feedback sent/received"
-				restutil.Render(responseDto, 400, c)
-				return
-			}
-
-			if dto.WorkstepType == common.WorkstepTypeNewVersion {
-				newSuggestionRequest = createNewVersionSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry)
-			} else if dto.WorkstepType == common.WorkstepTypeNextWorkstep {
-				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeNextWorkstep)
-			} else if dto.WorkstepType == common.WorkstepTypeFinal {
-				newSuggestionRequest = createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(*dto, *latestTrustmeshEntry, common.WorkstepTypeFinal)
-			} else {
-				responseDto.Error = "Workstep type is invalid for suggestion"
-				restutil.Render(responseDto, 400, c)
-				return
-			}
-
 		}
 
 		syncTree := synctree.CreateFromBusinessObjectJson(newSuggestionRequest.BusinessObjectJson, newSuggestionRequest.KnowledgeLimiters)
