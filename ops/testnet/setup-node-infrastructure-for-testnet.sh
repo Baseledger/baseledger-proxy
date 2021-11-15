@@ -11,7 +11,5 @@ export API_CONCIRCLE_URL=s4h.rp.concircle.com # SOR endpoint
 # - DB_UB_PWD=${DB_UB_PWD}
 # - API_UB_USER=${API_UB_USER}
 # - API_UB_PWD=${API_UB_PWD}
-# - API_CONCIRCLE_USER
-# - API_CONCIRCLE_PWD
 
 docker-compose -p baseledger-node up -d
