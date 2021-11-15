@@ -102,7 +102,9 @@ func ParseStringIntoRequestParams(requestParamsDbFormat string) []RequestParam {
 
 	for _, param := range paramsStringRepresentation {
 		paramNameAndFieldValue := strings.Split(param, ":")
-		requestParams = append(requestParams, RequestParam{paramNameAndFieldValue[0], paramNameAndFieldValue[1]})
+		if len(paramNameAndFieldValue) == 2 {
+			requestParams = append(requestParams, RequestParam{paramNameAndFieldValue[0], paramNameAndFieldValue[1]})
+		}
 	}
 
 	return requestParams
