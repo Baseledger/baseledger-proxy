@@ -168,7 +168,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			offchainMessage.StatusTextMessage,
 			offchainMessage.SenderId.String())
 
-		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == common.WorkstepTypeFinal && status == "success"
+		exitOnFinalWorkstep := offchainMessage.ReferencedWorkstepType == common.WorkstepTypeFinal && status == "1"
 		if exitOnFinalWorkstep {
 			exitToEth(&trustmeshEntry)
 		}
