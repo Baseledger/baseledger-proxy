@@ -124,7 +124,7 @@ func buildWebhookRequestBody(
 			logger.Errorf("Error %v fetching request parameter field %v from trustmesh entry \n", err.Error(), param.ParamValueField)
 			return ""
 		}
-		requestBody = strings.Replace(requestBody, param.ParamName, fmt.Sprintf("%v", paramValue), 1)
+		requestBody = strings.Replace(requestBody, "{{"+param.ParamName+"}}", fmt.Sprintf("%v", paramValue), 1)
 	}
 
 	if webhookType == types.CreateObject {

@@ -41,7 +41,7 @@ func TestGivenAUrlWhenhandleBasicAuthBasicAuthAddedTourl(t *testing.T) {
 	}
 }
 
-func TestGivenACreateWebhookAndTrustmeshWhenBuildWebhookRequestBodyCorrectRequestCreated(t *testing.T) {
+func TestGivenACreateWebhookWithSpecialParamPayloadWhenBuildWebhookRequestBodyCorrectRequestBodyCreated(t *testing.T) {
 	trustmeshEntry := &types.TrustmeshEntry{
 		BaseledgerBusinessObjectId: "test",
 		BusinessObjectType:         "test",
@@ -60,6 +60,42 @@ func TestGivenACreateWebhookAndTrustmeshWhenBuildWebhookRequestBodyCorrectReques
 	payload := "{ 'testproperty' : 'testvalue' }"
 
 	want := "{ 'sorPayload': '{ 'testproperty' : 'testvalue' }' }"
+
+	result := buildWebhookRequestBody(
+		webhook.Body,
+		webhook.BodyParams,
+		webhook.WebhookType,
+		trustmeshEntry,
+		payload,
+		"irelevant",
+		"irelevant",
+		"irelevant",
+	)
+
+	if strings.Compare(want, result) != 0 {
+		t.Fatalf(`TestHook = %q,  want match for %#q, nil`, result, want)
+	}
+}
+
+func TestGivenACreateWebhookWithBodyParamsWhenBuildWebhookRequestBodyCorrectRequestBodyCreated(t *testing.T) {
+	trustmeshEntry := &types.TrustmeshEntry{
+		BaseledgerBusinessObjectId: "test",
+		BusinessObjectType:         "test",
+		SorBusinessObjectId:        "test",
+		BaseledgerTransactionId:    uuid.NewV4(),
+		ReceiverOrgId:              uuid.NewV4(),
+		TrustmeshId:                uuid.NewV4(),
+	}
+
+	webhook := &types.SorWebhook{
+		Body:        "{ 'sorPayload': '{{business_object_json_payload}}', 'workflow_id':'{{trustmesh_id}}' }",
+		BodyParams:  "trustmesh_id:TrustmeshId",
+		WebhookType: types.CreateObject,
+	}
+
+	payload := "{ 'testproperty' : 'testvalue' }"
+
+	want := "{ 'sorPayload': '{ 'testproperty' : 'testvalue' }', 'workflow_id':'" + trustmeshEntry.TrustmeshId.String() + "' }"
 
 	result := buildWebhookRequestBody(
 		webhook.Body,
