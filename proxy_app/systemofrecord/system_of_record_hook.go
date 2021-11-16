@@ -62,11 +62,11 @@ func TriggerSorWebhook(
 		message,
 		origin)
 
-	if requestBody == nil {
+	if requestBody == "" {
 		return false
 	}
 
-	request := prepareWebhookRequest(*requestBody, targetUrl, webhook.HttpMethod)
+	request := prepareWebhookRequest(requestBody, targetUrl, webhook.HttpMethod)
 
 	if request == nil {
 		return false
@@ -112,7 +112,7 @@ func buildWebhookRequestBody(
 	payload string, // TODO: Move special params templating to a dedicated method
 	approved string,
 	message string,
-	origin string) *string {
+	origin string) string {
 	logger.Infof("Building body..")
 
 	requestBody := bodyTemplate
@@ -122,22 +122,23 @@ func buildWebhookRequestBody(
 		paramValue, err := reflections.GetField(trustmeshEntry, param.ParamValueField)
 		if err != nil {
 			logger.Errorf("Error %v fetching request parameter field %v from trustmesh entry \n", err.Error(), param.ParamValueField)
-			return nil
+			return ""
 		}
 		requestBody = strings.Replace(requestBody, param.ParamName, fmt.Sprintf("%v", paramValue), 1)
-		if webhookType == types.CreateObject {
-			requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", payload, 1) // TODO: Might be an issue with escaping quotes, look into concirlce_restutil line 101 for a fix
-		} else {
-			requestBody = strings.Replace(requestBody, "{{approved}}", approved, 1)
-			requestBody = strings.Replace(requestBody, "{{message}}", message, 1)
-		}
-
-		requestBody = strings.Replace(requestBody, "{{origin}}", origin, 1)
 	}
+
+	if webhookType == types.CreateObject {
+		requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", payload, 1) // TODO: Might be an issue with escaping quotes, look into concirlce_restutil line 101 for a fix
+	} else {
+		requestBody = strings.Replace(requestBody, "{{approved}}", approved, 1)
+		requestBody = strings.Replace(requestBody, "{{message}}", message, 1)
+	}
+
+	requestBody = strings.Replace(requestBody, "{{origin}}", origin, 1)
 
 	logger.Infof("Body built %v\n", requestBody)
 
-	return &requestBody
+	return requestBody
 }
 
 func prepareWebhookRequest(requestBody string, targetUrl string, httpMethod string) *http.Request {
