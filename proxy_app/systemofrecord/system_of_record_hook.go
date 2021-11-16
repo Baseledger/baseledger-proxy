@@ -98,8 +98,8 @@ func buildWebhookRequestUrl(targetUrl string, urlParams string, trustmeshEntry *
 }
 
 func handleBasicAuth(targetUrl string, username string, password string) string {
-	targetUrlParts := strings.SplitAfter(targetUrl, "//")
-	targetUrl = targetUrlParts[0] + username + ":" + password + "@" + targetUrlParts[1]
+	targetUrlParts := strings.Split(targetUrl, "//")
+	targetUrl = targetUrlParts[0] + "//" + username + ":" + password + "@" + targetUrlParts[1]
 	logger.Infof("Included basic auth credentials into url")
 	return targetUrl
 }
