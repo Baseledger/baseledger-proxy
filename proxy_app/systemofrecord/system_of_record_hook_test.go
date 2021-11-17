@@ -41,7 +41,7 @@ func TestGivenAUrlWhenhandleBasicAuthBasicAuthAddedTourl(t *testing.T) {
 	}
 }
 
-func TestGivenACreateWebhookWithSpecialParamPayloadWhenBuildWebhookRequestBodyCorrectRequestBodyCreated(t *testing.T) {
+func TestGivenACreateWebhookWithSpecialParamPayloadAndOriginWhenBuildWebhookRequestBodyCorrectRequestBodyCreated(t *testing.T) {
 	trustmeshEntry := &types.TrustmeshEntry{
 		BaseledgerBusinessObjectId: "test",
 		BusinessObjectType:         "test",
@@ -52,14 +52,14 @@ func TestGivenACreateWebhookWithSpecialParamPayloadWhenBuildWebhookRequestBodyCo
 	}
 
 	webhook := &types.SorWebhook{
-		Body:        "{ 'sorPayload': '{{business_object_json_payload}}' }",
+		Body:        "{ 'sorPayload': '{{business_object_json_payload}}', 'origin':'{{origin}}' }",
 		BodyParams:  "",
 		WebhookType: types.CreateObject,
 	}
 
 	payload := "{ 'testproperty' : 'testvalue' }"
 
-	want := "{ 'sorPayload': '{ 'testproperty' : 'testvalue' }' }"
+	want := "{ 'sorPayload': '{ 'testproperty' : 'testvalue' }', 'origin':'proxy' }"
 
 	result := buildWebhookRequestBody(
 		webhook.Body,
@@ -69,7 +69,7 @@ func TestGivenACreateWebhookWithSpecialParamPayloadWhenBuildWebhookRequestBodyCo
 		payload,
 		"irelevant",
 		"irelevant",
-		"irelevant",
+		"proxy",
 	)
 
 	if strings.Compare(want, result) != 0 {
@@ -105,6 +105,40 @@ func TestGivenACreateWebhookWithBodyParamsWhenBuildWebhookRequestBodyCorrectRequ
 		payload,
 		"irelevant",
 		"irelevant",
+		"irelevant",
+	)
+
+	if strings.Compare(want, result) != 0 {
+		t.Fatalf(`TestHook = %q,  want match for %#q, nil`, result, want)
+	}
+}
+
+func TestGivenAUpdateWebhookWithSpecialParamsApprovedAndMessageWhenBuildWebhookRequestBodyCorrectRequestBodyCreated(t *testing.T) {
+	trustmeshEntry := &types.TrustmeshEntry{
+		BaseledgerBusinessObjectId: "test",
+		BusinessObjectType:         "test",
+		SorBusinessObjectId:        "test",
+		BaseledgerTransactionId:    uuid.NewV4(),
+		ReceiverOrgId:              uuid.NewV4(),
+		TrustmeshId:                uuid.NewV4(),
+	}
+
+	webhook := &types.SorWebhook{
+		Body:        "{ 'isApproved': '{{approved}}', 'feedbackMessage': '{{message}}' }",
+		BodyParams:  "",
+		WebhookType: types.UpdateObject,
+	}
+
+	want := "{ 'isApproved': 'APPROVED', 'feedbackMessage': 'this is a feedback message' }"
+
+	result := buildWebhookRequestBody(
+		webhook.Body,
+		webhook.BodyParams,
+		webhook.WebhookType,
+		trustmeshEntry,
+		"",
+		"APPROVED",
+		"this is a feedback message",
 		"irelevant",
 	)
 
