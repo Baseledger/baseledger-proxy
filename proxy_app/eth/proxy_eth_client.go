@@ -10,8 +10,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	uuid "github.com/kthomas/go.uuid"
 	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
+	"github.com/unibrightio/proxy-api/types"
 
 	proxyCommon "github.com/unibrightio/proxy-api/common"
 	contracts "github.com/unibrightio/proxy-api/contracts"
@@ -35,7 +37,7 @@ func GetClient() *ethclient.Client {
 	return ethClient
 }
 
-func AddNewProof(txId string, proof string) {
+func AddNewProof(txId string, proof string, trustmeshId uuid.UUID) {
 	instance, auth := getContractInstance()
 	if instance == nil || auth == nil {
 		logger.Error("Error getting contract instance")
@@ -48,6 +50,7 @@ func AddNewProof(txId string, proof string) {
 	}
 
 	logger.Infof("eth tx sent: %s", tx.Hash().Hex())
+	types.SetEthTxHash(trustmeshId, tx.Hash().Hex())
 }
 
 func GetProof(txId string) {

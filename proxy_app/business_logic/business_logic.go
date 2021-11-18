@@ -219,7 +219,7 @@ func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 		return
 	}
 
-	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof)
+	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof, trustmeshEntry.TrustmeshId)
 }
 
 func setTxStatus(txResult proxytypes.Result, commitmentState string) {

@@ -57,8 +57,8 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
 	r.GET("/trustmeshes/:id", basicAuth, handler.GetTrustmeshHandler())
-	r.POST("/suggestion", basicAuth, handler.CreateSuggestionRequestHandler())
-	r.POST("/feedback", basicAuth, handler.CreateSynchronizationFeedbackHandler())
+	r.POST("/suggestion", proxyMiddleware.AuthorizeJWTMiddleware(), handler.CreateSuggestionRequestHandler())
+	r.POST("/feedback", proxyMiddleware.AuthorizeJWTMiddleware(), handler.CreateSynchronizationFeedbackHandler())
 	r.GET("/sunburst/:txId", basicAuth, handler.GetSunburstHandler())
 	r.GET("/organization", basicAuth, handler.GetOrganizationsHandler())
 	r.POST("/organization", basicAuth, handler.CreateOrganizationHandler())
@@ -74,8 +74,8 @@ func main() {
 	r.DELETE("/sorwebhook/:id", basicAuth, handler.DeleteSorWebhookHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
-	r.GET("/workflow/new", basicAuth, handler.GetNewWorkflowHandler())
-	r.GET("/workflow/latestState/:bo_id", basicAuth, handler.GetLatestWorkflowStateHandler())
+	r.GET("/workflow/new", proxyMiddleware.AuthorizeJWTMiddleware(), handler.GetNewWorkflowHandler())
+	r.GET("/workflow/latestState/:bo_id", proxyMiddleware.AuthorizeJWTMiddleware(), handler.GetLatestWorkflowStateHandler())
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
 	r.POST("/dev/tx", proxyMiddleware.AuthorizeJWTMiddleware(), rateMiddleware, handler.CreateTransactionHandler())
@@ -103,7 +103,6 @@ func setupViper() {
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 	viper.AutomaticEnv() // Overwrite config with env variables if exist, important for debugging session
-
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Println(fmt.Printf("viper read config error %v\n", err))
