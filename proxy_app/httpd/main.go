@@ -123,7 +123,26 @@ func subscribeToWorkgroupMessages() {
 	natsToken := "testToken1" // TODO: Read from configuration
 	logger.Infof("subscribeToWorkgroupMessages natsServerUrl %v", natsServerUrl)
 	messagingClient := &messaging.NatsMessagingClient{}
-	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
+	messagingClient.Subscribe(natsServerUrl, natsToken, common.BaseledgerNatsSubject, receiveOffchainProcessMessage)
+	messagingClient.Subscribe(natsServerUrl, natsToken, common.EthTxHashNatsSubject, receiveTxEthHashUpdateMessage)
+}
+
+func receiveTxEthHashUpdateMessage(sender string, natsMsg *nats.Msg) {
+	var natsTrustmeshUpdateMessage types.NatsTrustmeshUpdateMessage
+	err := json.Unmarshal(natsMsg.Data, &natsTrustmeshUpdateMessage)
+	if err != nil {
+		logger.Errorf("Error parsing nats message %v\n", err)
+		return
+	}
+
+	logger.Infof("message received %v", natsTrustmeshUpdateMessage)
+
+	trustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnBboid(natsTrustmeshUpdateMessage.BaseledgerBusinessObjectId)
+	if err != nil {
+		logger.Errorf("Error getting latest trustmesh entry by bbod %v", err.Error())
+	}
+	types.SetEthTxHash(trustmeshEntry.TrustmeshId, natsTrustmeshUpdateMessage.EthTxHash)
+	return
 }
 
 func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {

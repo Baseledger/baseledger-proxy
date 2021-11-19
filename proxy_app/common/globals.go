@@ -20,3 +20,6 @@ const WorkstepTypeFinal = "FINALWORKSTEP"
 const BaseledgerTransactionTypeSuggest = "SUGGEST"
 const BaseledgerTransactionTypeApprove = "APPROVE"
 const BaseledgerTransactionTypeReject = "REJECT"
+
+const BaseledgerNatsSubject = "baseledger"
+const EthTxHashNatsSubject = "ethHash"

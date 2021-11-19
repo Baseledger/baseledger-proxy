@@ -37,6 +37,11 @@ type NatsMessage struct {
 	TxHash         string
 }
 
+type NatsTrustmeshUpdateMessage struct {
+	EthTxHash                  string
+	BaseledgerBusinessObjectId string
+}
+
 type NewSuggestionRequest struct {
 	WorkgroupId                          uuid.UUID
 	Recipient                            string

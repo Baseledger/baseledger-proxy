@@ -60,7 +60,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		var payload, _ = json.Marshal(natsMessage)
 
-		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String(), common.BaseledgerNatsSubject)
 
 		// commenting this just for demo so its not conflicted with feedback status update
 		// systemofrecord.TriggerSorWebhook(
@@ -119,7 +119,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		var payload, _ = json.Marshal(natsMessage)
 
-		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String(), common.BaseledgerNatsSubject)
 
 		// commenting this just for demo so its not conflicted with feedback status update
 		// systemofrecord.TriggerSorWebhook(
@@ -219,7 +219,7 @@ func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 		return
 	}
 
-	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof, trustmeshEntry.TrustmeshId)
+	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof, trustmeshEntry)
 }
 
 func setTxStatus(txResult proxytypes.Result, commitmentState string) {
