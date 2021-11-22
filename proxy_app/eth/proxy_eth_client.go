@@ -59,7 +59,8 @@ func AddNewProof(txId string, proof string, trustmeshEntry *types.TrustmeshEntry
 	logger.Infof("successful setting of tx hash, broadcasting offchain message ")
 	var natsMessage types.NatsTrustmeshUpdateMessage
 	natsMessage.EthTxHash = tx.Hash().Hex()
-	natsMessage.BaseledgerBusinessObjectId = trustmeshEntry.BaseledgerBusinessObjectId
+	// it has to be referenced bboid because at this point entry has to be feedback (approval feedback of final workstep)
+	natsMessage.BaseledgerBusinessObjectId = trustmeshEntry.ReferencedBaseledgerBusinessObjectId
 	var payload, _ = json.Marshal(natsMessage)
 
 	proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.SenderOrgId.String(), proxyCommon.EthTxHashNatsSubject)
