@@ -18,8 +18,9 @@ type workgroupDetailsDto struct {
 }
 
 type createWorkgroupRequest struct {
-	Name         string `json:"name"`
-	PrivatizeKey string `json:"privatize_key"`
+	Id           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	PrivatizeKey string    `json:"privatize_key"`
 }
 
 // @Security BasicAuth
@@ -120,6 +121,7 @@ func DeleteWorkgroupHandler() gin.HandlerFunc {
 
 func newWorkgroup(req createWorkgroupRequest) *types.Workgroup {
 	return &types.Workgroup{
+		Id:            req.Id,
 		WorkgroupName: req.Name,
 		PrivatizeKey:  req.PrivatizeKey,
 	}

@@ -104,11 +104,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/trustmeshes?rpp=1000",
+							"raw": "http://ub:ub321@localhost:8081/trustmeshes?rpp=1000",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -147,11 +147,11 @@
 							}
 						},
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/suggestion",
+							"raw": "http://ub:ub321@localhost:8081/suggestion",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -179,11 +179,11 @@
 							}
 						},
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/suggestion",
+							"raw": "http://ub:ub321@localhost:8081/suggestion",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -211,16 +211,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8082/feedback",
+							"raw": "http://ub:ub321@localhost:8081/feedback",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
 							],
-							"port": "8082",
+							"port": "8081",
 							"path": [
 								"feedback"
 							]
@@ -239,11 +239,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/organization",
+							"raw": "http://ub:ub321@localhost:8081/organization",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -266,10 +266,10 @@
 							"raw": "{\r\n    \"name\": \"Ambex\"\r\n}"
 						},
 						"url": {
-							"raw": "http://unibright:ub321@localhost:8081/organization",
+							"raw": "http://ub:ub321@localhost:8081/organization",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
+								"user": "ub",
 								"password": "ub321"
 							},
 							"host": [
@@ -289,10 +289,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub321@localhost:8081/ecacb5b7-269e-4194-9c85-b462ee49e00a",
+							"raw": "http://ub:ub321@localhost:8081/ecacb5b7-269e-4194-9c85-b462ee49e00a",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
+								"user": "ub",
 								"password": "ub321"
 							},
 							"host": [
@@ -317,11 +317,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/workgroup",
+							"raw": "http://ub:ub321@localhost:8081/workgroup",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -341,13 +341,13 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Factoring Workgroup\",\r\n    \"privatize_key\": \"secretPrivatizationKey\"\r\n}"
+							"raw": "{\r\n    \"id\": \"584362d8-6590-4000-b478-9891f948c86b\"\r\n    \"name\": \"Factoring Workgroup\",\r\n    \"privatize_key\": \"secretPrivatizationKey\"\r\n}"
 						},
 						"url": {
-							"raw": "http://unibright:ub321@localhost:8081/workgroup",
+							"raw": "http://ub:ub321@localhost:8081/workgroup",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
+								"user": "ub",
 								"password": "ub321"
 							},
 							"host": [
@@ -367,10 +367,10 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub321@localhost:8081/workgroup/584362d8-6590-4000-b478-9891f948c86b",
+							"raw": "http://ub:ub321@localhost:8081/workgroup/584362d8-6590-4000-b478-9891f948c86b",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
+								"user": "ub",
 								"password": "ub321"
 							},
 							"host": [
@@ -396,11 +396,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
+							"raw": "http://ub:ub321@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -425,11 +425,11 @@
 							"raw": "{\r\n    \"organization_id\": \"4e227c7c-e73a-4e46-8907-786832cd87d3\",\r\n    \"organization_endpoint\": \"ambex2NatsServer:4222\",\r\n    \"organization_token\": \"ambex2NatsSecretToken\"\r\n}"
 						},
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
+							"raw": "http://ub:ub321@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"
@@ -450,11 +450,11 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://unibright:ub123@localhost:8081/workgroup/734276bc-4adc-4721-acf8-ac66dc91cb27/participation/83000976-d82c-409b-8b8e-72a84c455e36",
+							"raw": "http://ub:ub321@localhost:8081/workgroup/734276bc-4adc-4721-acf8-ac66dc91cb27/participation/83000976-d82c-409b-8b8e-72a84c455e36",
 							"protocol": "http",
 							"auth": {
-								"user": "unibright",
-								"password": "ub123"
+								"user": "ub",
+								"password": "ub321"
 							},
 							"host": [
 								"localhost"

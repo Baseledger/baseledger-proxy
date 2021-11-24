@@ -13,18 +13,14 @@ type Workgroup struct {
 }
 
 func (t *Workgroup) Create() bool {
-	if dbutil.Db.GetConn().NewRecord(t) {
-		result := dbutil.Db.GetConn().Create(&t)
-		rowsAffected := result.RowsAffected
-		errors := result.GetErrors()
-		if len(errors) > 0 {
-			logger.Errorf("errors while creating new entry %v\n", errors)
-			return false
-		}
-		return rowsAffected > 0
+	result := dbutil.Db.GetConn().Create(&t)
+	rowsAffected := result.RowsAffected
+	errors := result.GetErrors()
+	if len(errors) > 0 {
+		logger.Errorf("errors while creating new entry %v\n", errors)
+		return false
 	}
-
-	return false
+	return rowsAffected > 0
 }
 
 func (t *Workgroup) Delete() bool {

@@ -32,8 +32,13 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	if !txResult.TxInfo.TxValid {
 		logger.Warnf("Transaction %v is invalid with code %v and log %v", trustmeshEntry.TransactionHash, txResult.TxInfo.TxCode, txResult.TxInfo.TxLog)
 
-		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.PutStatusUpdate(trustmeshEntry, "error")
+		systemofrecord.TriggerSorWebhook(
+			types.UpdateObject,
+			&trustmeshEntry,
+			"",
+			"",
+			"Transaction is invalid",
+			"")
 
 		setTxStatus(txResult, common.InvalidCommitmentState)
 		return
@@ -42,11 +47,13 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 	offchainMessage, err := proxytypes.GetOffchainMsgById(trustmeshEntry.OffchainProcessMessageId)
 	if err != nil {
 		logger.Error("Offchain process msg not found")
-		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.TriggerSorWebhook(
-		//	types.UpdateObject,
-		// 	trustmeshEntry,
-		// 	"error")
+		systemofrecord.TriggerSorWebhook(
+			types.UpdateObject,
+			&trustmeshEntry,
+			"",
+			"",
+			"Offchain process msg not found",
+			"")
 		return
 	}
 	switch trustmeshEntry.EntryType {
@@ -62,11 +69,13 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
-		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.TriggerSorWebhook(
-		//	types.UpdateObject,
-		// 	trustmeshEntry,
-		// 	"success")
+		systemofrecord.TriggerSorWebhook(
+			types.UpdateObject,
+			&trustmeshEntry,
+			"",
+			"",
+			"success",
+			"")
 
 	case common.SuggestionReceivedTrustmeshEntryType:
 		logger.Info(common.SuggestionReceivedTrustmeshEntryType)
@@ -121,11 +130,13 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
 
-		// commenting this just for demo so its not conflicted with feedback status update
-		// systemofrecord.TriggerSorWebhook(
-		//	types.UpdateObject,
-		// 	trustmeshEntry,
-		// 	"success")
+		systemofrecord.TriggerSorWebhook(
+			types.UpdateObject,
+			&trustmeshEntry,
+			"",
+			"",
+			"success",
+			"")
 
 	case common.FeedbackReceivedTrustmeshEntryType:
 		logger.Info(common.FeedbackReceivedTrustmeshEntryType)
