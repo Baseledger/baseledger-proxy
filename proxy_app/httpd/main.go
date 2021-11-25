@@ -127,24 +127,6 @@ func subscribeToWorkgroupMessages() {
 	messagingClient.Subscribe(natsServerUrl, natsToken, common.EthTxHashNatsSubject, receiveTxEthHashUpdateMessage)
 }
 
-func receiveTxEthHashUpdateMessage(sender string, natsMsg *nats.Msg) {
-	var natsTrustmeshUpdateMessage types.NatsTrustmeshUpdateMessage
-	err := json.Unmarshal(natsMsg.Data, &natsTrustmeshUpdateMessage)
-	if err != nil {
-		logger.Errorf("Error parsing nats message %v\n", err)
-		return
-	}
-
-	logger.Infof("message received %v", natsTrustmeshUpdateMessage)
-
-	trustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnBboid(natsTrustmeshUpdateMessage.BaseledgerBusinessObjectId)
-	if err != nil {
-		logger.Errorf("Error getting latest trustmesh entry by bbod %v", err.Error())
-	}
-	types.SetEthTxHash(trustmeshEntry.TrustmeshId, natsTrustmeshUpdateMessage.EthTxHash)
-	return
-}
-
 func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 	// TODO: should we move this parsing to nats client and just get struct in this callback?
 	var natsMessage types.NatsMessage
@@ -189,4 +171,22 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 		logger.Errorf("error when creating new trustmesh entry")
 	}
 
+}
+
+func receiveTxEthHashUpdateMessage(sender string, natsMsg *nats.Msg) {
+	var natsTrustmeshUpdateMessage types.NatsTrustmeshUpdateMessage
+	err := json.Unmarshal(natsMsg.Data, &natsTrustmeshUpdateMessage)
+	if err != nil {
+		logger.Errorf("Error parsing nats message %v\n", err)
+		return
+	}
+
+	logger.Infof("message received %v", natsTrustmeshUpdateMessage)
+
+	trustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnBboid(natsTrustmeshUpdateMessage.BaseledgerBusinessObjectId)
+	if err != nil {
+		logger.Errorf("Error getting latest trustmesh entry by bbod %v", err.Error())
+	}
+	types.UpdateTrustmeshEthTxHash(trustmeshEntry.TrustmeshId, natsTrustmeshUpdateMessage.EthTxHash)
+	return
 }

@@ -38,7 +38,7 @@ func GetClient() *ethclient.Client {
 	return ethClient
 }
 
-func AddNewProof(txId string, proof string, trustmeshEntry *types.TrustmeshEntry) {
+func StoreExitProofInTrustmeshAndInformCounterparty(txId string, proof string, trustmeshEntry *types.TrustmeshEntry) {
 	instance, auth := getContractInstance()
 	if instance == nil || auth == nil {
 		logger.Error("Error getting contract instance")
@@ -51,7 +51,7 @@ func AddNewProof(txId string, proof string, trustmeshEntry *types.TrustmeshEntry
 	}
 
 	logger.Infof("eth tx sent: %s", tx.Hash().Hex())
-	err = types.SetEthTxHash(trustmeshEntry.TrustmeshId, tx.Hash().Hex())
+	err = types.UpdateTrustmeshEthTxHash(trustmeshEntry.TrustmeshId, tx.Hash().Hex())
 	if err != nil {
 		logger.Errorf("Error updating trustmesh eth hash %v", err.Error())
 		return

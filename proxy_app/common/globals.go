@@ -22,4 +22,4 @@ const BaseledgerTransactionTypeApprove = "APPROVE"
 const BaseledgerTransactionTypeReject = "REJECT"
 
 const BaseledgerNatsSubject = "baseledger"
-const EthTxHashNatsSubject = "ethHash"
+const EthTxHashNatsSubject = "ethExitHash"

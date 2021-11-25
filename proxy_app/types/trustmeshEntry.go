@@ -86,10 +86,10 @@ func GetTrustmeshById(id uuid.UUID) (*Trustmesh, error) {
 	return &trustmesh, nil
 }
 
-func SetEthTxHash(id uuid.UUID, ethTxHash string) error {
+func UpdateTrustmeshEthTxHash(id uuid.UUID, ethTxHash string) error {
 	db := dbutil.Db.GetConn()
 
-	res := db.Exec("update trustmeshes set eth_tx_hash = ? where id = ?", ethTxHash, id.String())
+	res := db.Exec("update trustmeshes set eth_exit_tx_hash = ? where id = ?", ethTxHash, id.String())
 
 	if res.Error != nil {
 		logger.Errorf("Error when setting eth tx hash %v", res.Error.Error())

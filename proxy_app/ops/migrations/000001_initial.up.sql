@@ -87,7 +87,7 @@ WITH
 CREATE TABLE public.trustmeshes (
   id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
   created_at timestamp with time zone DEFAULT now() NOT NULL,
-  eth_tx_hash text
+  eth_exit_tx_hash text
 );
 
 ALTER TABLE public.trustmeshes OWNER TO baseledger;
