@@ -109,7 +109,3 @@ func ParseStringIntoRequestParams(requestParamsDbFormat string) []RequestParam {
 
 	return requestParams
 }
-
-// TODO: Unit tests
-// TODO: e2e tests
-// TODO: webhook fields

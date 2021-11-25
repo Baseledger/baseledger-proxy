@@ -1,0 +1,528 @@
+{
+	"info": {
+		"_postman_id": "936e752a-a213-4d01-bf0b-cf0b1794c99a",
+		"name": "Baseledger Proxy v2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Webhook",
+			"item": [
+				{
+					"name": "create webhook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"url\": \"http://www.test.com/endpoint\",\r\n    \"url_params\": [],\r\n    \"http_method\": \"POST\",\r\n    \"webhook_type\": 0,\r\n    \"auth_type\": 1,\r\n    \"auth_username\": \"ub\",\r\n    \"auth_password\": \"ub123\",\r\n    \"xcsrf_url\": \"\",\r\n    \"body_content_type\": \"JSON\",\r\n    \"body\": \"{\\\"testProperty\\\":\\\"testValue\\\"}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/sorwebhook",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"sorwebhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get webhooks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/sorwebhook",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"sorwebhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete webhook",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/sorwebhook/:id",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"sorwebhook",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Trustmesh",
+			"item": [
+				{
+					"name": "Get trustmeshes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/trustmeshes?rpp=1000",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"trustmeshes"
+							],
+							"query": [
+								{
+									"key": "rpp",
+									"value": "1000"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Suggestion\\Feedback",
+			"item": [
+				{
+					"name": "create initial suggestion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workgroup_id\": \"\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6as\",\r\n    \"workstep_type\": \"\",\r\n    \"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue\\\"}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/suggestion",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"suggestion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new version suggestion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"workgroup_id\": \"\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"NEWVERSION\",\r\n    \"workflow_id\": \"58b28735-53ca-40bc-9dd1-944290946f98\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue2\\\"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/suggestion",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"suggestion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create feedback",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"workflow_id\": \"81470c1c-6ff3-4890-818f-02b2f44b1be7\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"approved\": true,\r\n    \"feedback_message\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/feedback",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"feedback"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "organizations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/organization",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "organizations",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Ambex\"\r\n}"
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/organization",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"organization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "organizations",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/ecacb5b7-269e-4194-9c85-b462ee49e00a",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"ecacb5b7-269e-4194-9c85-b462ee49e00a"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Workgroups",
+			"item": [
+				{
+					"name": "workgroups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/workgroup",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"workgroup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workgroups",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"584362d8-6590-4000-b478-9891f948c86b\"\r\n    \"name\": \"Factoring Workgroup\",\r\n    \"privatize_key\": \"secretPrivatizationKey\"\r\n}"
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/workgroup",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"workgroup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workgroups",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/workgroup/584362d8-6590-4000-b478-9891f948c86b",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"workgroup",
+								"584362d8-6590-4000-b478-9891f948c86b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Participations",
+			"item": [
+				{
+					"name": "participations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"workgroup",
+								"734276bc-4adc-4621-acf8-ac66dc91cb27",
+								"participation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "participations",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization_id\": \"4e227c7c-e73a-4e46-8907-786832cd87d3\",\r\n    \"organization_endpoint\": \"ambex2NatsServer:4222\",\r\n    \"organization_token\": \"ambex2NatsSecretToken\"\r\n}"
+						},
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/workgroup/734276bc-4adc-4621-acf8-ac66dc91cb27/participation",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"workgroup",
+								"734276bc-4adc-4621-acf8-ac66dc91cb27",
+								"participation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "participations",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://ub:ub321@localhost:8081/workgroup/734276bc-4adc-4721-acf8-ac66dc91cb27/participation/83000976-d82c-409b-8b8e-72a84c455e36",
+							"protocol": "http",
+							"auth": {
+								"user": "ub",
+								"password": "ub321"
+							},
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"workgroup",
+								"734276bc-4adc-4721-acf8-ac66dc91cb27",
+								"participation",
+								"83000976-d82c-409b-8b8e-72a84c455e36"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "sign and broadcast tx",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"base_req\": {\r\n        \"from\":\"baseledger1xn0yt9zl56frdsfhuz9vrcky2kup9zpye4a30j\",\r\n        \"chain_id\":\"baseledger\"\r\n    },\r\n    \"transaction_id\": \"cbf25e6e-cac1-4afc-8dbf-504eafb3d7d8\",\r\n    \"payload\": \"f6d0cf9d716e1935018bc68fec6030b9ad437683a544759d380d0adacd6173c8e4f742eebf5d083410822bd849a545d96d715d38871e35af158aa7b6095e04334eba4719d93b226cb4d07185ca2451a87ee2000dfd7f572d18f6adf5ddf9858ef479be6a9cb7734bc240d19a77de3b50a4a1a3eac4d0158936f68678da8a0b1c487a6d088a77fec05bd33a53889ca48d4de183d651065c505828c02e9da184469a97859da62b091bb2941ffb1b061a33b03956ec643b59a00c58d358f72746fac6aacb38b253e61849a7bfddc82fce3be44bc49483f0ccbca4a80f6234b6df4bb0d79c4a72f368063cfad8828ac1cc4abcee6af09c8fcfb8095cb4a60d0080571fed1078729c9e7f41e0914fa87f0ccc5447779563c68e5dbab0a9c6d0e8b37751aab8a5ead9fcbb18cbf587083f69e53badaba7f8c7ff8b85c0fa6361dbae865a755f437108ee1ab9430c1d29a4ae45754427c2aa4193b4bd74978f746819ce8bdcd4204086986f1f464fac2661ac32fffc56826f80762c8e783d6bccb0347743f833dc0c0359883e165ecae2c87af8f504be0e40e6d73ccb267a3163f0237fd81935a63e9c600af1f0f694c31fbc497f124b9518b224af77b485e41671c478fc88e99693d1cee3ab5cf53ff0de861c596ac33df2ceaef918c6c6424b217b7805d3cb4f17ff9e6a81bbaebd9484c9\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:1317/proxy/signAndBroadcast",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1317",
+							"path": [
+								"proxy",
+								"signAndBroadcast"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "query baseledger transation from blockchain app",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:1317/unibrightio/baseledger/baseledger/BaseledgerTransaction/460d0bf1-085a-4994-b761-9e175fa2dff5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1317",
+							"path": [
+								"unibrightio",
+								"baseledger",
+								"baseledger",
+								"BaseledgerTransaction",
+								"460d0bf1-085a-4994-b761-9e175fa2dff5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

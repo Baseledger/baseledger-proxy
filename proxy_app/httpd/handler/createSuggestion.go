@@ -67,17 +67,17 @@ func CreateSuggestionRequestHandler() gin.HandlerFunc {
 		}
 
 		if dto.WorkgroupId == "" {
-			// valid only until we go with the assumtion 1 recipient == 1 workgroup
+			// valid only for concircle demo, working with preseeded workgroup id. Will be deleted with proper workgroup invitation mechanism
 			workgroupClient := &workgroups.PostgresWorkgroupClient{}
-			workgroupMembership := workgroupClient.GetRecipientWorkgroupMember(dto.Recipient)
+			workgroup := workgroupClient.FindWorkgroup("734276bc-4adc-4621-acf8-ac66dc91cb27")
 
-			if workgroupMembership == nil {
-				responseDto.Error = "failed to find a workgroup membership for recipient"
+			if workgroup == nil {
+				responseDto.Error = "failed to find concircle preseeded workgroup membership"
 				restutil.Render(responseDto, 400, c)
 				return
 			}
 
-			dto.WorkgroupId = workgroupMembership.WorkgroupId
+			dto.WorkgroupId = workgroup.Id.String()
 		}
 
 		newSuggestionRequest := &types.NewSuggestionRequest{}
