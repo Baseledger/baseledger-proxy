@@ -5,12 +5,45 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/token"
 )
 
-func AuthorizeJWTMiddleware() gin.HandlerFunc {
+func BasicAuth(fallbackToJwt bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		basicAuthUser, _ := viper.Get("API_UB_USER").(string)
+		basicAuthPwd, _ := viper.Get("API_UB_PWD").(string)
+		// Get the Basic Authentication credentials
+		user, password, hasAuth := c.Request.BasicAuth()
+		if hasAuth && user == basicAuthUser && password == basicAuthPwd {
+			logger.Info("Basic auth successful")
+			// Setting this flag inside this context so next middleware knows it is already auth
+			if fallbackToJwt {
+				c.Set("auth", true)
+			}
+		} else {
+			if fallbackToJwt {
+				logger.Error("Basic auth failed, trying with jwt")
+				c.Next()
+			} else {
+				logger.Error("Basic auth failed")
+				c.Abort()
+				c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+				c.JSON(http.StatusForbidden, map[string]interface{}{"error": "auth failed"})
+			}
+		}
+	}
+}
+
+func AuthorizeJWTMiddleware(isFallback bool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		basicAuth, hasBasicAuth := c.Get("auth")
+		if isFallback && hasBasicAuth == true && basicAuth == true {
+			logger.Infof("Already auth with basic auth")
+			c.Next()
+			return
+		}
 		const BEARER_SCHEMA = "Bearer"
 		authHeader := c.GetHeader("Authorization")
 		if len(authHeader) < len(BEARER_SCHEMA)+1 {
