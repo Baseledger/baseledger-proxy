@@ -46,7 +46,7 @@ type Trustmesh struct {
 	BusinessObjectTypes string
 	Finalized           bool
 	ContainsRejections  bool
-	EthTxHash           string
+	EthExitTxHash       string
 	Entries             []TrustmeshEntry
 }
 

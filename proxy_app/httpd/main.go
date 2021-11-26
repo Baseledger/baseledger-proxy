@@ -187,6 +187,6 @@ func receiveTxEthHashUpdateMessage(sender string, natsMsg *nats.Msg) {
 	if err != nil {
 		logger.Errorf("Error getting latest trustmesh entry by bbod %v", err.Error())
 	}
-	types.UpdateTrustmeshEthTxHash(trustmeshEntry.TrustmeshId, natsTrustmeshUpdateMessage.EthTxHash)
+	types.UpdateTrustmeshEthTxHash(trustmeshEntry.TrustmeshId, natsTrustmeshUpdateMessage.EthExitTxHash)
 	return
 }

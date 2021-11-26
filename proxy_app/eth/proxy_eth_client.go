@@ -58,7 +58,7 @@ func StoreExitProofInTrustmeshAndInformCounterparty(txId string, proof string, t
 	}
 	logger.Infof("successful setting of tx hash, broadcasting offchain message ")
 	var natsMessage types.NatsTrustmeshUpdateMessage
-	natsMessage.EthTxHash = tx.Hash().Hex()
+	natsMessage.EthExitTxHash = tx.Hash().Hex()
 	// it has to be referenced bboid because at this point entry has to be feedback (approval feedback of final workstep)
 	natsMessage.BaseledgerBusinessObjectId = trustmeshEntry.ReferencedBaseledgerBusinessObjectId
 	var payload, _ = json.Marshal(natsMessage)

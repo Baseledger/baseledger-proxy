@@ -26,7 +26,7 @@ type latestTrustmeshEntryDto struct {
 	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
 	BusinessObjectJsonPayload  string `json:"business_object_json_payload"`
 	Approved                   bool   `json:"approved"`
-	EthTxHash                  string `json:"eth_tx_hash"`
+	EthExitTxHash              string `json:"eth_tx_hash"`
 }
 
 // @Security BasicAuth
@@ -112,7 +112,7 @@ func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 			BaseledgerBusinessObjectId: entry.BaseledgerBusinessObjectId,
 			BusinessObjectJsonPayload:  boJson,
 			Approved:                   approved,
-			EthTxHash:                  trustmesh.EthTxHash,
+			EthExitTxHash:              trustmesh.EthExitTxHash,
 		}
 
 		restutil.Render(dto, 200, c)

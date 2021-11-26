@@ -38,7 +38,7 @@ type NatsMessage struct {
 }
 
 type NatsTrustmeshUpdateMessage struct {
-	EthTxHash                  string
+	EthExitTxHash              string
 	BaseledgerBusinessObjectId string
 }
 
