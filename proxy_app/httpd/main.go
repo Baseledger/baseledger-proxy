@@ -64,7 +64,7 @@ func main() {
 	r.DELETE("/organization/:id", proxyMiddleware.BasicAuth(false), handler.DeleteOrganizationHandler())
 	r.GET("/workgroup", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.GetWorkgroupsHandler())
 	r.POST("/workgroup", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.CreateWorkgroupHandler())
-	r.DELETE("/workgroup/:id", proxyMiddleware.BasicAuth(false), handler.DeleteWorkgroupHandler())
+	r.DELETE("/workgroup/:id", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.DeleteWorkgroupHandler())
 	r.GET("/workgroup/:id/participation", proxyMiddleware.BasicAuth(false), handler.GetWorkgroupMembersHandler())
 	r.POST("/workgroup/:id/participation", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.CreateWorkgroupMemberHandler())
 	r.DELETE("/workgroup/:id/participation/:participationId", proxyMiddleware.BasicAuth(false), handler.DeleteWorkgroupMemberHandler())
