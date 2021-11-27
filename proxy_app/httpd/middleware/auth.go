@@ -38,8 +38,8 @@ func BasicAuth(fallbackToJwt bool) gin.HandlerFunc {
 
 func AuthorizeJWTMiddleware(isFallback bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		basicAuth, hasBasicAuth := c.Get("auth")
-		if isFallback && hasBasicAuth == true && basicAuth == true {
+		basicAuthSucceded, basicAuthParamExists := c.Get("auth")
+		if isFallback && basicAuthParamExists == true && basicAuthSucceded == true {
 			logger.Infof("Already auth with basic auth")
 			c.Next()
 			return
