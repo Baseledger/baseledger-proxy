@@ -26,6 +26,7 @@ type latestTrustmeshEntryDto struct {
 	BaseledgerBusinessObjectId string `json:"baseledger_business_object_id"`
 	BusinessObjectJsonPayload  string `json:"business_object_json_payload"`
 	Approved                   bool   `json:"approved"`
+	EthExitTxHash              string `json:"eth_tx_hash"`
 }
 
 // @Security BasicAuth
@@ -89,6 +90,13 @@ func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 			return
 		}
 
+		trustmesh, err := types.GetTrustmeshById(entry.TrustmeshId)
+
+		if err != nil {
+			restutil.RenderError("error when fetching latest worfkflow entry", 400, c)
+			return
+		}
+
 		approved := false
 		if entry.OffchainProcessMessage.BaseledgerTransactionType == common.BaseledgerTransactionTypeApprove {
 			approved = true
@@ -104,6 +112,7 @@ func GetLatestWorkflowStateHandler() gin.HandlerFunc {
 			BaseledgerBusinessObjectId: entry.BaseledgerBusinessObjectId,
 			BusinessObjectJsonPayload:  boJson,
 			Approved:                   approved,
+			EthExitTxHash:              trustmesh.EthExitTxHash,
 		}
 
 		restutil.Render(dto, 200, c)

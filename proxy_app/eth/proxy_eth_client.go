@@ -3,6 +3,7 @@ package eth
 import (
 	"context"
 	"crypto/ecdsa"
+	"encoding/json"
 	"log"
 	"math/big"
 
@@ -12,6 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
+	"github.com/unibrightio/proxy-api/proxyutil"
+	"github.com/unibrightio/proxy-api/types"
 
 	proxyCommon "github.com/unibrightio/proxy-api/common"
 	contracts "github.com/unibrightio/proxy-api/contracts"
@@ -35,7 +38,7 @@ func GetClient() *ethclient.Client {
 	return ethClient
 }
 
-func AddNewProof(txId string, proof string) {
+func StoreExitProofInTrustmeshAndInformCounterparty(txId string, proof string, trustmeshEntry *types.TrustmeshEntry) {
 	instance, auth := getContractInstance()
 	if instance == nil || auth == nil {
 		logger.Error("Error getting contract instance")
@@ -48,6 +51,19 @@ func AddNewProof(txId string, proof string) {
 	}
 
 	logger.Infof("eth tx sent: %s", tx.Hash().Hex())
+	err = types.UpdateTrustmeshEthTxHash(trustmeshEntry.TrustmeshId, tx.Hash().Hex())
+	if err != nil {
+		logger.Errorf("Error updating trustmesh eth hash %v", err.Error())
+		return
+	}
+	logger.Infof("successful setting of tx hash, broadcasting offchain message ")
+	var natsMessage types.NatsTrustmeshUpdateMessage
+	natsMessage.EthExitTxHash = tx.Hash().Hex()
+	// it has to be referenced bboid because at this point entry has to be feedback (approval feedback of final workstep)
+	natsMessage.BaseledgerBusinessObjectId = trustmeshEntry.ReferencedBaseledgerBusinessObjectId
+	var payload, _ = json.Marshal(natsMessage)
+
+	proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.SenderOrgId.String(), proxyCommon.EthTxHashNatsSubject)
 }
 
 func GetProof(txId string) {

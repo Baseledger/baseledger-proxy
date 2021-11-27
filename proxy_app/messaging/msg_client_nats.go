@@ -10,7 +10,8 @@ type IMessagingClient interface {
 	// message - message payload
 	// recipient - address of the recipient (i.e. NATS server url) taken from workgroup
 	// token - token used to authenticate (i.e. NATS server token) taken from the workgroup
-	SendMessage(message []byte, recipient string, token string)
+	// subject - nats subject
+	SendMessage(message []byte, recipient string, token string, subject string)
 
 	// used to receive messages sent by other participants to our nats server
 	// serverUrl - local server url
@@ -23,7 +24,7 @@ type IMessagingClient interface {
 type NatsMessagingClient struct {
 }
 
-func (client *NatsMessagingClient) SendMessage(message []byte, recipient string, token string) {
+func (client *NatsMessagingClient) SendMessage(message []byte, recipient string, token string, subject string) {
 	// https://docs.nats.io/developing-with-nats/security/token
 	nc, err := nats.Connect("nats://" + token + "@" + recipient)
 
@@ -35,7 +36,7 @@ func (client *NatsMessagingClient) SendMessage(message []byte, recipient string,
 	defer nc.Close()
 
 	// TODO: https://docs.nats.io/developing-with-nats/sending/replyto
-	err = nc.Publish("baseledger", message)
+	err = nc.Publish(subject, message)
 
 	if err != nil {
 		logger.Errorf("Error while trying to send NATS message: %v, message: %s, recipient: %s, token: %s", err, message, recipient, token)

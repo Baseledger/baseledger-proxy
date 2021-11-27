@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -55,47 +54,31 @@ func main() {
 	r := gin.Default()
 	r.Use(proxyMiddleware.CORSMiddleware())
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.GET("/trustmeshes", basicAuth, handler.GetTrustmeshesHandler())
-	r.GET("/trustmeshes/:id", basicAuth, handler.GetTrustmeshHandler())
-	r.POST("/suggestion", basicAuth, handler.CreateSuggestionRequestHandler())
-	r.POST("/feedback", basicAuth, handler.CreateSynchronizationFeedbackHandler())
-	r.GET("/sunburst/:txId", basicAuth, handler.GetSunburstHandler())
-	r.GET("/organization", basicAuth, handler.GetOrganizationsHandler())
-	r.POST("/organization", basicAuth, handler.CreateOrganizationHandler())
-	r.DELETE("/organization/:id", basicAuth, handler.DeleteOrganizationHandler())
-	r.GET("/workgroup", basicAuth, handler.GetWorkgroupsHandler())
-	r.POST("/workgroup", basicAuth, handler.CreateWorkgroupHandler())
-	r.DELETE("/workgroup/:id", basicAuth, handler.DeleteWorkgroupHandler())
-	r.GET("/workgroup/:id/participation", basicAuth, handler.GetWorkgroupMembersHandler())
-	r.POST("/workgroup/:id/participation", basicAuth, handler.CreateWorkgroupMemberHandler())
-	r.DELETE("/workgroup/:id/participation/:participationId", basicAuth, handler.DeleteWorkgroupMemberHandler())
-	r.GET("/sorwebhook", basicAuth, handler.GetSorWebhooksHandler())
-	r.POST("/sorwebhook", basicAuth, handler.CreateSorWebhookHandler())
-	r.DELETE("/sorwebhook/:id", basicAuth, handler.DeleteSorWebhookHandler())
+	r.GET("/trustmeshes", proxyMiddleware.BasicAuth(false), handler.GetTrustmeshesHandler())
+	r.GET("/trustmeshes/:id", proxyMiddleware.BasicAuth(false), handler.GetTrustmeshHandler())
+	r.POST("/suggestion", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.CreateSuggestionRequestHandler())
+	r.POST("/feedback", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.CreateSynchronizationFeedbackHandler())
+	r.GET("/sunburst/:txId", proxyMiddleware.BasicAuth(false), handler.GetSunburstHandler())
+	r.GET("/organization", proxyMiddleware.BasicAuth(false), handler.GetOrganizationsHandler())
+	r.POST("/organization", proxyMiddleware.BasicAuth(false), handler.CreateOrganizationHandler())
+	r.DELETE("/organization/:id", proxyMiddleware.BasicAuth(false), handler.DeleteOrganizationHandler())
+	r.GET("/workgroup", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.GetWorkgroupsHandler())
+	r.POST("/workgroup", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.CreateWorkgroupHandler())
+	r.DELETE("/workgroup/:id", proxyMiddleware.BasicAuth(false), handler.DeleteWorkgroupHandler())
+	r.GET("/workgroup/:id/participation", proxyMiddleware.BasicAuth(false), handler.GetWorkgroupMembersHandler())
+	r.POST("/workgroup/:id/participation", proxyMiddleware.BasicAuth(true), proxyMiddleware.AuthorizeJWTMiddleware(true), handler.CreateWorkgroupMemberHandler())
+	r.DELETE("/workgroup/:id/participation/:participationId", proxyMiddleware.BasicAuth(false), handler.DeleteWorkgroupMemberHandler())
+	r.GET("/sorwebhook", proxyMiddleware.BasicAuth(false), handler.GetSorWebhooksHandler())
+	r.POST("/sorwebhook", proxyMiddleware.BasicAuth(false), handler.CreateSorWebhookHandler())
+	r.DELETE("/sorwebhook/:id", proxyMiddleware.BasicAuth(false), handler.DeleteSorWebhookHandler())
 	// TODO: BAS-29 r.POST("/workgroup/invite", handler.InviteToWorkgroupHandler())
 	// full details of workgroup, including organization
-	r.GET("/workflow/new", basicAuth, handler.GetNewWorkflowHandler())
-	r.GET("/workflow/latestState/:bo_id", basicAuth, handler.GetLatestWorkflowStateHandler())
+	r.GET("/workflow/new", proxyMiddleware.AuthorizeJWTMiddleware(false), handler.GetNewWorkflowHandler())
+	r.GET("/workflow/latestState/:bo_id", proxyMiddleware.AuthorizeJWTMiddleware(false), handler.GetLatestWorkflowStateHandler())
 	r.POST("/dev/users", handler.CreateUserHandler())
 	r.POST("/dev/auth", handler.LoginUserHandler())
-	r.POST("/dev/tx", proxyMiddleware.AuthorizeJWTMiddleware(), rateMiddleware, handler.CreateTransactionHandler())
+	r.POST("/dev/tx", proxyMiddleware.AuthorizeJWTMiddleware(false), rateMiddleware, handler.CreateTransactionHandler())
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-}
-
-func basicAuth(c *gin.Context) {
-	basicAuthUser, _ := viper.Get("API_UB_USER").(string)
-	basicAuthPwd, _ := viper.Get("API_UB_PWD").(string)
-	// Get the Basic Authentication credentials
-	user, password, hasAuth := c.Request.BasicAuth()
-	if hasAuth && user == basicAuthUser && password == basicAuthPwd {
-		logger.Info("Basic auth successful")
-	} else {
-		logger.Error("Basic auth failed")
-		c.Abort()
-		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
-		c.JSON(http.StatusForbidden, map[string]interface{}{"error": "auth failed"})
-		return
-	}
 }
 
 // discuss if we should use config struct or this is enough
@@ -103,7 +86,6 @@ func setupViper() {
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 	viper.AutomaticEnv() // Overwrite config with env variables if exist, important for debugging session
-
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Println(fmt.Printf("viper read config error %v\n", err))
@@ -124,7 +106,8 @@ func subscribeToWorkgroupMessages() {
 	natsToken := "testToken1" // TODO: Read from configuration
 	logger.Infof("subscribeToWorkgroupMessages natsServerUrl %v", natsServerUrl)
 	messagingClient := &messaging.NatsMessagingClient{}
-	messagingClient.Subscribe(natsServerUrl, natsToken, "baseledger", receiveOffchainProcessMessage)
+	messagingClient.Subscribe(natsServerUrl, natsToken, common.BaseledgerNatsSubject, receiveOffchainProcessMessage)
+	messagingClient.Subscribe(natsServerUrl, natsToken, common.EthTxHashNatsSubject, receiveTxEthHashUpdateMessage)
 }
 
 func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
@@ -171,4 +154,22 @@ func receiveOffchainProcessMessage(sender string, natsMsg *nats.Msg) {
 		logger.Errorf("error when creating new trustmesh entry")
 	}
 
+}
+
+func receiveTxEthHashUpdateMessage(sender string, natsMsg *nats.Msg) {
+	var natsTrustmeshUpdateMessage types.NatsTrustmeshUpdateMessage
+	err := json.Unmarshal(natsMsg.Data, &natsTrustmeshUpdateMessage)
+	if err != nil {
+		logger.Errorf("Error parsing nats message %v\n", err)
+		return
+	}
+
+	logger.Infof("message received %v", natsTrustmeshUpdateMessage)
+
+	trustmeshEntry, err := types.GetLatestTrustmeshEntryBasedOnBboid(natsTrustmeshUpdateMessage.BaseledgerBusinessObjectId)
+	if err != nil {
+		logger.Errorf("Error getting latest trustmesh entry by bbod %v", err.Error())
+	}
+	types.UpdateTrustmeshEthTxHash(trustmeshEntry.TrustmeshId, natsTrustmeshUpdateMessage.EthExitTxHash)
+	return
 }
