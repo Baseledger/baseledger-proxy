@@ -15,7 +15,7 @@ func GetToken(email string) (string, error) {
 	proxyClaims := jwt.MapClaims{}
 	proxyClaims["authorized"] = true
 	proxyClaims["email"] = email
-	proxyClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	proxyClaims["exp"] = time.Now().Add(time.Minute * 60).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, proxyClaims)
 	return token.SignedString(jwtSecret)
