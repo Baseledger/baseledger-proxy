@@ -23,7 +23,7 @@ import (
 
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	_ "github.com/unibrightio/proxy-api/httpd/docs"
+	docs "github.com/unibrightio/proxy-api/httpd/docs"
 
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 )
@@ -37,6 +37,7 @@ import (
 // @name Authorization
 func main() {
 	setupViper()
+	docs.SwaggerInfo.Host = viper.GetString("SWAGGER_HOST")
 	logger.SetupLogger()
 	setupDb()
 	cron.StartCron()

@@ -199,9 +199,13 @@ func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 		return
 	}
 
+	// looking into trustmesh entries, we are trying to find suggestion sent for final workstep
+	// that has baseledger business object id that feedback is approving
 	containsFinal := false
 	for _, entry := range trustmesh.Entries {
-		if entry.WorkstepType == common.WorkstepTypeFinal {
+		if entry.WorkstepType == common.WorkstepTypeFinal &&
+			entry.EntryType == common.SuggestionSentTrustmeshEntryType &&
+			entry.BaseledgerBusinessObjectId == trustmeshEntry.ReferencedBaseledgerBusinessObjectId {
 			containsFinal = true
 			break
 		}
