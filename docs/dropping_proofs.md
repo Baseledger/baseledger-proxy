@@ -25,7 +25,7 @@ which will return 200. Note that per user, you are limited to 10 proofs in a per
 
 Then you login with the provided user:
 
-    http://alice.lakewood.baseledger.net/dev/auth
+    POST http://alice.lakewood.baseledger.net/dev/auth
     {
         "email": "<your_email>",
         "password": "<your_pass>"
@@ -42,7 +42,8 @@ which will return 200 with a JWT token.
 
 Final step is to trigger the transaction endpoint:
 
-    http://alice.lakewood.baseledger.net/dev/tx
+    Authorization header: Bearer <jwt_token>
+    POST http://alice.lakewood.baseledger.net/dev/tx
     {
         "payload": "<your_payload>", // Legth must be <= 30
         "op_code": 9 // this is the only supported op_code for now, representing simple proof storage
