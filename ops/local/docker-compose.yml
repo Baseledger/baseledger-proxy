@@ -27,7 +27,10 @@ services:
       - ${NATS_EXPOSED_PORT}:4222
     restart: always
   blockchain_app:
-    image: baseledger/blockchain_app
+    build:
+      context: ../../blockchain_app
+      dockerfile: ../blockchain_app/ops/Dockerfile
+    image: blockchain_app
     # container_name: ${prefix}-staport // TODO: Use this instead of -p first_node to avoid number suffix
     networks:
       - baseledger
