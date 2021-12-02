@@ -67,7 +67,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		var payload, _ = json.Marshal(natsMessage)
 
-		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String(), common.BaseledgerNatsSubject)
 
 		systemofrecord.TriggerSorWebhook(
 			types.UpdateObject,
@@ -128,7 +128,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 
 		var payload, _ = json.Marshal(natsMessage)
 
-		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String())
+		proxyutil.SendOffchainMessage(payload, trustmeshEntry.WorkgroupId.String(), trustmeshEntry.ReceiverOrgId.String(), common.BaseledgerNatsSubject)
 
 		systemofrecord.TriggerSorWebhook(
 			types.UpdateObject,
@@ -199,9 +199,13 @@ func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 		return
 	}
 
+	// looking into trustmesh entries, we are trying to find suggestion sent for final workstep
+	// that has baseledger business object id that feedback is approving
 	containsFinal := false
 	for _, entry := range trustmesh.Entries {
-		if entry.WorkstepType == common.WorkstepTypeFinal {
+		if entry.WorkstepType == common.WorkstepTypeFinal &&
+			entry.EntryType == common.SuggestionSentTrustmeshEntryType &&
+			entry.BaseledgerBusinessObjectId == trustmeshEntry.ReferencedBaseledgerBusinessObjectId {
 			containsFinal = true
 			break
 		}
@@ -230,7 +234,7 @@ func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 		return
 	}
 
-	eth.AddNewProof(transactionId.String(), trustmeshSyncTree.RootProof)
+	eth.StoreExitProofInTrustmeshAndInformCounterparty(transactionId.String(), trustmeshSyncTree.RootProof, trustmeshEntry)
 }
 
 func setTxStatus(txResult proxytypes.Result, commitmentState string) {

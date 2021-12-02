@@ -124,7 +124,7 @@ func CreateNewFeedbackBaseledgerTransactionPayload(
 	return enc
 }
 
-func SendOffchainMessage(payload []byte, workgroupId string, recipientId string) (err error) {
+func SendOffchainMessage(payload []byte, workgroupId string, recipientId string, subject string) (err error) {
 	workgroupClient := &workgroups.PostgresWorkgroupClient{}
 
 	logger.Infof("trying to find workgroup member - workgroup id: %s recipient id: %s \n", workgroupId, recipientId)
@@ -137,7 +137,11 @@ func SendOffchainMessage(payload []byte, workgroupId string, recipientId string)
 	logger.Infof("trying to message on url: %s with token: %s\n", workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
 
 	messagingClient := &messaging.NatsMessagingClient{}
-	messagingClient.SendMessage(payload, workgroupMembership.OrganizationEndpoint, workgroupMembership.OrganizationToken)
+	messagingClient.SendMessage(
+		payload,
+		workgroupMembership.OrganizationEndpoint,
+		workgroupMembership.OrganizationToken,
+		subject)
 
 	return nil
 }
