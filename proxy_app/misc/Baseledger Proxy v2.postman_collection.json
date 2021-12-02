@@ -523,6 +523,114 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Dropping proofs",
+			"item": [
+				{
+					"name": "create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"<your_email>\",\r\n    \"password\": \"<your_pass>\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://alice.lakewood.baseledger.net/dev/users",
+							"protocol": "http",
+							"host": [
+								"alice",
+								"lakewood",
+								"baseledger",
+								"net"
+							],
+							"path": [
+								"dev",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"<your_email>\",\r\n    \"password\": \"<your_pass>\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://alice.lakewood.baseledger.net/dev/auth",
+							"protocol": "http",
+							"host": [
+								"alice",
+								"lakewood",
+								"baseledger",
+								"net"
+							],
+							"path": [
+								"dev",
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "drop proof",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJlbWFpbCI6Imt1cnRpY29nbmplbkBnbWFpbC5jb20iLCJleHAiOjE2Mzg0NTAxMDZ9.K7Xheb1g4pNLQV6A5yvXQ4uaWYX7oMFtetMtU8IFNww",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"payload\": \"<your_payload>\",\r\n    \"op_code\": 9\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://alice.lakewood.baseledger.net/dev/tx",
+							"protocol": "http",
+							"host": [
+								"alice",
+								"lakewood",
+								"baseledger",
+								"net"
+							],
+							"path": [
+								"dev",
+								"tx"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
