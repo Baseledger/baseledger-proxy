@@ -54,3 +54,13 @@ in CURL:
 which will return 200 with a transaction hash.
 
 That is it! You can verify your proof is stored by visiting https://lakewood.baseledger.net/transactions/<transaction_hash>
+
+
+To stop the node and cleanup, just use these two commands to stop and remove the container:
+
+    docker stop baseledger_lakewood_node
+    docker rm baseledger_lakewood_node
+
+followed with this one to remove the image:
+
+    docker rmi baseledger/blockchain_app
