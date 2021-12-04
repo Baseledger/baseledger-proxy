@@ -20,6 +20,7 @@ export DB_UB_USER=ub &&
 export DB_UB_PWD=ub123 &&
 export API_UB_USER=ub &&
 export API_UB_PWD=ub321 &&
+export JWT_SECRET="+KbPeShVmYq3t6w9z$C&F)J@McQfTjWn" && # local nodes test secret
 export ORGANIZATION_ID=d45c9b93-3eef-4993-add6-aa1c84d17eea # unique identifier of the organization, currently hardcoded in seed data
 
 docker-compose -p first_node up -d
@@ -35,6 +36,7 @@ export DB_UB_USER=ub &&
 export DB_UB_PWD=ub123 &&
 export API_UB_USER=ub &&
 export API_UB_PWD=ub321 &&
+export JWT_SECRET="z%C*F-JaNdRgUjXn2r5u8x/A?D(G+KbP" && # local nodes test secret
 export ORGANIZATION_ID=969e989c-bb61-4180-928c-0d48afd8c6a3 # unique identifier of the organization, currently hardcoded in seed data
 
 docker-compose -p second_node up -d

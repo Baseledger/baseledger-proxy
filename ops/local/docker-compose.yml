@@ -53,6 +53,8 @@ services:
       - DB_UB_PWD=${DB_UB_PWD}
       - API_UB_USER=${API_UB_USER}
       - API_UB_PWD=${API_UB_PWD}
+      - SWAGGER_HOST=localhost:${PROXY_APP_PORT}
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - baseledger
     ports:

@@ -199,6 +199,11 @@ func tryExitToEth(trustmeshEntry *types.TrustmeshEntry) {
 		return
 	}
 
+	if trustmesh.EthExitTxHash != "" {
+		logger.Warnf("Trustmesh %v already exited", trustmesh.Id)
+		return
+	}
+
 	// looking into trustmesh entries, we are trying to find suggestion sent for final workstep
 	// that has baseledger business object id that feedback is approving
 	containsFinal := false
