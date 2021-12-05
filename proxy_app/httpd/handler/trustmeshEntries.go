@@ -37,10 +37,11 @@ type latestTrustmeshEntryDto struct {
 // @Produce json
 // @Success 200 {array} newWorkflowDto
 // @Failure 400 {string} errorMessage
-// @Router /workflow/new [get]
+// @Router /workflow/new/{workgroup_id} [get]
 func GetNewWorkflowHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		res, err := types.GetPendingTrustmeshEntries()
+		workgroupId := c.Param("workgroup_id")
+		res, err := types.GetPendingTrustmeshEntries(workgroupId)
 
 		if err != nil {
 			restutil.Render("error when fetching pending entries", 400, c)

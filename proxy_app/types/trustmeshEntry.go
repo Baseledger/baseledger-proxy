@@ -119,12 +119,12 @@ func GetTrustmeshEntryById(id uuid.UUID) (*TrustmeshEntry, error) {
 	return &trustmeshEntry, nil
 }
 
-func GetPendingTrustmeshEntries() ([]*TrustmeshEntry, error) {
+func GetPendingTrustmeshEntries(workgroupId string) ([]*TrustmeshEntry, error) {
 	db := dbutil.Db.GetConn()
 
 	entries := []*TrustmeshEntry{}
 
-	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries te1 where entry_type = 'SuggestionReceived' and workstep_type = 'INITIAL' and not exists (select * from trustmesh_entries te2 where te1.baseledger_transaction_id = te2.referenced_baseledger_transaction_id)").Find(&entries)
+	res := db.Preload("OffchainProcessMessage").Raw("select * from trustmesh_entries te1 where workgroup_id = ? and entry_type = 'SuggestionReceived' and workstep_type = 'INITIAL' and not exists (select * from trustmesh_entries te2 where te1.baseledger_transaction_id = te2.referenced_baseledger_transaction_id)", workgroupId).Find(&entries)
 
 	if res.Error != nil {
 		logger.Errorf("Error when getting pending entries %v", res.Error.Error())
