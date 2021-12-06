@@ -87,7 +87,7 @@ func buildWebhookRequestUrl(targetUrl string, urlParams string, trustmeshEntry *
 
 	for _, param := range requestParams {
 		field := reflect.Indirect(reflect.ValueOf(trustmeshEntry)).FieldByName(param.ParamValueField)
-		if field.IsZero() {
+		if !field.IsValid() {
 			logger.Errorf("Error fetching request parameter field %v from trustmesh entry \n", param.ParamValueField)
 			return ""
 		}
