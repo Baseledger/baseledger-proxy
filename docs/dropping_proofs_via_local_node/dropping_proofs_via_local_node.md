@@ -55,6 +55,8 @@ which will return 200 with a transaction hash.
 
 That is it! You can verify your proof is stored by visiting https://lakewood.baseledger.net/transactions/<transaction_hash>
 
+In case you try to drop proof without having acquired tokens beforehand, you will get an error stating that the account cannot be found.
+
 
 To stop the node and cleanup, just use these two commands to stop and remove the container:
 
