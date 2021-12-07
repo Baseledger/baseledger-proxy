@@ -2,7 +2,6 @@ package systemofrecord
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -144,7 +143,7 @@ func buildWebhookRequestBody(
 func prepareWebhookRequest(requestBody string, targetUrl string, httpMethod string) *http.Request {
 	logger.Infof("Preparing request..")
 
-	bodyBytes, _ := json.Marshal(requestBody)
+	bodyBytes := []byte(requestBody)
 	reader := bytes.NewReader(bodyBytes)
 
 	req, err := http.NewRequest(httpMethod, targetUrl, reader)
