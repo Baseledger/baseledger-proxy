@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/cookiejar"
+	"net/http/httputil"
 	"reflect"
 	"strings"
 
@@ -220,6 +221,14 @@ func triggerWebhookRequest(request *http.Request) {
 		logger.Errorf("Error firing away request %v\n", err.Error())
 		return
 	}
+
+	// Save a copy of this request for debugging.
+	requestDump, err := httputil.DumpRequest(request, true)
+	if err != nil {
+		logger.Errorf("DumpRequest error %s\n", err.Error())
+	}
+
+	logger.Infof("DumpRequest result " + string(requestDump))
 
 	logger.Infof("Sor Webhook request succesfull")
 	logger.Infof("Sor Webhook request response %v\n", resp)
