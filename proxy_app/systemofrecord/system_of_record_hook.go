@@ -31,7 +31,7 @@ func TriggerSorWebhook(
 	webhookType types.WebhookType,
 	trustmeshEntry *types.TrustmeshEntry,
 	payload string,
-	approved string,
+	approved string, // TODO This is 1 or 0 for feedback Approved or Rejected when origin is the counterparty, and is 1 or 0 for proxy status update Success or Failuer when origin is empty.
 	message string,
 	origin string,
 ) bool {
