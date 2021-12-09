@@ -27,6 +27,7 @@ type createSorWebhookRequest struct {
 
 type sorWebhookDetailsDto struct {
 	Id              uuid.UUID            `json:"id"`
+	Url             string               `json:"url"`
 	UrlParams       []types.RequestParam `json:"url_params"`
 	HttpMethod      string               `json:"http_method"`
 	WebhookType     types.WebhookType    `json:"webhook_type"`
@@ -59,6 +60,7 @@ func GetSorWebhooksHandler() gin.HandlerFunc {
 		for i := 0; i < len(sorWebhooks); i++ {
 			sorWebhookDto := &sorWebhookDetailsDto{}
 			sorWebhookDto.Id = sorWebhooks[i].Id
+			sorWebhookDto.Url = sorWebhooks[i].Url
 			sorWebhookDto.UrlParams = types.ParseStringIntoRequestParams(sorWebhooks[i].UrlParams)
 			sorWebhookDto.HttpMethod = sorWebhooks[i].HttpMethod
 			sorWebhookDto.WebhookType = sorWebhooks[i].WebhookType
