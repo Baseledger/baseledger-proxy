@@ -24,8 +24,8 @@ const (
 )
 
 type RequestParam struct {
-	ParamName       string
-	ParamValueField string
+	ParamName       string `json:"param_name"`
+	ParamValueField string `json:"param_value_field"`
 }
 
 type SorWebhook struct {
