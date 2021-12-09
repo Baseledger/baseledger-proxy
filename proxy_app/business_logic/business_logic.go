@@ -36,7 +36,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"",
+			"0",
 			"Transaction is invalid",
 			"")
 
@@ -51,7 +51,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"",
+			"0",
 			"Offchain process msg not found",
 			"")
 		return
@@ -73,7 +73,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"",
+			"1",
 			"success",
 			"")
 
@@ -134,7 +134,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"",
+			"1",
 			"success",
 			"")
 
