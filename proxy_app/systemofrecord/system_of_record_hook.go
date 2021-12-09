@@ -142,16 +142,17 @@ func buildWebhookRequestBody(
 }
 
 func prepareWebhookRequest(requestBody string, targetUrl string, httpMethod string) *http.Request {
-	logger.Infof("Preparing request..")
+	logger.Infof("Preparing request with body.. %v", requestBody)
 
-	bodyBytes := []byte(requestBody)
-	reader := bytes.NewReader(bodyBytes)
+	var jsonStr = []byte(requestBody)
 
-	req, err := http.NewRequest(httpMethod, targetUrl, reader)
+	req, err := http.NewRequest(httpMethod, targetUrl, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		logger.Errorf("Error preparing request %v\n", err.Error())
 		return nil
 	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	return req
 }
@@ -216,6 +217,14 @@ func triggerXcsrfTokenRequest(request *http.Request) (string, []*http.Cookie) {
 func triggerWebhookRequest(request *http.Request) {
 	logger.Infof("Firing away request..")
 
+	// Save a copy of this request for debugging.
+	requestDump, err := httputil.DumpRequest(request, true)
+	if err != nil {
+		logger.Errorf("DumpRequest error %s\n", err.Error())
+	}
+
+	logger.Infof("DumpRequest before result " + string(requestDump))
+
 	resp, err := client.Do(request)
 	if err != nil {
 		logger.Errorf("Error firing away request %v\n", err.Error())
@@ -223,12 +232,12 @@ func triggerWebhookRequest(request *http.Request) {
 	}
 
 	// Save a copy of this request for debugging.
-	requestDump, err := httputil.DumpRequest(request, true)
+	requestDump, err = httputil.DumpRequest(request, true)
 	if err != nil {
 		logger.Errorf("DumpRequest error %s\n", err.Error())
 	}
 
-	logger.Infof("DumpRequest result " + string(requestDump))
+	logger.Infof("DumpRequest after result " + string(requestDump))
 
 	logger.Infof("Sor Webhook request succesfull")
 	logger.Infof("Sor Webhook request response %v\n", resp)
