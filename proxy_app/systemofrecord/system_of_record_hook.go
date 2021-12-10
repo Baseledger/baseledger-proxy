@@ -2,6 +2,7 @@ package systemofrecord
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -128,7 +129,7 @@ func buildWebhookRequestBody(
 	}
 
 	if webhookType == types.CreateObject {
-		requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", payload, 1) // TODO: Might be an issue with escaping quotes, look into concirlce_restutil line 101 for a fix
+		requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", jsonEscape(payload), 1)
 	} else {
 		requestBody = strings.Replace(requestBody, "{{approved}}", approved, 1)
 		requestBody = strings.Replace(requestBody, "{{message}}", message, 1)
@@ -242,4 +243,13 @@ func triggerWebhookRequest(request *http.Request) {
 	logger.Infof("Sor Webhook request succesfull")
 	logger.Infof("Sor Webhook request response %v\n", resp)
 	logger.Infof("Sor Webhook request response body %v\n", resp.Body)
+}
+
+func jsonEscape(i string) string {
+	b, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	// Trim the beginning and trailing " character
+	return string(b[1 : len(b)-1])
 }

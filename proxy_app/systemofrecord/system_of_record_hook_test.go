@@ -57,9 +57,9 @@ func TestGivenACreateWebhookWithSpecialParamPayloadAndOriginWhenBuildWebhookRequ
 		WebhookType: types.CreateObject,
 	}
 
-	payload := "{ 'testproperty' : 'testvalue' }"
+	payload := `{ "testproperty" : "testvalue" }`
 
-	want := "{ 'sorPayload': '{ 'testproperty' : 'testvalue' }', 'origin':'proxy' }"
+	want := "{ 'sorPayload': '{ \\\"testproperty\\\" : \\\"testvalue\\\" }', 'origin':'proxy' }"
 
 	result := buildWebhookRequestBody(
 		webhook.Body,
@@ -93,9 +93,9 @@ func TestGivenACreateWebhookWithBodyParamsWhenBuildWebhookRequestBodyCorrectRequ
 		WebhookType: types.CreateObject,
 	}
 
-	payload := "{ 'testproperty' : 'testvalue' }"
+	payload := `{ "testproperty" : "testvalue" }`
 
-	want := "{ 'sorPayload': '{ 'testproperty' : 'testvalue' }', 'workflow_id':'" + trustmeshEntry.TrustmeshId.String() + "' }"
+	want := "{ 'sorPayload': '{ \\\"testproperty\\\" : \\\"testvalue\\\" }', 'workflow_id':'" + trustmeshEntry.TrustmeshId.String() + "' }"
 
 	result := buildWebhookRequestBody(
 		webhook.Body,
