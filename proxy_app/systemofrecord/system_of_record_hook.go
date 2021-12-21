@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/oleiade/reflections"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/types"
 )
@@ -32,7 +33,7 @@ func TriggerSorWebhook(
 	webhookType types.WebhookType,
 	trustmeshEntry *types.TrustmeshEntry,
 	payload string,
-	approved string, // TODO This is 1 or 0 for feedback Approved or Rejected when origin is the counterparty, and is 1 or 0 for proxy status update Success or Failuer when origin is empty.
+	approved bool, // TODO This is true or false for feedback Approved or Rejected when origin is the counterparty, and is true or false for proxy status update Success or Failuer when origin is empty.
 	message string,
 	origin string,
 ) bool {
@@ -111,7 +112,7 @@ func buildWebhookRequestBody(
 	webhookType types.WebhookType,
 	trustmeshEntry *types.TrustmeshEntry,
 	payload string, // TODO: Move special params templating to a dedicated method
-	approved string,
+	approved bool,
 	message string,
 	origin string) string {
 	logger.Infof("Building body..")
@@ -131,11 +132,12 @@ func buildWebhookRequestBody(
 	if webhookType == types.CreateObject {
 		requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", jsonEscape(payload), 1)
 	} else {
-		requestBody = strings.Replace(requestBody, "{{approved}}", approved, 1)
+		requestBody = strings.Replace(requestBody, "{{approved}}", fmt.Sprintf("%t", approved), 1)
 		requestBody = strings.Replace(requestBody, "{{message}}", message, 1)
 	}
 
 	requestBody = strings.Replace(requestBody, "{{origin}}", origin, 1)
+	requestBody = strings.Replace(requestBody, "{{organization_id}}", viper.Get("ORGANIZATION_ID").(string), 1)
 
 	logger.Infof("Body built %v\n", requestBody)
 

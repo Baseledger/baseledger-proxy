@@ -80,7 +80,7 @@ body:
 {
      "workflow_id": "", // Mandatory if baseledger_business_object_id not provided. If baseledger_business_object_id is provided, it preceeds over this one. Maps to trustmesh_id internally.
      "baseledger_business_object_id": "", // // Mandatory. The referenced id must in be in at least one trustmesh entry and the entry has to be in the correct state to continue.
-     "approved": 1, // Mandatory. 1 - True, 0 - False
+     "approved": true, // Mandatory. true, false.
      "feedback_message": "" // Optional. Text following the feedback 
 }
 ```
@@ -162,7 +162,8 @@ Usage example:
 {{origin}} - empty string if comming from proxy, otherwise sender organization id
 {{message}} - error message from proxy or feedback message from sender organization id
 {{business_object_json_payload}} - if webhook_type = 0 (Incoming new suggestion for object creation), this holds the business object payload
-{{approved}} - if webhook_type = 1 (Incoming feebdack for an existing object), this hold the feedback status 1 - Approved or 0 - Decline
+{{approved}} - if webhook_type = 1 (Incoming feebdack for an existing object), this hold the feedback status true - Approved or false - Decline
+{{organization_id}} - id of the organization stored in the proxy instance of the webhook creator
 
 **GET /webhook**
 lists all
@@ -199,6 +200,6 @@ response(200 ok, 400 in case of processing error in the proxy):
         "workstep_type": "", // SUGGESTION, FEEDBACK, NEWVERSION, NEXT_WORKSTEP, FINAL
         "baseledger_business_object_id": "", // newly generated if SUGGESTION, NEXTWORKSTEP or FINAL suggestion. Same if NEWVERSION, FEEDBACK
         "business_object_json_payload": "", // Payload of the business object if workstep_type SUGGESTION, NEWVERSION, NEXTWORKSTEP
-        "approved": 1, // If workstep_type FEEDBACK, 1 for approved, 0 for declined
+        "approved": true, // If workstep_type FEEDBACK, true for approved, false for declined
     }]
 ```

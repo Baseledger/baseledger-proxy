@@ -36,7 +36,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"0",
+			false,
 			"Transaction is invalid",
 			"")
 
@@ -51,7 +51,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"0",
+			false,
 			"Offchain process msg not found",
 			"")
 		return
@@ -73,7 +73,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"1",
+			true,
 			"success",
 			"")
 
@@ -110,7 +110,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 				types.CreateObject,
 				&trustmeshEntry,
 				boJson,
-				"",
+				false,
 				offchainMessage.StatusTextMessage,
 				offchainMessage.SenderId.String(),
 			)
@@ -134,7 +134,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			types.UpdateObject,
 			&trustmeshEntry,
 			"",
-			"1",
+			true,
 			"success",
 			"")
 
@@ -164,9 +164,9 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			return
 		}
 		logger.Infof("Business object unmarshalled", bo)
-		status := "1"
+		status := true
 		if trustmeshEntry.BaseledgerTransactionType == common.BaseledgerTransactionTypeReject {
-			status = "0"
+			status = false
 		}
 
 		logger.Infof("Sending feedback received status update %v\n", status)
@@ -179,7 +179,7 @@ func ExecuteBusinessLogic(txResult proxytypes.Result) {
 			offchainMessage.StatusTextMessage,
 			offchainMessage.SenderId.String())
 
-		if status == "1" {
+		if status == true {
 			tryExitToEth(&trustmeshEntry)
 		}
 
