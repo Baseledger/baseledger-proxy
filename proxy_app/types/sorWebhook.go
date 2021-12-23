@@ -24,8 +24,8 @@ const (
 )
 
 type RequestParam struct {
-	ParamName       string
-	ParamValueField string
+	ParamName       string `json:"param_name"`
+	ParamValueField string `json:"param_value_field"`
 }
 
 type SorWebhook struct {
@@ -74,8 +74,8 @@ func (t *SorWebhook) Delete() bool {
 func FetchWebhookByType(webhookType WebhookType) *SorWebhook {
 	logger.Infof("Fetching SOR webhook of type %v..", webhookType)
 
-	var webhook *SorWebhook
-	dbError := dbutil.Db.GetConn().First(&webhook, "webhook_type = ?", webhookType).Error
+	var webhook = &SorWebhook{}
+	dbError := dbutil.Db.GetConn().First(webhook, "webhook_type = ?", webhookType).Error
 
 	if dbError != nil {
 		logger.Warnf("SOR webhook does not exist")

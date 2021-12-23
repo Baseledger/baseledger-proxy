@@ -7,10 +7,12 @@ import (
 	"log"
 	"net/http"
 	"net/http/cookiejar"
+	"net/http/httputil"
 	"reflect"
 	"strings"
 
 	"github.com/oleiade/reflections"
+	"github.com/spf13/viper"
 	"github.com/unibrightio/proxy-api/logger"
 	"github.com/unibrightio/proxy-api/types"
 )
@@ -31,7 +33,7 @@ func TriggerSorWebhook(
 	webhookType types.WebhookType,
 	trustmeshEntry *types.TrustmeshEntry,
 	payload string,
-	approved string,
+	approved bool, // TODO This is true or false for feedback Approved or Rejected when origin is the counterparty, and is true or false for proxy status update Success or Failuer when origin is empty.
 	message string,
 	origin string,
 ) bool {
@@ -87,7 +89,7 @@ func buildWebhookRequestUrl(targetUrl string, urlParams string, trustmeshEntry *
 
 	for _, param := range requestParams {
 		field := reflect.Indirect(reflect.ValueOf(trustmeshEntry)).FieldByName(param.ParamValueField)
-		if field.IsZero() {
+		if !field.IsValid() {
 			logger.Errorf("Error fetching request parameter field %v from trustmesh entry \n", param.ParamValueField)
 			return ""
 		}
@@ -110,7 +112,7 @@ func buildWebhookRequestBody(
 	webhookType types.WebhookType,
 	trustmeshEntry *types.TrustmeshEntry,
 	payload string, // TODO: Move special params templating to a dedicated method
-	approved string,
+	approved bool,
 	message string,
 	origin string) string {
 	logger.Infof("Building body..")
@@ -128,13 +130,14 @@ func buildWebhookRequestBody(
 	}
 
 	if webhookType == types.CreateObject {
-		requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", payload, 1) // TODO: Might be an issue with escaping quotes, look into concirlce_restutil line 101 for a fix
+		requestBody = strings.Replace(requestBody, "{{business_object_json_payload}}", jsonEscape(payload), 1)
 	} else {
-		requestBody = strings.Replace(requestBody, "{{approved}}", approved, 1)
+		requestBody = strings.Replace(requestBody, "{{approved}}", fmt.Sprintf("%t", approved), 1)
 		requestBody = strings.Replace(requestBody, "{{message}}", message, 1)
 	}
 
 	requestBody = strings.Replace(requestBody, "{{origin}}", origin, 1)
+	requestBody = strings.Replace(requestBody, "{{organization_id}}", viper.Get("ORGANIZATION_ID").(string), 1)
 
 	logger.Infof("Body built %v\n", requestBody)
 
@@ -142,16 +145,17 @@ func buildWebhookRequestBody(
 }
 
 func prepareWebhookRequest(requestBody string, targetUrl string, httpMethod string) *http.Request {
-	logger.Infof("Preparing request..")
+	logger.Infof("Preparing request with body.. %v", requestBody)
 
-	bodyBytes, _ := json.Marshal(requestBody)
-	reader := bytes.NewReader(bodyBytes)
+	var jsonStr = []byte(requestBody)
 
-	req, err := http.NewRequest(httpMethod, targetUrl, reader)
+	req, err := http.NewRequest(httpMethod, targetUrl, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		logger.Errorf("Error preparing request %v\n", err.Error())
 		return nil
 	}
+
+	req.Header.Set("Content-Type", "application/json")
 
 	return req
 }
@@ -216,13 +220,38 @@ func triggerXcsrfTokenRequest(request *http.Request) (string, []*http.Cookie) {
 func triggerWebhookRequest(request *http.Request) {
 	logger.Infof("Firing away request..")
 
+	// Save a copy of this request for debugging.
+	requestDump, err := httputil.DumpRequest(request, true)
+	if err != nil {
+		logger.Errorf("DumpRequest error %s\n", err.Error())
+	}
+
+	logger.Infof("DumpRequest before result " + string(requestDump))
+
 	resp, err := client.Do(request)
 	if err != nil {
 		logger.Errorf("Error firing away request %v\n", err.Error())
 		return
 	}
 
+	// Save a copy of this request for debugging.
+	requestDump, err = httputil.DumpRequest(request, true)
+	if err != nil {
+		logger.Errorf("DumpRequest error %s\n", err.Error())
+	}
+
+	logger.Infof("DumpRequest after result " + string(requestDump))
+
 	logger.Infof("Sor Webhook request succesfull")
 	logger.Infof("Sor Webhook request response %v\n", resp)
 	logger.Infof("Sor Webhook request response body %v\n", resp.Body)
+}
+
+func jsonEscape(i string) string {
+	b, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	// Trim the beginning and trailing " character
+	return string(b[1 : len(b)-1])
 }

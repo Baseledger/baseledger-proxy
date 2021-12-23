@@ -27,12 +27,14 @@ type createSorWebhookRequest struct {
 
 type sorWebhookDetailsDto struct {
 	Id              uuid.UUID            `json:"id"`
+	Url             string               `json:"url"`
 	UrlParams       []types.RequestParam `json:"url_params"`
 	HttpMethod      string               `json:"http_method"`
 	WebhookType     types.WebhookType    `json:"webhook_type"`
 	AuthType        types.AuthType       `json:"auth_type"`
 	AuthUsername    string               `json:"auth_username"`
 	AuthPassword    string               `json:"auth_password"`
+	XcsrfUrl        string               `json:"xcsrf_url"`
 	BodyContentType string               `json:"body_content_type"`
 	Body            string               `json:"body"`
 	BodyParams      []types.RequestParam `json:"body_params"`
@@ -59,12 +61,14 @@ func GetSorWebhooksHandler() gin.HandlerFunc {
 		for i := 0; i < len(sorWebhooks); i++ {
 			sorWebhookDto := &sorWebhookDetailsDto{}
 			sorWebhookDto.Id = sorWebhooks[i].Id
+			sorWebhookDto.Url = sorWebhooks[i].Url
 			sorWebhookDto.UrlParams = types.ParseStringIntoRequestParams(sorWebhooks[i].UrlParams)
 			sorWebhookDto.HttpMethod = sorWebhooks[i].HttpMethod
 			sorWebhookDto.WebhookType = sorWebhooks[i].WebhookType
 			sorWebhookDto.AuthType = sorWebhooks[i].AuthType
 			sorWebhookDto.AuthUsername = sorWebhooks[i].AuthUsername
 			sorWebhookDto.AuthPassword = sorWebhooks[i].AuthPassword
+			sorWebhookDto.XcsrfUrl = sorWebhooks[i].XCSRFUrl
 			sorWebhookDto.BodyContentType = sorWebhooks[i].BodyContentType
 			sorWebhookDto.Body = sorWebhooks[i].Body
 			sorWebhookDto.BodyParams = types.ParseStringIntoRequestParams(sorWebhooks[i].BodyParams)
@@ -153,6 +157,7 @@ func newSorWebhook(req createSorWebhookRequest) *types.SorWebhook {
 		AuthType:        req.AuthType,
 		AuthUsername:    req.AuthUsername,
 		AuthPassword:    req.AuthPassword,
+		XCSRFUrl:        req.XcsrfUrl,
 		BodyContentType: req.BodyContentType,
 		Body:            req.Body,
 		BodyParams:      types.ParseRequestParamsIntoString(req.BodyParams),

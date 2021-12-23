@@ -6,9 +6,9 @@ Highlevel overview of the steps needed:
 2. Get some work tokens
 3. Trigger transaction to store proof
 
-First, you need to setup a local node and join lakewood. In order to do that, you need to checkout the repo <repo_link> and have Docker installed. 
+First, you need to setup a local node and join lakewood. In order to do that, you need to checkout the repo https://github.com/Baseledger/baseledger-lakewood and have Docker installed. 
 
-Once ready, navigate to the repo root and run:
+Once ready, navigate to the <repo root>/docs/dropping_proofs_via_local_node and run:
 
     docker run -d -p 1317:1317 -p 26655:26656 --name baseledger_lakewood_node baseledger/blockchain_app
 
@@ -34,7 +34,7 @@ Your node is now configured to join lakewood and you just need to start it. Exec
 
 You should see the log output of the node, showing progress as it starts to sync with the network. This process can take some time. You can close the window and the node will continue to run in the background.
 
-While waiting for the sync, take the address your previously stored and jump to <faucet_link> in order to get some work tokens for it.
+While waiting for the sync, take the address your previously stored and send it in an email to worktokens@baseledger.net in order to get some work tokens in it. A testnet faucet is under development.
 
 Once the node has synced and you've got your work tokens, you can trigger a transaction against your node by triggering the following endpoint:
 
@@ -54,6 +54,8 @@ in CURL:
 which will return 200 with a transaction hash.
 
 That is it! You can verify your proof is stored by visiting https://lakewood.baseledger.net/transactions/<transaction_hash>
+
+In case you try to drop proof without having acquired tokens beforehand, you will get an error stating that the account cannot be found.
 
 
 To stop the node and cleanup, just use these two commands to stop and remove the container:

@@ -118,8 +118,7 @@ func CreateTransactionHandler() gin.HandlerFunc {
 			return
 		}
 
-		// TODO: set proper size
-		maximumPayloadSize := 30
+		maximumPayloadSize := 128
 		if len(req.Payload) > maximumPayloadSize {
 			restutil.RenderError("payload maximum size exceeded", 400, c)
 			return
