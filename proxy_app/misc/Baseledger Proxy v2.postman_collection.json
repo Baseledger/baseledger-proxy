@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "936e752a-a213-4d01-bf0b-cf0b1794c99a",
+		"_postman_id": "991fe15a-de08-437d-b6a2-cd87a2bb2452",
 		"name": "Baseledger Proxy v2",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -139,7 +139,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"workgroup_id\": \"\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6as\",\r\n    \"workstep_type\": \"\",\r\n    \"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue\\\"}\"\r\n}",
+							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6as\",\r\n    \"workstep_type\": \"\",\r\n    \"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue\\\"}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -171,7 +171,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"workgroup_id\": \"\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"NEWVERSION\",\r\n    \"workflow_id\": \"58b28735-53ca-40bc-9dd1-944290946f98\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue2\\\"\"\r\n}",
+							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"NEWVERSION\",\r\n    \"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue2\\\"\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -203,7 +203,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"workflow_id\": \"81470c1c-6ff3-4890-818f-02b2f44b1be7\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"approved\": true,\r\n    \"feedback_message\": \"\"\r\n}",
+							"raw": "{\r\n\t\"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"approved\": true,\r\n    \"feedback_message\": \"\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
