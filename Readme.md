@@ -23,5 +23,5 @@ To trigger a request synchronization request:
    - downgrade docker-compose from v2 to v1
    - When using the Docker Desktop application it is possible to simply uncheck the "Use Docker Compose V2" in the preferences under general.
 3. .baseledger/config/config.toml no such file or directory
-  - when getting the  <span style="color:red">*.baseledger/config/config.toml no such file or directory*</span> error
-  - replace "~" with "/root" in the  ops/local/run-blockchain.sh script
+    - when getting the  <span style="color:red">*.baseledger/config/config.toml no such file or directory*</span> error
+    - replace "~" with "/root" in the  ops/local/run-blockchain.sh script
