@@ -118,14 +118,16 @@ docker exec second_node_blockchain_app_1 sed -i 's/allow_duplicate_ip = false/al
 # docker exec first_node_blockchain_app_1 sed -i 's/timeout_commit = "5s"/timeout_commit = "30s"/' ~/.baseledger/config/config.toml
 # docker exec second_node_blockchain_app_1 sed -i 's/timeout_commit = "5s"/timeout_commit = "30s"/' ~/.baseledger/config/config.toml
 
-
 # start first node - TODO: Has to  be executed in a separate window after running this script in order to have logs
 # docker exec first_node_blockchain_app_1 baseledgerd start
-# node2_adress = docker exec second_node_blockchain_app_1 baseledgerd keys show node2_validator -a
-# docker exec first_node_blockchain_app_1 baseledgerd tx bank send node1_validator node2_adress 1000token --yes
 
 # start second node - TODO: Has to  be executed in a separate window after running this script in order to have logs
 # docker exec second_node_blockchain_app_1 baseledgerd start
+
+# send tokens to second node address
+# node2_adress = docker exec second_node_blockchain_app_1 baseledgerd keys show node2_validator -a
+# docker exec first_node_blockchain_app_1 baseledgerd tx bank send node1_validator node2_adress 1000token --yes
+
 
 # cleanup
 
