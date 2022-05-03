@@ -5,9 +5,10 @@ To trigger a request synchronization request:
 3. Copy the blockchain_app folder from lakewood repo to root of this repo
 4. Navigate to repo root/ops/local folder
 5. Run ./run_blockchain.sh (WSL) or sudo sh run_blockchain.sh (Non root user on Linux)
-6. Import 'proxy_app/misc/Baseledger Proxy v2.postman_collection.json' to postman
-7. Open 'create initial suggestion' request
-8. Fire away
+6. Make sure to follow manual steps in run-blockchain script to start 2 nodes and to fund second node account (check line with comment `start first node`, `start second node` and `send tokens to second node address`) 
+7. Import 'proxy_app/misc/Baseledger Proxy v2.postman_collection.json' to postman
+8. Open 'create initial suggestion' request
+9. Fire away
 
 
 ---
