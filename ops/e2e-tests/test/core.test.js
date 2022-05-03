@@ -3,11 +3,11 @@ const chai = require("chai");
 const expect = chai.expect;
 chai.use(require('chai-uuid'));
 
-var alice_proxy_app_url = 'http://unibright:ub123@localhost:8081';
-var alice_blockchain_app_url = 'http://unibright:ub123@localhost:1317';
+var alice_proxy_app_url = 'http://ub:ub321@localhost:8081';
+var alice_blockchain_app_url = 'http://ub:ub321@localhost:1317';
 
-var bob_proxy_app_url = 'http://unibright:ub123@localhost:8082';
-var bob_blockchain_app_url = 'http://unibright:ub123@localhost:1318';
+var bob_proxy_app_url = 'http://ub:ub321@localhost:8082';
+var bob_blockchain_app_url = 'http://ub:ub321@localhost:1318';
 
 var test_workgroup_id = "734276bc-4adc-4621-acf8-ac66dc91cb27";
 var alice_organization_id = "d45c9b93-3eef-4993-add6-aa1c84d17eea";
