@@ -262,7 +262,7 @@ func createNextWorkstepOrFinalSuggestionRequestFromLatestTrustmeshEntry(
 	workstepType string) *types.NewSuggestionRequest {
 	return &types.NewSuggestionRequest{
 		WorkgroupId:                          uuid.FromStringOrNil(req.WorkgroupId),
-		Recipient:                            latestFeedbackTrustmeshEntry.SenderOrgId.String(),
+		Recipient:                            req.Recipient,
 		WorkstepType:                         workstepType,
 		BusinessObjectType:                   req.BusinessObjectType,
 		BusinessObjectId:                     req.BusinessObjectId,
