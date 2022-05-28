@@ -139,7 +139,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6as\",\r\n    \"workstep_type\": \"\",\r\n    \"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue\\\"}\"\r\n}",
+							"raw": "{\r\n    \"workgroup_id\": \"734276bc-4adc-4621-acf8-ac66dc91cb27\",\r\n    \"recipient\": \"969e989c-bb61-4180-928c-0d48afd8c6a3\",\r\n    \"workstep_type\": \"\",\r\n    \"workflow_id\": \"\",\r\n    \"baseledger_business_object_id\": \"\",\r\n    \"business_object_type\": \"some_sor_type\",\r\n    \"business_object_id\": \"some_sor_id\",\r\n    \"business_object_json\": \"{\\\"testProperty\\\":\\\"testValue\\\"}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
