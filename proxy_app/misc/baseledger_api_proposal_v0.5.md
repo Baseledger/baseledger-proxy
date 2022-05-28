@@ -13,9 +13,9 @@ body:
 
     "recipient": "", // Mandatory. GUID, represents the recipient. We curently support only one recipient. 
     
-    "workstep_type": "", // Optional. INITIAL, NEWVERSION, NEXTWORKSTEP, FINAL. Look bellow for rules related to this field and relation with baseledger_business_object_id.
+    "workstep_type": "", // Optional. INITIAL, NEWVERSION, NEXTWORKSTEP, FINALWORKSTEP. Look bellow for rules related to this field and relation with baseledger_business_object_id.
 
-    "workflow_id": "", // Mandatory if baseledger_business_object_id not provided and workstep NEWVERSION, NEXTWORKSTEP or FINAL. If baseledger_business_object_id is provided, it preceeds over this one. Maps to trustmesh_id internally.
+    "workflow_id": "", // Mandatory if baseledger_business_object_id not provided and workstep NEWVERSION, NEXTWORKSTEP or FINALWORKSTEP. If baseledger_business_object_id is provided, it preceeds over this one. Maps to trustmesh_id internally.
     
     "baseledger_business_object_id": "", // Optional. Look bellow for rules related to this field and relation with workstep_type.
 
@@ -34,7 +34,7 @@ response(200 ok, 400 in case of processing error in the proxy):
     {
         "workflow_id": "", // ID of the trustmesh where the bboid belongs
         "workstep_id": "", // Latest entry of the bboid in the trustmesh (i.e. suggestion for new version sent, waiting feedback)
-        "baseledger_business_object_id": "", // newly generated in case INITIAL, NEXTWORKSTEP or FINAL suggestion. Same if NEWVERSION
+        "baseledger_business_object_id": "", // newly generated in case INITIAL, NEXTWORKSTEP or FINALWORKSTEP suggestion. Same if NEWVERSION
         "transaction_hash": "", // Latest transaction hash of the relevant trustmesh entry
         "error": "" // string message in case of failure
     }
@@ -54,12 +54,12 @@ response(200 ok, 400 in case of processing error in the proxy):
     find the latest trustmesh entry based on the bboid, verify correct state (i.e. not finalized, not waiting for feedback etc.),
     create a new suggestion with a newly generated bboid as the bboid and the SOR provided as the referencedbboid and return to SOR
 
-* if bboid is provided and FINAL workstep_type,
+* if bboid is provided and FINALWORKSTEP workstep_type,
     this bboid references the previous workstep bussiness object.
     find the latest trustmesh entry based on the bboid, verify correct state (i.e. not finalized, not waiting for feedback etc.),
     create a new suggestion with a newly generated bboid as the bboid and the SOR provided as the referencedbboid and return to SOR
 
-* If bboid not provided, workflow_id provided and workstep_type NEWVERSION, NEXTWORKSTEP, FINAL
+* If bboid not provided, workflow_id provided and workstep_type NEWVERSION, NEXTWORKSTEP, FINALWORKSTEP
     Find the latest trustmesh entry based on the workflow_id. If status ok, create a new suggestion 
     and return the bboid.
 
@@ -197,8 +197,8 @@ response(200 ok, 400 in case of processing error in the proxy):
     [{
         "workflow_id": "", // ID of the trustmesh
         "workstep_id": "", // Latest trustmesh entry id (i.e. suggestion sent, feedbackreceived)
-        "workstep_type": "", // SUGGESTION, FEEDBACK, NEWVERSION, NEXT_WORKSTEP, FINAL
-        "baseledger_business_object_id": "", // newly generated if SUGGESTION, NEXTWORKSTEP or FINAL suggestion. Same if NEWVERSION, FEEDBACK
+        "workstep_type": "", // SUGGESTION, FEEDBACK, NEWVERSION, NEXT_WORKSTEP, FINALWORKSTEP
+        "baseledger_business_object_id": "", // newly generated if SUGGESTION, NEXTWORKSTEP or FINALWORKSTEP suggestion. Same if NEWVERSION, FEEDBACK
         "business_object_json_payload": "", // Payload of the business object if workstep_type SUGGESTION, NEWVERSION, NEXTWORKSTEP
         "approved": true, // If workstep_type FEEDBACK, true for approved, false for declined
     }]
