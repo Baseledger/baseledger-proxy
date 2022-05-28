@@ -155,7 +155,7 @@ SorBusinessObjectId
 
 Usage example: 
 
-    "url_params": [{"ParamName":"my_custom_param_name", "ParamValueField": "BaseledgerBusinessObjectId"}]
+    "url_params": [{"param_name":"my_custom_param_name", "param_value_field": "BaseledgerBusinessObjectId"}]
 
 **Note on special params**
 
